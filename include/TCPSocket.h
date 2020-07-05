@@ -1,32 +1,18 @@
 #ifndef TCPSOCKET_H_
 #define TCPSOCKET_H_
 
-
-#include <netdb.h>
-#include <unistd.h>
+#include "Platform.h"
 #include "EndPoint.h"
-
 
 namespace CSE384
 {
-  #if !defined(WIN32) && !defined(_WIN32) && !defined(__WIN32__) && !defined(__NT__) && !defined(_WIN64)
-     using SOCKET = int;
-     const int SD_SEND = SHUT_WR;
-     const int SD_RECEIVE = ::SHUT_RD;
-     const int SD_BOTH = ::SHUT_RDWR;
-     const int INVALID_SOCKET = -1;
-
-     inline int closesocket(SOCKET s)
-     {
-	   return close(s);
-     }
-  #endif
-
+  
+	
   class TCPSocketOptions;
   class TCPSocket
   {
      public:
-	    TCPSocket();
+		TCPSocket();  
 	    TCPSocket(SOCKET fd);
 	    void Connect(const EndPoint& ep, TCPSocketOptions* sc=nullptr);
 	    bool IsConnected() const;
@@ -51,6 +37,9 @@ namespace CSE384
 	    TCPSocket& operator=(const TCPSocket& s) = delete;
      private:
 	   SOCKET sock_fd;
+      //#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__) || defined(_WIN64)
+	     
+      // #endif 
 	   //char remote_addr[INET6_ADDRSTRLEN];
   };
 

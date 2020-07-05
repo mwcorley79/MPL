@@ -5,6 +5,7 @@
 
 #include <string>
 #include <sstream>
+#include <thread>
 
 namespace CSE384
 {
@@ -37,20 +38,12 @@ namespace CSE384
       return getaddrinfo(node_name, serv_name, &hints, servinfo);
   }
 
-  TCPSocket::TCPSocket(SOCKET socket):  sock_fd(socket)
-		                               // sc_(nullptr),
-								       // servinfo(nullptr)
+  TCPSocket::TCPSocket() : sock_fd(INVALID_SOCKET)
   {}
 
 
-  //TCPSocket::TCPSocket(const EndPoint& ep, TCPSocketOptions* sc): sock_fd(INVALID_SOCKET),
-  //		                                                          sc_(sc)
-  TCPSocket::TCPSocket() : sock_fd(INVALID_SOCKET)
-  {
-	 //int addr_info_result;
-	 //if((addr_info_result = GetAddressInfo(ep.IP_STR(), ToString(ep.Port()).c_str(), AF_UNSPEC, &servinfo)) != 0)
-	   // throw GetAddrInfoException(addr_info_result);
-  }
+  TCPSocket::TCPSocket(SOCKET socket): sock_fd(socket)
+  {}
 
   TCPSocket::TCPSocket(TCPSocket&& s)
   {
@@ -178,7 +171,8 @@ namespace CSE384
          ++count;
          if(count > sendRetries)
             return -1;
-         usleep(wait_time);
+         std::this_thread::sleep_for(std::chrono::microseconds(wait_time));
+         //usleep(wait_time);
        }
       }
       return blockLen;
@@ -193,7 +187,7 @@ namespace CSE384
 
      while(bytesLeft > 0)
      {
-       bytesRecvd = recv(sock_fd,(void*) &block[blockIndx],bytesLeft,0);
+       bytesRecvd = recv(sock_fd, (char*) &block[blockIndx],bytesLeft,0);
 
        if(bytesRecvd > 0)
        {
@@ -207,7 +201,8 @@ namespace CSE384
          ++count;
          if(count > recvRetries)
            return -1;
-         usleep(wait_time);
+         std::this_thread::sleep_for(std::chrono::microseconds(wait_time));
+         //usleep(wait_time);
        }
      }
      return blockLen;

@@ -89,7 +89,7 @@ namespace CSE384
        // void StopReceiving();
         void IsReceiving(bool receiving);  
 
-          bool Start();
+        bool Start();
 
         // can redefine socket level processing (if you wish)
         virtual void SendSocketMessage(const Message& msg);
@@ -100,7 +100,7 @@ namespace CSE384
         void IsSending(bool issending);   
         void StartSending();
         void StopSending();
-       
+
   };
 
   inline void Sender::IsSending(bool issending)

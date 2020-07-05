@@ -13,7 +13,8 @@
 #include <cstring>
 #include <exception>
 #include <errno.h>
-#include <netdb.h>
+
+#include "Platform.h"
 
 
 namespace CSE384 {

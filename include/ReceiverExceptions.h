@@ -11,16 +11,15 @@
 #ifndef RECEIVEREXCEPTIONS_H_
 #define RECEIVEREXCEPTIONS_H_
 
-#include<exception>
+#include <exception>
 #include <string>
 #include <cstring>
+#include <locale.h>
+
 
 #include <errno.h>
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
-
+#include "Platform.h"
 
 namespace CSE384 
 {
@@ -35,7 +34,7 @@ namespace CSE384
 
        virtual const char* what() const throw()
        {
-         return strerror(errnum_);
+           return strerror(errnum_);
        }
 
       virtual ~ReceiverException() throw() {}

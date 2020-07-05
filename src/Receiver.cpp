@@ -66,7 +66,7 @@ namespace CSE384
             	}
             }
         }
-        catch (const std::exception &e)
+        catch (const std::exception)
         {
            IsListening(false);
         }
@@ -184,6 +184,7 @@ namespace CSE384
 
    int main(int argc, char* argv[])
    {   
+      // SocketSystem ss;
       // define server endpoint ip address and port for listening
       // EndPoint serverEP("127.0.0.1", 6060);
       EndPoint serverEP("::1", 6060);
@@ -192,7 +193,8 @@ namespace CSE384
       TestClientHandler th;
 
       // set TCP socket options
-      TCPSocketOptions sock_opts(SOL_SOCKET,(SO_REUSEPORT | SO_REUSEADDR));
+      //TCPSocketOptions sock_opts(SOL_SOCKET,(SO_REUSEPORT | SO_REUSEADDR));
+      TCPSocketOptions sock_opts(SOL_SOCKET, (SO_REUSEADDR));
 
       // define instance of the receiver (server host)
       Receiver receiver(serverEP, &sock_opts);

@@ -2,7 +2,6 @@
 #include "SenderExceptions.h"
 #include "ReceiverExceptions.h"
 
-
 namespace CSE384 
 {
    Sender::Sender(TCPSocketOptions* sc):    sc_(sc),
@@ -243,7 +242,7 @@ namespace CSE384
            Connect(ep);
            break;
     	 }
-    	 catch(SenderException& ex)
+    	 catch(SenderException)
     	 {
            if(vlevel)
            {
@@ -320,8 +319,9 @@ void TestSenderAsync(const std::string& name)
 
 int main()
 {
+    //SocketSystem ss;
 	TestSenderAsync("test 1");
-
+   
     //int senderCount = 1;
     //std::vector<std::thread> thread_vec;  // store thread is in vector
     // start senderCount (5) concurrent sender threads to test
