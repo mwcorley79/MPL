@@ -30,12 +30,11 @@ Build MPL.so (shared object library installed in ./MPL/install/lib)
   <li> cd build </li>
   <li> cmake .. </li>
   <li> make all </li>
-  The previous step should have produced two executable files: SenderTest and ReceiberTest. </br></br>
+  The previous step should have produced two executable files: SenderTest and ReceiverTest. </br></br>
   <li> Open two (separate terminal windows and type ./ReceiverTest in one terminal, and ./SenderTest in the other trerminal
-       This should produce input such as the following </i>
+       This should produce output such as the following </i>
   
-
-Prerequisites for Linux(Windows)
+Prerequisites for Windows
   <ol>
     <li> Install CMake for Windows: https://cmake.org/download/ </li>
     <li> Visual Studio 2019 (installed, using as default generator)</li>
