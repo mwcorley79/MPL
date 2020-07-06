@@ -12,7 +12,7 @@ Prerequisites for Linux
   <li> install cmake 3.10 or greater (debian based:  sudo apt-get install cmake) </li>
   <li> toolchain: e.g. gcc/g++ etc. </li>
 </ol>
-Steps for testing on Linux: build the MPL.so (shared object library installed in ./MPL/install/lib)
+Build MPL.so (shared object library installed in ./MPL/install/lib)
 <ol> 
   <li> open a terminal console windows and type the following commands in the shell ... 
   <li> git clone https://github.com/mwcorley79/MPL.git </li>
@@ -22,7 +22,7 @@ Steps for testing on Linux: build the MPL.so (shared object library installed in
   <li> cmake .. -DCMAKE_INSTALL_PREFIX=../install </li>
   <li> make install </li>
  </ol>
- Steps for testing the MPL library on Linux
+ Testing the MPL library on Linux
  <ol>
   <li>  ... in the same terminal from the previous step, type the following commands </li>
   <li> cd ../MPLtest </li>
