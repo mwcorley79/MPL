@@ -25,7 +25,7 @@ Build MPL.so (shared object library installed in ./MPL/install/lib)
  Testing the MPL library on Linux
  <ol>
   <li>  ... in the same terminal from the previous step, type the following commands </li>
-  <li> cd ../MPLtest </li>
+  <li> cd ../MPLtests </li>
   <li> mkdir build </li>
   <li> cd build </li>
   <li> cmake .. </li>
