@@ -1,18 +1,18 @@
 # Message Passing Library (MPL) 
-Reusable message passing framework (repo) for developing network (client/server) applications by wrapping full duplex TCP sockets.  <br> <br>
- One goal is to enable cross-platform portability (TCP socket level compatibility between Linux and Windows) by providing a TCPSocket class that wraps the (basic) differences between low-level (C-based) Window and Linux socket APIs  -- note: this not a complete, but minimal port to support the TCP communication required to enable message passing). <br> <br>
-<b> The Windows port is not yet functional (as of 07/05/2020). See TCPSocket.h/.cpp for details on socket wrapping </b> <br><br>
+Reusable message passing library (MPL) framework for developing network (client/server) applications by wrapping full duplex TCP sockets.  <br> <br>
+One goal is to enable cross-platform portability (TCP socket level compatibility between Linux and Windows) by providing a TCPSocket class that wraps the (basic) differences between the low-level (C-based) Windows and Linux socket APIs.  (note: this not a complete, but minimal port to support the TCP communication required to enable message passing.) <br> <br>
+<b> The Windows port is not yet functional (as of 07/05/2020). See TCPSocket.h/.cpp for details on the TCP socket wrapper code </b> <br><br>
 This project uses CMake to manage the build process for Linux and Windows.  <br> <br>
 The current objective (purpose) for this repo is to participate in a joint effort with Dr. James Fawcett to compare various (primarily performance related) aspects of the C++ and the (newer) Rust programming language. <br><br>
 
-Steps to Build MPL (shared library: MPL.so -- Linux and MPL.dll -- on Windows) <br> <br>
+<b> Steps to Build MPL (shared library: MPL.so -- Linux and MPL.dll -- on Windows) </b> <br> 
 (Note: only Linux vesrion is functional as of 7/6/20)
 Prerequisites for Linux
 <ol>
   <li> install cmake 3.10 or greater (debian based:  sudo apt-get install cmake) </li>
   <li> toolchain: e.g. gcc/g++ etc. </li>
 </ol>
-Steps for testing on Linux: build the MPL.so (shared object library installed ./MPL/install/lib)
+Steps for testing on Linux: build the MPL.so (shared object library installed in ./MPL/install/lib)
 <ol> 
   <li> open a terminal console windows and type the following commands in the shell ... 
   <li> git clone https://github.com/mwcorley79/MPL.git </li>
@@ -22,7 +22,7 @@ Steps for testing on Linux: build the MPL.so (shared object library installed ./
   <li> cmake .. -DCMAKE_INSTALL_PREFIX=../install </li>
   <li> make install </li>
  </ol>
- Steps for testing the MPL
+ Steps for testing the MPL library on Linux
  <ol>
   <li>  ... in the same terminal from the previous step, type the following commands </li>
   <li> cd ../MPLtest </li>
@@ -41,5 +41,5 @@ Prerequisites for Linux(Windows)
     <li> Visual Studio 2019 (installed, using as default generator)</li>
   </ol>
   Steps for testing on Windows <br><br>
-  Will update when the Windows version is complete
+  *** Will update when the Windows version is complete
 
