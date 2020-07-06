@@ -32,7 +32,7 @@ Build MPL.so (shared object library installed in ./MPL/install/lib)
   <li> make all </li>
   The previous step should have produced two executable files: SenderTest and ReceiverTest. </br></br>
   <li> Open two (separate terminal windows and type ./ReceiverTest in one terminal, and ./SenderTest in the other trerminal
-       This should produce output such as the following </i>
+       This should produce output such as the following: </i>
   <img src="./output.PNG"/>  
   
 Prerequisites for Windows
@@ -41,5 +41,9 @@ Prerequisites for Windows
     <li> Visual Studio 2019 (installed, using as default generator)</li>
   </ol>
   Steps for testing on Windows <br><br>
-  *** Will update when the Windows version is complete
+  *** Will update when the Windows version is complete *** <br><br>
+  
+  <H2>Description:</H2>
+  <b> Sender </b> encapsulates client-side message passing. <b> Receiver </b> and <b> ClientHandler </b> encapsulate server-side message passing. Full-duplex infers a       bidirectional communication in which both the Sender and (derived) ClientHandler instances support GetMessage() and PostMessage() operations. 
+  <img src="./concept.PNG"/>  
 
