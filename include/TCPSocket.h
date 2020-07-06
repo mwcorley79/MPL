@@ -6,8 +6,6 @@
 
 namespace CSE384
 {
-  
-	
   class TCPSocketOptions;
   class TCPSocket
   {
