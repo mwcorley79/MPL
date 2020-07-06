@@ -142,6 +142,8 @@ namespace CSE384
 
 // ***  RECEIVER TEST STUB ***
  #ifdef TEST_RECEIVER
+   #include <iostream>
+   #include <mpl.h>
   /*  Note: use either "SenderTest" for test */
    using namespace CSE384;
   

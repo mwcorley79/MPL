@@ -12,7 +12,7 @@ namespace CSE384
 
     // binary message structure: (wire protocol as used by messaging interface)
     
-    #pragma pack(2) // https://docs.microsoft.com/en-us/cpp/preprocessor/pack?view=vs-2019
+    //#pragma pack(2) // https://docs.microsoft.com/en-us/cpp/preprocessor/pack?view=vs-2019
     struct MSGHEADER
     {
         unsigned int len_ : 32;  // bit field:  force (4-byte) word alignment
@@ -29,7 +29,7 @@ namespace CSE384
             len_ = htonl(len_);
             type_ = htons(type_);
         }
-    };   //__attribute__((__packed__)); // <--need to override compiler memory boundary alignment
+    } __attribute__((__packed__)); // <--need to override compiler memory boundary alignment
 
     class Message
     {

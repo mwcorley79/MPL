@@ -10,7 +10,7 @@ namespace CSE384
   class TCPSocket
   {
      public:
-		TCPSocket();  
+		  TCPSocket();  
 	    TCPSocket(SOCKET fd);
 	    void Connect(const EndPoint& ep, TCPSocketOptions* sc=nullptr);
 	    bool IsConnected() const;
@@ -35,24 +35,23 @@ namespace CSE384
 	    TCPSocket& operator=(const TCPSocket& s) = delete;
      private:
 	   SOCKET sock_fd;
-      //#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__) || defined(_WIN64)
-	     
+      //#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__) || defined(_WIN64)  
       // #endif 
 	   //char remote_addr[INET6_ADDRSTRLEN];
   };
 
   // class for deferring socket options to the application
   // (for client and server side)
-
+  
   class TCPSocketOptions
   {
       public:
-	     friend TCPSocket;
-	     TCPSocketOptions(int level, int option_names);
+	      friend TCPSocket;
+	      TCPSocketOptions(int level, int option_names);
       private:
-	     int SetSocketOptions(TCPSocket* soc);
-	     int level_;
-         int option_names_;
+	      int SetSocketOptions(TCPSocket* soc);
+	      int level_;
+        int option_names_;
   };
 
   inline TCPSocketOptions::TCPSocketOptions(int level, int option_names): level_(level),
@@ -107,7 +106,6 @@ namespace CSE384
 		 sock_fd = -1;
 	 return ret;
   }
-
 };
 
 #endif /* TCPSOCKET_H_ */

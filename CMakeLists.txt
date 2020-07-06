@@ -22,11 +22,30 @@ set (SOURCES src/Cpp11-BlockingQueue.cpp
              src/Receiver.cpp
              src/TCPSocket.cpp)
 
+set (INCLUDES include/ClientHandler.h
+              include/Cpp11-BlockingQueue.h
+              include/EndPoint.h
+              include/Logger.h
+              include/Message.h
+              include/mpl.h
+              include/Platform.h
+              include/ReceiverExceptions.h
+              include/Receiver.h
+              include/SenderExceptions.h
+              include/Sender.h
+              include/Task.h
+              include/TCPSocketExceptions.h
+              include/TCPSocket.h
+              include/ThreadPool.h
+              include/Utilities.h)                 
+
 # generate the MPL (shared) library target (.so / .dll) from the SOURCES
 add_library(MPL SHARED ${SOURCES} )
 
 # generate the MPL (static) library target (.a / .lib) from the SOURCES
-add_library(MPLstatic STATIC ${SOURCES} )
+#add_library(MPLstatic STATIC ${SOURCES} )
 
-# install the statis and shared libs into the bin directory of the install directory
-# install(TARGETS MPL MPLstatic  DESTINATION lib)
+# install the and shared libs and includes into the respeective the install directories
+install(TARGETS MPL DESTINATION lib)
+install(FILES ${INCLUDES} DESTINATION include)
+

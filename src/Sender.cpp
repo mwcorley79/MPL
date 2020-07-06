@@ -261,6 +261,9 @@ namespace CSE384
 #ifdef TEST_SENDER
 #include <string>
 #include <vector>
+#include<iostream>
+#include <mpl.h>
+
 using namespace CSE384;
 
 void SenderProc(Sender* sender)
