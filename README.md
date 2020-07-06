@@ -33,6 +33,7 @@ Build MPL.so (shared object library installed in ./MPL/install/lib)
   The previous step should have produced two executable files: SenderTest and ReceiverTest. </br></br>
   <li> Open two (separate terminal windows and type ./ReceiverTest in one terminal, and ./SenderTest in the other trerminal
        This should produce output such as the following </i>
+  <img src="./output.PNG"/>  
   
 Prerequisites for Windows
   <ol>
