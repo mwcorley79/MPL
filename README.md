@@ -33,7 +33,7 @@ Build MPL.so (shared object library installed in ./MPL/install/lib)
   The previous step should have produced two executable files: SenderTest and ReceiverTest. </br></br>
   <li> Open two (separate terminal windows and type ./ReceiverTest in one terminal, and ./SenderTest in the other trerminal
        This should produce output such as the following: </i>
-  <img src="./output.PNG"/>  
+  <img src="./png/output.PNG"/>  
   
 Prerequisites for Windows
   <ol>
@@ -45,5 +45,5 @@ Prerequisites for Windows
   
   <H2>Description:</H2>
   Three (3) primary classes comprise the framework: <b> Sender - </b> encapsulates client-side message passing. <b> Receiver </b> and <b> ClientHandler - </b>         encapsulate server-side message passing. Full-duplex infers bidirectional communication in which both the Sender and (derived) ClientHandler instances support GetMessage() and PostMessage() operations simultaneously.  The following picture illustrates the high-level concept: 
-  <img src="./concept.PNG"/>  
+  <img src="./png/concept.PNG"/>  
 
