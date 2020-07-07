@@ -11,8 +11,9 @@ namespace CSE384
     using MessageType = enum {DISCONNECT=-1, STOP_SENDING=-2, STRING=-3};
 
     // binary message structure: (wire protocol as used by messaging interface)
-    
-    //#pragma pack(2) // https://docs.microsoft.com/en-us/cpp/preprocessor/pack?view=vs-2019
+     #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__) || defined(_WIN64)
+       #pragma pack(1) // https://docs.microsoft.com/en-us/cpp/preprocessor/pack?view=vs-2019
+     #endif 
     struct MSGHEADER
     {
         unsigned int len_ : 32;  // bit field:  force (4-byte) word alignment
@@ -29,7 +30,11 @@ namespace CSE384
             len_ = htonl(len_);
             type_ = htons(type_);
         }
+  #if !defined(WIN32) && !defined(_WIN32) && !defined(__WIN32__) && !defined(__NT__) && !defined(_WIN64)
     } __attribute__((__packed__)); // <--need to override compiler memory boundary alignment
+  #else
+    };
+  #endif 
 
     class Message
     {
