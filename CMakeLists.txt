@@ -40,12 +40,12 @@ set (INCLUDES include/ClientHandler.h
               include/Utilities.h)                 
 
 # generate the MPL (shared) library target (.so / .dll) from the SOURCES
-add_library(MPL SHARED ${SOURCES} )
+# add_library(MPLshared SHARED ${SOURCES} )
 
 # generate the MPL (static) library target (.a / .lib) from the SOURCES
-#add_library(MPLstatic STATIC ${SOURCES} )
+add_library(MPL STATIC ${SOURCES} )
 
-# install the and shared libs and includes into the respeective the install directories
+# install the lib(s) and includes into the respeective the install directories
 install(TARGETS MPL DESTINATION lib)
 install(FILES ${INCLUDES} DESTINATION include)
 

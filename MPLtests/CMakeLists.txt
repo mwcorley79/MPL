@@ -32,12 +32,12 @@ target_compile_definitions(SenderTest PUBLIC TEST_SENDER)
 
 if (UNIX)
     # link MPL.so and pthread to the ReceiverTest and SenderTest targets for LINUX
-    target_link_libraries (ReceiverTest MPL.so pthread)
-    target_link_libraries (SenderTest MPL.so pthread)
+    target_link_libraries (ReceiverTest MPL.a pthread)
+    target_link_libraries (SenderTest MPL.a pthread)
 else (NOT UNIX) 
     # link MPL.dll to ReceiverTest and SenderTest targets for WINDOWS
-    target_link_libraries (ReceiverTest MPL.dll)
-    target_link_libraries (SenderTest MPL.dll)
+    target_link_libraries (ReceiverTest MPL.lib)
+    target_link_libraries (SenderTest MPL.lib)
 endif (UNIX)
 
 
