@@ -46,4 +46,6 @@ Prerequisites for Windows
   <H2>Description:</H2>
   Three (3) primary classes comprise the framework: <b> Sender - </b> encapsulates client-side message passing. <b> Receiver </b> and <b> ClientHandler - </b>         encapsulate server-side message passing. Full-duplex infers bidirectional communication in which both the Sender and (derived) ClientHandler instances support GetMessage() and PostMessage() operations simultaneously.  The following picture illustrates the high-level concept: 
   <img src="./png/concept.PNG"/>  
-
+  
+  
+ <iframe src="https://mwcorley79.github.io/MikeCorley" height="200" width="300" title="Iframe Example"></iframe> 
