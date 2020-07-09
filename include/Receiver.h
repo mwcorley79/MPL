@@ -77,6 +77,10 @@ namespace CSE384
 
         ThreadPool<8> threadPool_;
 
+        #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__) || defined(_WIN64)
+        SocketSystem s;
+        #endif
+
         //struct sockaddr_in self;
    };
 

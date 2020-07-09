@@ -10,6 +10,10 @@
 
 #include <cstring>
 #include <exception>
+#include<string>
+#include <cstdio>
+#include <errno.h>
+#include <locale.h>
 
   class SocketException : public std::exception
   {
@@ -19,13 +23,14 @@
 
        virtual const char* what() const throw()
        {
-         return (const char*) strerror(errnum_);
+         return (const char*) strerror(errnum_);   
        }
 
        virtual ~SocketException() throw()
        {}
     protected:
        int errnum_;
+       std::string error_str;
   };
 
   class SocketCreateException : SocketException

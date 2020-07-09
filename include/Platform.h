@@ -1,3 +1,6 @@
+// Note: the purpose of the this is really just for managing the platform differences 
+// between Windows and Linux coket libraries
+
 #ifndef _MPL_PLATFORM_H
 #define _MPL_PLATFORM_H
 
@@ -28,27 +31,45 @@
   #include <WS2tcpip.h>     // support for IPv6 and other things
   #include <IPHlpApi.h>     // ip helpers
 
+  #include<atomic>
+
   #pragma warning(disable:4522)
   #pragma comment(lib, "Ws2_32.lib")
 
   /////////////////////////////////////////////////////////////////////////////
   // SocketSystem class - manages loading and unloading Winsock library
-
+  // Sender and Receiver define an instance of SocketSystem as private member
+  // SocketSystem hold a static counter as reference counter or loading
+  // and unloading the Windows socket system.  The first Sender or Receiver
+  // instantiated will load the windows sockets (WSA startup), and the 
+  // last sSender or Receiver to go out of scope will will release (unload WAS cleanup)
+  // the socket system
   class SocketSystem
   {
-     public:
-	   SocketSystem()  
-	   {
-		 iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+    public: 
+	  
+	   SocketSystem()
+	   { 
+		   rcount++;
+		   if (rcount.load() == 1)
+		   {
+			   iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+		   }
 	   }
 
 	   ~SocketSystem()
 	   {
-		  int error = WSACleanup();
+		   rcount--;
+		   if (rcount.load() == 0)
+		   {
+			   int error = WSACleanup();
+		   }
 	   }	 
      private:
-  	  int iResult;
-      WSADATA wsaData;
+		
+		static std::atomic<int> rcount;
+		inline static int iResult;
+        inline static WSADATA wsaData;
   };
 #endif
 

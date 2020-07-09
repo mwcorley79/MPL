@@ -4,10 +4,15 @@
 
 namespace CSE384 
 {
+
+   
+
    Sender::Sender(TCPSocketOptions* sc):    sc_(sc),
                                             isSending_(false),
                                             isReceiving_(false)
-   {}
+   {
+      
+   }
 
    void Sender::PostMessage(const Message& m)
    {  
@@ -281,8 +286,8 @@ void TestSenderAsync(const std::string& name)
    std::cout << name << " started" << std::endl;
    
    // specify the server Endpoint we wish to connect
-   // EndPoint serverEp("127.0.0.1", 6060);
-   EndPoint serverEp("::1", 6060);
+    EndPoint serverEp("127.0.0.1", 6060);
+   //EndPoint serverEp("::1", 6060);
    
    // instantiate a sender 
    Sender sender;
@@ -322,7 +327,6 @@ void TestSenderAsync(const std::string& name)
 
 int main()
 {
-    //SocketSystem ss;
 	TestSenderAsync("test 1");
    
     //int senderCount = 1;

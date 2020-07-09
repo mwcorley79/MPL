@@ -101,6 +101,10 @@ namespace CSE384
         void StartSending();
         void StopSending();
 
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__) || defined(_WIN64)
+        SocketSystem s;
+#endif
+        
   };
 
   inline void Sender::IsSending(bool issending)
