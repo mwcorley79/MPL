@@ -101,7 +101,9 @@ namespace CSE384
         void StartSending();
         void StopSending();
 
+        
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__) || defined(_WIN64)
+        // On windows the Winsock needs to initialized SocketSystem manages this with a ref count
         SocketSystem s;
 #endif
         

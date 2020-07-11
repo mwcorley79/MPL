@@ -20,7 +20,8 @@ set (SOURCES src/Cpp11-BlockingQueue.cpp
              src/Utilities.cpp
              src/EndPoint.cpp         
              src/Receiver.cpp
-             src/TCPSocket.cpp)
+             src/TCPSocket.cpp
+             src/Platform.cpp)
 
 set (INCLUDES include/ClientHandler.h
               include/Cpp11-BlockingQueue.h

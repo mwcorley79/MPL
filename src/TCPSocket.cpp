@@ -92,7 +92,7 @@ namespace CSE384
 	  	      throw SocketOptionsException();
 
 	  	 // attempt current connection result, and get out with first successful attempt
-	  	 if(connect(sock_fd, p->ai_addr, p->ai_addrlen) == -1)
+	  	 if(connect(sock_fd, p->ai_addr, p->ai_addrlen) == INVALID_SOCKET)
 	  	 {
 	  	    closesocket(sock_fd);
 	  	    continue;
@@ -132,7 +132,7 @@ namespace CSE384
 	     		 throw SocketOptionsException();
 
 	    // attempt current connection result, and get out with first successful attempt
-	    if(bind(sock_fd, p->ai_addr, p->ai_addrlen) == -1)
+	    if(bind(sock_fd, p->ai_addr, p->ai_addrlen) == INVALID_SOCKET)
 	    {
 	       closesocket(sock_fd);
 	       continue;
@@ -141,7 +141,7 @@ namespace CSE384
 	 }
 
 	 // if couldn't bind to any of the addrinfo results, then bail with -1 indicator
-	 if(p == 0 || sock_fd < 0)
+	 if(p == 0 || sock_fd == INVALID_SOCKET)
 	 {
 	    freeaddrinfo(servinfo);
 	    throw ReceiverBindException();

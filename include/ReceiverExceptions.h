@@ -16,6 +16,12 @@
 #include <cstring>
 #include <locale.h>
 
+// for strerror_s on Linux: source: https://en.cppreference.com/w/c/string/byte/strerror
+#if !defined(WIN32) && !defined(_WIN32) && !defined(__WIN32__) && !defined(__NT__) && !defined(_WIN64)
+  #ifndef __STDC_WANT_LIB_EXT1__ 1
+    #define __STDC_WANT_LIB_EXT1__ 1
+  #endif 
+#endif
 
 #include <errno.h>
 
@@ -26,76 +32,101 @@ namespace CSE384
   class ReceiverException : public std::exception
   {
      public:
-       ReceiverException()
-       {}
+  #if !defined(WIN32) && !defined(_WIN32) && !defined(__WIN32__) && !defined(__NT__) && !defined(_WIN64)
+       ReceiverException(): errnum_(errno)
+  #else
+       ReceiverException(): errnum_(WSAGetLastError())
+  #endif
+       {
+           msgbuf[0] = '\0';
+       }
 
        ReceiverException(int errnum): errnum_(errnum)
-       {}
+       {
+           msgbuf[0] = '\0';
+       }
 
        virtual const char* what() const throw()
        {
-           return strerror(errnum_);
+ #if !defined(WIN32) && !defined(_WIN32) && !defined(__WIN32__) && !defined(__NT__) && !defined(_WIN64)
+         #ifdef __STDC_LIB_EXT1__
+           strerror_s(msgbuf, 511, errno);
+           return msgbuf;
+         #endif
+ #else
+       // source: https://stackoverflow.com/questions/3400922/how-do-i-retrieve-an-error-string-from-wsagetlasterror
+        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,   // flags
+               NULL,                // lpsource
+               errnum_,             // message id
+               MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),    // languageid
+               (LPSTR) msgbuf,              // output buffer
+               sizeof(msgbuf),     // size of msgbuf, bytes
+               NULL);
+
+        return msgbuf;
+#endif                
        }
 
       virtual ~ReceiverException() throw() {}
     protected:
        int errnum_;
+       char msgbuf[512];
   };
 
 
  class ReceiverTransmitMessageHeaderException : public ReceiverException
  {
    public: 
-     ReceiverTransmitMessageHeaderException(): ReceiverException(errno)
+     ReceiverTransmitMessageHeaderException()
      {}
  };
 
  class ReceiverTransmitMessageDataException : public ReceiverException
  {
    public:
-     ReceiverTransmitMessageDataException(): ReceiverException(errno)
+     ReceiverTransmitMessageDataException()
      {}
  };
 
  class ReceiverSendResponseException : public ReceiverException
  {
    public:
-     ReceiverSendResponseException(): ReceiverException(errno)
+     ReceiverSendResponseException()
      {}
  };
 
  class ReceiverReceiveMessageHeaderException : public ReceiverException
  { 
    public:
-     ReceiverReceiveMessageHeaderException(): ReceiverException(errno)
+     ReceiverReceiveMessageHeaderException()
      {}
  };
 
  class ReceiverReceiveMessageDataException : public ReceiverException
  {
    public:
-     ReceiverReceiveMessageDataException(): ReceiverException(errno)
+     ReceiverReceiveMessageDataException()
      {}
  };
  
  class ReceiverShutDownReadException : public ReceiverException
  {
    public:
-     ReceiverShutDownReadException(): ReceiverException(errno)
+     ReceiverShutDownReadException()
      {}
  };
 
 class ReceiverShutDownWriteException : public ReceiverException
 {
   public:
-    ReceiverShutDownWriteException(): ReceiverException(errno)
+    ReceiverShutDownWriteException()
     {}
 };
 
 class ReceiverCloseException : public ReceiverException
 {
   public:
-    ReceiverCloseException(): ReceiverException(errno)
+    ReceiverCloseException()
     {}
 };
 
@@ -103,7 +134,7 @@ class ReceiverCloseException : public ReceiverException
 class ReceiverAcceptException : public ReceiverException
 {
   public:
-    ReceiverAcceptException(): ReceiverException(errno)
+    ReceiverAcceptException()
     {}
 };
 
