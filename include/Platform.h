@@ -12,6 +12,7 @@ const int PORTABLE_SOCK_ERR_BUF_SIZE = 512;
   #include <sys/types.h> 
   #include <sys/socket.h>
   #include <arpa/inet.h>
+  #include<errno.h>
 
   // for strerror_s on Linux: source: https://en.cppreference.com/w/c/string/byte/strerror
   #ifndef __STDC_WANT_LIB_EXT1__
