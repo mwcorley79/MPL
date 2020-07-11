@@ -10,7 +10,7 @@ namespace CSE384
   class TCPSocket
   {
      public:
-		  TCPSocket();  
+		TCPSocket();  
 	    TCPSocket(SOCKET fd);
 	    void Connect(const EndPoint& ep, TCPSocketOptions* sc=nullptr);
 	    bool IsConnected() const;
@@ -27,17 +27,14 @@ namespace CSE384
 	    int ShutdownRecv();
 	    int Close();
 
-	    TCPSocket(TCPSocket&& s);
-	    TCPSocket& operator=(TCPSocket&& s);
+	    TCPSocket(TCPSocket&& s) noexcept; 
+	    TCPSocket& operator=(TCPSocket&& s) noexcept;
 
 	    // disable copy construction and assignment
 	    TCPSocket(const TCPSocket& s) = delete;
 	    TCPSocket& operator=(const TCPSocket& s) = delete;
      private:
 	   SOCKET sock_fd;
-      //#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__) || defined(_WIN64)  
-      // #endif 
-	   //char remote_addr[INET6_ADDRSTRLEN];
   };
 
   // class for deferring socket options to the application
@@ -81,7 +78,7 @@ namespace CSE384
 
   inline bool TCPSocket::IsConnected() const
   {
-	  return (sock_fd != -1);
+	  return (sock_fd != INVALID_SOCKET);
   }
 
   inline int TCPSocket::Shutdown()

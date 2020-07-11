@@ -6,7 +6,6 @@
 // Author:      Mike Corley, Syracuse University, mwcorley@syr.edu            //
 ////////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef SENDEREXCEPTIONS_H_
 #define SENDEREXCEPTIONS_H_
 
@@ -14,32 +13,13 @@
 #include <exception>
 #include <errno.h>
 #include <locale.h>
-
 #include "Platform.h"
-
-// for strerror_s on Linux: source: https://en.cppreference.com/w/c/string/byte/strerror
-#if !defined(WIN32) && !defined(_WIN32) && !defined(__WIN32__) && !defined(__NT__) && !defined(_WIN64)
-   #ifndef __STDC_WANT_LIB_EXT1__
-     #define __STDC_WANT_LIB_EXT1__
-   #endif 
-#endif
-
 
 namespace CSE384 {
 
-
 class SenderException : public std::exception
 {
-   public:
-#if !defined(WIN32) && !defined(_WIN32) && !defined(__WIN32__) && !defined(__NT__) && !defined(_WIN64)
-       SenderException() : errnum_(errno)
-#else
-       SenderException() : errnum_(WSAGetLastError())
-#endif
-       {
-           msgbuf[0] = '\0';
-       }
-       
+   public:       
      SenderException(int errnum): errnum_(errnum)
      {
          msgbuf[0] = '\0';
@@ -47,36 +27,23 @@ class SenderException : public std::exception
 
      virtual const char* what() const throw()
      {
-#if !defined(WIN32) && !defined(_WIN32) && !defined(__WIN32__) && !defined(__NT__) && !defined(_WIN64)
-#ifdef __STDC_LIB_EXT1__
-         strerror_s(msgbuf, 511, errno);
-         return msgbuf;
-#endif
-#else
-         // source: https://stackoverflow.com/questions/3400922/how-do-i-retrieve-an-error-string-from-wsagetlasterror
-         FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,   // flags
-             NULL,                // lpsource
-             errnum_,             // message id
-             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),    // languageid
-             (LPSTR)msgbuf,              // output buffer
-             sizeof(msgbuf),     // size of msgbuf, bytes
-             NULL);
-
-         return msgbuf;
-#endif              
+         return strerror_portable(msgbuf, PORTABLE_SOCK_ERR_BUF_SIZE-1, errnum_);
      }
 
-     ~SenderException() throw() {}
+     virtual ~SenderException() throw() 
+     {
+         // std::cerr << "Socket Exception destroyed " << std::endl;
+     }
    protected:
       int errnum_;
-      char msgbuf[512];
+      char msgbuf[PORTABLE_SOCK_ERR_BUF_SIZE];
 };
 
 
 class SenderConnectException : public SenderException
 {
    public:
-     SenderConnectException()
+     SenderConnectException(int errnum):  SenderException(errnum)
      {}
 };
 
@@ -84,7 +51,7 @@ class SenderConnectException : public SenderException
 class SenderCloseException : public SenderException
 {
    public:
-     SenderCloseException()
+     SenderCloseException(int errnum): SenderException(errnum)
      {}
 };
 
@@ -92,7 +59,7 @@ class SenderCloseException : public SenderException
 class SenderTransmitMessageHeaderException : public SenderException
 {
    public:
-     SenderTransmitMessageHeaderException()
+     SenderTransmitMessageHeaderException(int errnum): SenderException(errnum)
      {}
 };
 
@@ -100,7 +67,7 @@ class SenderTransmitMessageHeaderException : public SenderException
 class SenderTransmitMessageDataException : public SenderException
 {
    public:
-     SenderTransmitMessageDataException()
+     SenderTransmitMessageDataException(int errnum): SenderException(errnum)
      {}
 };
 

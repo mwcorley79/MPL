@@ -1,18 +1,14 @@
 #include "Sender.h"
 #include "SenderExceptions.h"
 #include "ReceiverExceptions.h"
+#include "Platform.h"
 
 namespace CSE384 
 {
-
-   
-
    Sender::Sender(TCPSocketOptions* sc):    sc_(sc),
                                             isSending_(false),
                                             isReceiving_(false)
-   {
-      
-   }
+   {}
 
    void Sender::PostMessage(const Message& m)
    {  
@@ -80,11 +76,11 @@ namespace CSE384
 
       // send message header
       if(socket.Send( (const char*) &mhdr, sizeof(struct MSGHEADER)) == -1)
-        throw SenderTransmitMessageHeaderException();
+        throw SenderTransmitMessageHeaderException(getlasterror_portable());
 
       // send message data
       if(socket.Send(msg.GetData(), msg.Length()) == -1)
-         throw SenderTransmitMessageDataException();
+         throw SenderTransmitMessageDataException(getlasterror_portable());
    }
 
    Message Sender::GetMessage()
@@ -145,7 +141,7 @@ namespace CSE384
         
           // send message data
           if(socket.Recv(msg.GetData(), msg.Length()) == -1)
-            throw ReceiverReceiveMessageDataException();
+            throw ReceiverReceiveMessageDataException(getlasterror_portable());
         
           return msg;
         }
@@ -157,7 +153,7 @@ namespace CSE384
         }
         else
         {
-          throw ReceiverReceiveMessageHeaderException();
+          throw ReceiverReceiveMessageHeaderException(getlasterror_portable());
         }
     }   
 
@@ -201,14 +197,17 @@ namespace CSE384
            send_thread_.join();
 
          socket.ShutdownSend();
-         socket.ShutdownRecv();
-         ret = (socket.Close() == 0);
          
-         if(ret)
-         {
+         
+         //if(ret)
+        // {
            if(recvThread.joinable())
              recvThread.join();
-         }
+        // }
+
+         socket.ShutdownRecv();
+         ret = (socket.Close() == 0);
+
       }
 
       return ret; 
@@ -286,7 +285,7 @@ void TestSenderAsync(const std::string& name)
    std::cout << name << " started" << std::endl;
    
    // specify the server Endpoint we wish to connect
-    EndPoint serverEp("127.0.0.1", 6060);
+   EndPoint serverEp("127.0.0.1", 6060);
    //EndPoint serverEp("::1", 6060);
    
    // instantiate a sender 
@@ -295,34 +294,48 @@ void TestSenderAsync(const std::string& name)
    int wait_secs = 1; // wait time between connection attempts
    int verbose_level = 1;  // verbose (display connect attempts)
    int connect_attempts = 10; // make 10 connection attempts
-   if(sender.ConnectPersist(serverEp, connect_attempts, wait_secs, verbose_level) < 10)
-    //if(sender.Connect(serverEp)) -- makes one attempt to connect
+  
+   /*
+     uncomment to test/see socket exception handling
+   try
    {
-      //handle messages received in separate thread
-      std::thread receiverProc(SenderProc, &sender);
+       sender.Connect(serverEp); // -- makes one attempt to connect
+   }
+   catch (std::exception& ex)
+   {
+       std::cerr << ex.what() << std::endl;
+   }
 
-      int num_messages = 10;
-      // loop to send 10 messages 
-      for(int j=0; j < num_messages; j++)
-      {
-         // build an and print each string message 
-         std::string strMsg = name + " [ Message #: " + std::to_string(j+1) + " ]";
-         Message msg(strMsg.c_str(),strMsg.length(), MessageType::STRING);
-         std::cout << "Message is: " << msg << std::endl;
+   if(sender.IsConnected())
+   */
 
-         // post message into the send queue
-         sender.PostMessage(msg); 
-         //std::cout << sender.GetMessage() << std::endl;
-         
-         // sleep for a second so we can see what's going on
-         std::this_thread::sleep_for(std::chrono::seconds(1));
-      }
+   if (sender.ConnectPersist(serverEp, connect_attempts, wait_secs, verbose_level) < 10)
+   {
+       //handle messages received in separate thread
+       std::thread receiverProc(SenderProc, &sender);
 
-      sender.Close();
-      receiverProc.join();
+       int num_messages = 10;
+       // loop to send 10 messages 
+       for (int j = 0; j < num_messages; j++)
+       {
+           // build an and print each string message 
+           std::string strMsg = name + " [ Message #: " + std::to_string(j + 1) + " ]";
+           Message msg(strMsg.c_str(), (int) strMsg.length(),  MessageType::STRING);
+           std::cout << "Message is: " << msg << std::endl;
+
+           // post message into the send queue
+           sender.PostMessage(msg);
+           //std::cout << sender.GetMessage() << std::endl;
+
+           // sleep for a second so we can see what's going on
+          std::this_thread::sleep_for(std::chrono::seconds(1));
+       }
+
+       sender.Close();
+       receiverProc.join();
    }
    else
-      perror("Connect:"); // for now, using c-style error printing
+       std::cerr << " failed to connect in " << connect_attempts << " attempts " << std::endl;
 }
 
 int main()

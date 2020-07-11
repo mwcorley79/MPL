@@ -187,8 +187,8 @@ namespace CSE384
    int main(int argc, char* argv[])
    {   
       // define server endpoint ip address and port for listening
-      // EndPoint serverEP("127.0.0.1", 6060);
       EndPoint serverEP("127.0.0.1", 6060);
+      //EndPoint serverEP("::1", 6060);
 
       // define instance of custom server processing (ccustom client handler) 
       TestClientHandler th;

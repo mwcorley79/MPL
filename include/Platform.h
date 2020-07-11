@@ -4,12 +4,31 @@
 #ifndef _MPL_PLATFORM_H
 #define _MPL_PLATFORM_H
 
+const int PORTABLE_SOCK_ERR_BUF_SIZE = 512;
+
 #if !defined(WIN32) && !defined(_WIN32) && !defined(__WIN32__) && !defined(__NT__) && !defined(_WIN64)
   #include <netdb.h>
   #include <unistd.h>
   #include <sys/types.h> 
   #include <sys/socket.h>
   #include <arpa/inet.h>
+
+  // for strerror_s on Linux: source: https://en.cppreference.com/w/c/string/byte/strerror
+  #ifndef __STDC_WANT_LIB_EXT1__
+    #define __STDC_WANT_LIB_EXT1__  
+  #endif 
+
+  // helper function to get socket errors in a portable way (windows and linux)
+  inline const char* strerror_portable(const char* errbuf, int buflen, int error)
+  {
+#ifdef __STDC_LIB_EXT1__
+	strerror_s(errbuf, buflen, errno, error);
+	return errbuf;
+#endif   
+  }
+
+  // helper function to make error handling portable:  on Linux return errno
+  inline int getlasterror_portable() { return errno; }
 
   using SOCKET = int;
   const int SD_SEND = SHUT_WR;
@@ -20,12 +39,14 @@
   inline int closesocket(SOCKET s)
   {
 	 return close(s);
-  }     
+  }   
+
 #else 
   #ifndef WIN32_LEAN_AND_MEAN  // prevents duplicate includes of core parts of windows.h in winsock2.h 
      #define WIN32_LEAN_AND_MEAN
   #endif
- 
+
+
   #include <Windows.h>      // Windows API
   #include <winsock2.h>     // Windows sockets, ver 2
   #include <WS2tcpip.h>     // support for IPv6 and other things
@@ -35,6 +56,12 @@
 
   #pragma warning(disable:4522)
   #pragma comment(lib, "Ws2_32.lib")
+
+  // helper function to make error handling portable:  on Linux return WSAGetLastError()
+  inline int getlasterror_portable() { return  WSAGetLastError(); }
+
+  // helper function to get socket errors in a portable way (windows and linux)
+  const char* strerror_portable(const char* errbuf, int buflen, int error);
 
   /////////////////////////////////////////////////////////////////////////////
   // SocketSystem class - manages loading and unloading Winsock library

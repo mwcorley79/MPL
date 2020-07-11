@@ -47,7 +47,7 @@ namespace CSE384
         
           // send message data
           if(data_socket.Recv(msg.GetData(), msg.Length()) == -1)
-            throw ReceiverReceiveMessageDataException();
+            throw ReceiverReceiveMessageDataException(getlasterror_portable());
         
           return msg;
         }
@@ -59,7 +59,7 @@ namespace CSE384
         }
         else
         {
-          throw ReceiverReceiveMessageHeaderException();
+          throw ReceiverReceiveMessageHeaderException(getlasterror_portable());
         }
     }
 
@@ -72,11 +72,11 @@ namespace CSE384
 
       // send message header
       if(data_socket.Send((const char*) &mhdr, sizeof(struct MSGHEADER)) == -1)
-        throw SenderTransmitMessageHeaderException();
+        throw SenderTransmitMessageHeaderException(getlasterror_portable());
 
       // send message data
       if(data_socket.Send(msg.GetData(), msg.Length()) == -1)
-         throw SenderTransmitMessageDataException();
+         throw SenderTransmitMessageDataException(getlasterror_portable());
    }
 
    void ClientHandler::StartSending()

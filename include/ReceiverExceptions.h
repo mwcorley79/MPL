@@ -15,32 +15,14 @@
 #include <string>
 #include <cstring>
 #include <locale.h>
-
-// for strerror_s on Linux: source: https://en.cppreference.com/w/c/string/byte/strerror
-#if !defined(WIN32) && !defined(_WIN32) && !defined(__WIN32__) && !defined(__NT__) && !defined(_WIN64)
-  #ifndef __STDC_WANT_LIB_EXT1__
-    #define __STDC_WANT_LIB_EXT1__
-  #endif 
-#endif
-
 #include <errno.h>
-
 #include "Platform.h"
 
 namespace CSE384 
 {
   class ReceiverException : public std::exception
   {
-     public:
-  #if !defined(WIN32) && !defined(_WIN32) && !defined(__WIN32__) && !defined(__NT__) && !defined(_WIN64)
-       ReceiverException(): errnum_(errno)
-  #else
-       ReceiverException(): errnum_(WSAGetLastError())
-  #endif
-       {
-           msgbuf[0] = '\0';
-       }
-
+     public: 
        ReceiverException(int errnum): errnum_(errnum)
        {
            msgbuf[0] = '\0';
@@ -48,85 +30,69 @@ namespace CSE384
 
        virtual const char* what() const throw()
        {
- #if !defined(WIN32) && !defined(_WIN32) && !defined(__WIN32__) && !defined(__NT__) && !defined(_WIN64)
-         #ifdef __STDC_LIB_EXT1__
-           strerror_s(msgbuf, 511, errno);
-           return msgbuf;
-         #endif
- #else
-       // source: https://stackoverflow.com/questions/3400922/how-do-i-retrieve-an-error-string-from-wsagetlasterror
-        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,   // flags
-               NULL,                // lpsource
-               errnum_,             // message id
-               MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),    // languageid
-               (LPSTR) msgbuf,              // output buffer
-               sizeof(msgbuf),     // size of msgbuf, bytes
-               NULL);
-
-        return msgbuf;
-#endif                
+           return strerror_portable(msgbuf, PORTABLE_SOCK_ERR_BUF_SIZE-1, errnum_);
        }
 
       virtual ~ReceiverException() throw() {}
     protected:
        int errnum_;
-       char msgbuf[512];
+       char msgbuf[PORTABLE_SOCK_ERR_BUF_SIZE];
   };
 
 
  class ReceiverTransmitMessageHeaderException : public ReceiverException
  {
    public: 
-     ReceiverTransmitMessageHeaderException()
+     ReceiverTransmitMessageHeaderException(int errnum): ReceiverException(errnum)
      {}
  };
 
  class ReceiverTransmitMessageDataException : public ReceiverException
  {
    public:
-     ReceiverTransmitMessageDataException()
+     ReceiverTransmitMessageDataException(int errnum): ReceiverException(errnum)
      {}
  };
 
  class ReceiverSendResponseException : public ReceiverException
  {
    public:
-     ReceiverSendResponseException()
+     ReceiverSendResponseException(int errnum): ReceiverException(errnum)
      {}
  };
 
  class ReceiverReceiveMessageHeaderException : public ReceiverException
  { 
    public:
-     ReceiverReceiveMessageHeaderException()
+     ReceiverReceiveMessageHeaderException(int errnum): ReceiverException(errnum)
      {}
  };
 
  class ReceiverReceiveMessageDataException : public ReceiverException
  {
    public:
-     ReceiverReceiveMessageDataException()
+     ReceiverReceiveMessageDataException(int errnum): ReceiverException(errnum)
      {}
  };
  
  class ReceiverShutDownReadException : public ReceiverException
  {
    public:
-     ReceiverShutDownReadException()
+     ReceiverShutDownReadException(int errnum): ReceiverException(errnum)
      {}
  };
 
 class ReceiverShutDownWriteException : public ReceiverException
 {
   public:
-    ReceiverShutDownWriteException()
+    ReceiverShutDownWriteException(int errnum): ReceiverException(errnum)
     {}
 };
 
 class ReceiverCloseException : public ReceiverException
 {
   public:
-    ReceiverCloseException()
+    ReceiverCloseException(int errnum): ReceiverException(errnum)
     {}
 };
 
@@ -134,7 +100,7 @@ class ReceiverCloseException : public ReceiverException
 class ReceiverAcceptException : public ReceiverException
 {
   public:
-    ReceiverAcceptException()
+    ReceiverAcceptException(int errnum): ReceiverException(errnum)
     {}
 };
 
@@ -142,28 +108,28 @@ class ReceiverAcceptException : public ReceiverException
 class ReceiverListenException : public ReceiverException
 {
   public:
-    ReceiverListenException(): ReceiverException(errno)
+    ReceiverListenException(int errnum) : ReceiverException(errnum)
     {}
 };
 
 class ReceiverCreateSocketException : public ReceiverException
 {
    public:
-     ReceiverCreateSocketException(): ReceiverException(errno)
+     ReceiverCreateSocketException(int errnum): ReceiverException(errnum)
      {}
 };
 
 class ReceiverBindException : public ReceiverException
 {
    public:
-     ReceiverBindException(): ReceiverException(errno)
+     ReceiverBindException(int errnum): ReceiverException(errnum)
      {}
 };
 
 class ReceiverGetAddrException : public ReceiverException
 {
    public:
-     ReceiverGetAddrException(): ReceiverException(errno)
+     ReceiverGetAddrException(int errnum): ReceiverException(errnum)
      {}    
 };
 
@@ -180,18 +146,15 @@ class ReceiverGetAddrInfoException : public ReceiverException
 };
 
 
-
 class ReceiverNoRegisteredClientHandlerException : public ReceiverException
 {
   public:
-    ReceiverNoRegisteredClientHandlerException() {}
-
+    ReceiverNoRegisteredClientHandlerException() : ReceiverException(0) {}
+    virtual const char* what() const throw()
+    {
+        return "No clientHandler Instance was registered";
+    }
 };
-
-
-
-
-
 
 }
 #endif /* RECEIVEREXCEPTIONS_H_ */

@@ -18,14 +18,14 @@ namespace CSE384
   }
 
   //get sockaddr, IPv4 or IPv6:
-  /* static void* get_in_addr(struct sockaddr *sa)
+  static void* get_in_addr(struct sockaddr *sa)
   {
      if(sa->sa_family == AF_INET)
         return &(((struct sockaddr_in*)sa)->sin_addr);
 
      return &(((struct sockaddr_in6*)sa)->sin6_addr);
   }
-  */
+  
 
   // reference: Beej's guide to network programming: http://beej.us/guide/bgnet/
   static int GetAddressInfo(const char* node_name, const char* serv_name, int ai_family, struct addrinfo** servinfo)
@@ -34,7 +34,6 @@ namespace CSE384
       memset(&hints, 0, sizeof(hints));
       hints.ai_family = ai_family;      // use IPv6 or IPv4
       hints.ai_socktype = SOCK_STREAM;  // for now this will always be TCP
-
       return getaddrinfo(node_name, serv_name, &hints, servinfo);
   }
 
@@ -45,28 +44,18 @@ namespace CSE384
   TCPSocket::TCPSocket(SOCKET socket): sock_fd(socket)
   {}
 
-  TCPSocket::TCPSocket(TCPSocket&& s)
+  TCPSocket::TCPSocket(TCPSocket&& s) noexcept
   {
-	  //servinfo = s.servinfo;
 	  sock_fd = s.sock_fd;
-	  //sc_ = s.sc_;
-
-	  //s.servinfo = nullptr;
 	  s.sock_fd = INVALID_SOCKET;
-	  //s.sc_ = nullptr;
   }
 
-  TCPSocket& TCPSocket::operator=(TCPSocket&& s)
+  TCPSocket& TCPSocket::operator=(TCPSocket&& s) noexcept
   {
      if (this != &s)
      {
-    	//servinfo = s.servinfo;
     	sock_fd = s.sock_fd;
-    	//sc_ = s.sc_;
-
-    	//s.servinfo = nullptr;
     	s.sock_fd = INVALID_SOCKET;
-    	//s.sc_ = nullptr;
      }
      return *this;
   }
@@ -75,6 +64,7 @@ namespace CSE384
   {
 	  struct addrinfo* p;
 	  struct addrinfo* servinfo;
+      int error = 0;
 
 	  int addr_info_result;
 	  if((addr_info_result = GetAddressInfo(ep.IP_STR(), ToString(ep.Port()).c_str(), AF_UNSPEC, &servinfo)) != 0)
@@ -83,28 +73,37 @@ namespace CSE384
 	  //iterate over all the results and connect to the first we can
 	  for(p = servinfo; p != 0; p = p->ai_next)
 	  {
-	  	 if((sock_fd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1)
-	  	    continue;
+          if ((sock_fd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1)
+          {
+              error = getlasterror_portable();
+              continue;
+          }
 
-	  	// if socket options are specified by the application, then apply before connect
+	  	 // if socket options are specified by the application, then apply before connect
 	  	 if(sc != 0)
-	  	    if(sc->SetSocketOptions(this) == -1)
-	  	      throw SocketOptionsException();
+             if (sc->SetSocketOptions(this) == -1)
+             {
+                 error = getlasterror_portable();
+                 freeaddrinfo(servinfo);
+                 throw SocketOptionsException(error);
+             }
 
 	  	 // attempt current connection result, and get out with first successful attempt
-	  	 if(connect(sock_fd, p->ai_addr, p->ai_addrlen) == INVALID_SOCKET)
+	  	 if(connect(sock_fd, p->ai_addr, (int) p->ai_addrlen) == INVALID_SOCKET)
 	  	 {
-	  	    closesocket(sock_fd);
-	  	    continue;
+             error = getlasterror_portable();
+             closesocket(sock_fd);
+	  	     continue;
 	  	 }
 	  	 break; //if we get here we must have connected successfully
 	 }
 
 	 // if couldn't connect to any of the addrinfo results, then bail with -1 indicator
-	 if(p == 0 || sock_fd < 0)
+	 if(p == 0 || sock_fd == INVALID_SOCKET)
 	 {
-		freeaddrinfo(servinfo);
-	    throw SenderConnectException();
+        sock_fd = INVALID_SOCKET;
+        freeaddrinfo(servinfo);
+	    throw SenderConnectException(error);
 	 }
 
 	 // fill textual address information to return
@@ -114,40 +113,50 @@ namespace CSE384
 
   void TCPSocket::Bind(const EndPoint& ep, TCPSocketOptions* sc)
   {
-	  struct addrinfo* p;
-	  struct addrinfo* servinfo;
-	  int addr_info_result;
-	  if((addr_info_result = GetAddressInfo(ep.IP_STR(), ToString(ep.Port()).c_str(), AF_UNSPEC, &servinfo)) != 0)
-	  	 throw GetAddrInfoException(addr_info_result);
+      struct addrinfo* p;
+      struct addrinfo* servinfo;
+      int addr_info_result;
+      int error = 0;
 
-     // iterate over all the results and connect to the first we can
-	 for(p = servinfo; p != 0; p = p->ai_next)
-	 {
-	    if((sock_fd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1)
-	        continue;
+      if ((addr_info_result = GetAddressInfo(ep.IP_STR(), ToString(ep.Port()).c_str(), AF_UNSPEC, &servinfo)) != 0)
+          throw GetAddrInfoException(addr_info_result);
 
-	    // if socket options are specified by the application, then apply before bind
-	    if(sc != 0)
-	     	if(sc->SetSocketOptions(this) == -1)
-	     		 throw SocketOptionsException();
+      // iterate over all the results and connect to the first we can
+      for (p = servinfo; p != 0; p = p->ai_next)
+      {
+          if ((sock_fd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1)
+          {
+              error = getlasterror_portable();
+              continue;
+          }
 
-	    // attempt current connection result, and get out with first successful attempt
-	    if(bind(sock_fd, p->ai_addr, p->ai_addrlen) == INVALID_SOCKET)
-	    {
-	       closesocket(sock_fd);
-	       continue;
-	    }
-	    break; //if we get here we must have connected successfully
-	 }
+          // if socket options are specified by the application, then apply before bind
+          if (sc != 0)
+              if (sc->SetSocketOptions(this) == -1)
+              {
+                  error = getlasterror_portable();
+                  freeaddrinfo(servinfo);
+                  throw SocketOptionsException(error);
+              }
 
-	 // if couldn't bind to any of the addrinfo results, then bail with -1 indicator
-	 if(p == 0 || sock_fd == INVALID_SOCKET)
-	 {
-	    freeaddrinfo(servinfo);
-	    throw ReceiverBindException();
-	 }
+          // attempt current connection result, and get out with first successful attempt
+          if (bind(sock_fd, p->ai_addr, (int) p->ai_addrlen) == INVALID_SOCKET)
+          {
+              error = getlasterror_portable();
+              closesocket(sock_fd);
+              continue;
+          }
+          break; //if we get here we must have connected successfully
+      }
 
-	 freeaddrinfo(servinfo);
+      // if couldn't bind to any of the addrinfo results, then bail with -1 indicator
+      if (p == 0 || sock_fd == INVALID_SOCKET)
+      {
+          freeaddrinfo(servinfo);
+          throw ReceiverBindException(error);
+      }
+
+      freeaddrinfo(servinfo);
   }
 
 
@@ -211,7 +220,7 @@ namespace CSE384
    void TCPSocket::Listen(int backlog)
    {
      if(listen(sock_fd, backlog) != 0)
-    	throw ReceiverListenException();
+    	throw ReceiverListenException(getlasterror_portable());
    }
 
    TCPSocket TCPSocket::Accept()
