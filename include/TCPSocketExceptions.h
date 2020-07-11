@@ -17,8 +17,8 @@
 
  // for strerror_s on Linux: source: https://en.cppreference.com/w/c/string/byte/strerror
 #if !defined(WIN32) && !defined(_WIN32) && !defined(__WIN32__) && !defined(__NT__) && !defined(_WIN64)
-   #ifndef __STDC_WANT_LIB_EXT1__ 1
-      #define __STDC_WANT_LIB_EXT1__ 1
+   #ifndef __STDC_WANT_LIB_EXT1__
+      #define __STDC_WANT_LIB_EXT1__
    #endif 
 #endif
 
