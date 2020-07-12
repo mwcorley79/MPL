@@ -64,7 +64,7 @@ The current objective (purpose) for this repo is to participate in a joint effor
     </li>
     <li> Repeat step 6, but substitute "SenderTest.vcxproj" for "ReceiverTest.vcxprog" </li>
     <li> In Visual Studio, Right click "ReceiverTest" -> "Build" </li>
-    <li> In Visual Studio, Right click "SenderTest" -> "Build" <li>
+    <li> In Visual Studio, Right click "SenderTest" -> "Build" </li>
     <li> Right click "ReceiverTest" -> "Set as Startup Project" and type Ctrl-F5 </li>
     <li> Right click "SenderTest" -> "Set as Startup Project" and type Ctrl-F5 </li>
   <li> 
