@@ -12,36 +12,52 @@ Prerequisites for Linux
   <li> install cmake 3.10 or greater (debian based:  sudo apt-get install cmake) </li>
   <li> toolchain: e.g. gcc/g++ etc. </li>
 </ol>
-Build MPL.so (shared object library installed in ./MPL/install/lib)
+Build and install the MPL library on Linux: MPL.a (static library installed in MPL/install/lib)
 <ol> 
-  <li> open a terminal console windows and type the following commands in the shell ... 
+  <li> open a terminal/console window and type the following commands in the shell ... </li>
   <li> git clone https://github.com/mwcorley79/MPL.git </li>
-  <li> cd MPL</li>
-  <li> mkdir build </li>
-  <li> cd build </li>
+  <li> cd MPL && mkdir build && cd build </li>
   <li> cmake .. -DCMAKE_INSTALL_PREFIX=../install </li>
   <li> make install </li>
- </ol>
- Testing the MPL library on Linux
- <ol>
+</ol>
+Testing the MPL library on Linux
+<ol>
   <li>  ... in the same terminal from the previous step, type the following commands </li>
-  <li> cd ../MPLtests </li>
-  <li> mkdir build </li>
-  <li> cd build </li>
+  <li> cd ../MPLtests && mkdir build && cd build </li>
   <li> cmake .. </li>
   <li> make all </li>
   The previous step should have produced two executable files: SenderTest and ReceiverTest. </br></br>
   <li> Open two (separate terminal windows and type ./ReceiverTest in one terminal, and ./SenderTest in the other trerminal
        This should produce output such as the following: </i>
   <img src="./png/output.PNG"/>  
-  
+</ol> 
 Prerequisites for Windows
   <ol>
     <li> Install CMake for Windows: https://cmake.org/download/ </li>
     <li> Visual Studio 2019 (installed, using as default generator)</li>
   </ol>
-  Steps for testing on Windows <br><br>
-  *** Will update when the Windows version is complete *** <br><br>
+ Build and install the MPL library on Windows: MPL.lib (static library installed in MPL/install/lib)
+  <ol> 
+    <li> open a terminal/command window and type the following commands in the shell ... </li>
+    <li> git clone https://github.com/mwcorley79/MPL.git </li>
+    <li> cd MPL && mkdir build && cd build </li>
+    <li> cmake .. -DCMAKE_INSTALL_PREFIX=../install
+      <ol><li> this generate the Visual Studio solution and projects in "MPL/build" folder <br>
+        and set install mpl library install folder to "MPL/INSTALL") </li></ol>
+    </li>   
+    <li>  Start Visual Studio 2019, choose "Open and Project or solution", <br>
+          navigate to the "MPL/build" folder and open solution file (MPL.sln) 
+    </li>
+    <li> right click on the "INSTALL" and click "Build" <br>
+         Note: Leave Visual Studio and terminal (from step 3) running
+    </li>
+  Testing the MPL library on Windows
+   
+       
+  
+    
+</ol>
+  
   
   <H2>Description:</H2>
   Three (3) primary classes comprise the framework: <b> Sender - </b> encapsulates client-side message passing. <b> Receiver </b> and <b> ClientHandler - </b>         encapsulate server-side message passing. Full-duplex infers bidirectional communication in which both the Sender and (derived) ClientHandler instances support GetMessage() and PostMessage() operations simultaneously.  The following picture illustrates the high-level concept: 
