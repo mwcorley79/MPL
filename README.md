@@ -28,6 +28,7 @@ The current objective (purpose) for this repo is to participate in a joint effor
        This should produce output such as the following: </li>
   <img src="./png/output.PNG"/>  
 </ol> 
+<hr>
 <b> Prerequisites for Windows </b>
   <ol>
     <li> Install CMake for Windows: https://cmake.org/download/ </li>
@@ -70,8 +71,7 @@ The current objective (purpose) for this repo is to participate in a joint effor
        This should produce output such as the following: </li>
        <img src="./png/winoutput.PNG"/>  
   </ol>
-   
-       
+   <hr>     
   <H2>MPL Framework Synopsis:</H2>
   Three (3) primary classes comprise the framework: <b> Sender - </b> encapsulates client-side message passing. <b> Receiver </b> and <b> ClientHandler - </b>         encapsulate server-side message passing. Full-duplex infers bidirectional communication in which both the Sender and (derived) ClientHandler instances support GetMessage() and PostMessage() operations simultaneously.  The following picture illustrates the high-level concept: 
   <img src="./png/concept.PNG"/>  
