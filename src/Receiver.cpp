@@ -165,16 +165,13 @@ namespace CSE384
        {
           // while there are messages in the blocking queue, and you have seen the disconnect
           // message, pull messages out and dispaly them.
-          //StartSending();
-          
+      
           Message msg;
           while( (msg = GetMessage()).GetType() != MessageType::DISCONNECT)
           {
-             std::cout << "Got a message from: " << msg << std::endl;
+             std::cout << "Got a message:" << msg << "from:" RemoteEP() << std::endl;
              PostMessage(Message( std::string("Reply from server: ") +  GetServiceEndPoint().ToString()));
           }
-
-          // StopSending();
        }
 
        ~TestClientHandler()

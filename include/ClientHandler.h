@@ -54,6 +54,8 @@ namespace CSE384
          void PostMessage(const Message& m);
 
          EndPoint& GetServiceEndPoint();
+
+         EndPoint RemoteEP();
          
          // pure virtual function: must implement 
          virtual void AppProc() = 0;
@@ -81,7 +83,7 @@ namespace CSE384
          void SetServiceEndPoint(const EndPoint& ep);
 
          std::thread recvThread;
-         std::thread  sendThread;
+         std::thread sendThread;
          
          TCPSocket data_socket;
          std::atomic<bool> isReceiving_;
@@ -106,6 +108,11 @@ namespace CSE384
     inline void ClientHandler::SetServiceEndPoint(const EndPoint& ep)
     {
       ServiceEP = ep;
+    }
+
+    inline EndPoint ClientHandler::RemoteEP()
+    {
+       return data_socket.RemoteEP();
     }
 
     inline EndPoint& ClientHandler::GetServiceEndPoint()
@@ -154,7 +161,6 @@ namespace CSE384
     {
        isSending_.store(sending);
     }
-
 
     inline bool ClientHandler::IsSending() const
     {

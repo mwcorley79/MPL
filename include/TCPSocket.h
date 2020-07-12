@@ -9,100 +9,104 @@ namespace CSE384
   class TCPSocketOptions;
   class TCPSocket
   {
-     public:
-		TCPSocket();  
-	    TCPSocket(SOCKET fd);
-	    void Connect(const EndPoint& ep, TCPSocketOptions* sc=nullptr);
-	    bool IsConnected() const;
-	    bool IsValid() const;
-	    void Bind(const EndPoint& ep, TCPSocketOptions* sc=nullptr);
-	    void Listen(int backlog);
-	    int Send(const char *block, unsigned int blockLen, int sendRetries=1, unsigned int wait_time=1);
-	    int Recv(const char *block, unsigned int blockLen, int recvRetries=1, unsigned int wait_time=1);
-	    operator SOCKET ();
-	    SOCKET GetSockFd();
-	    TCPSocket Accept();
-	    int Shutdown();
-	    int ShutdownSend();
-	    int ShutdownRecv();
-	    int Close();
+  public:
+    TCPSocket();
+    TCPSocket(SOCKET fd);
+    void Connect(const EndPoint &ep, TCPSocketOptions *sc = nullptr);
+    bool IsConnected() const;
+    bool IsValid() const;
+    void Bind(const EndPoint &ep, TCPSocketOptions *sc = nullptr);
+    void Listen(int backlog);
+    int Send(const char *block, unsigned int blockLen, int sendRetries = 1, unsigned int wait_time = 1);
+    int Recv(const char *block, unsigned int blockLen, int recvRetries = 1, unsigned int wait_time = 1);
+    operator SOCKET();
+    SOCKET GetSockFd();
+    TCPSocket Accept();
+    EndPoint RemoteEP();
+    int Shutdown();
+    int ShutdownSend();
+    int ShutdownRecv();
+    int Close();
 
-	    TCPSocket(TCPSocket&& s) noexcept; 
-	    TCPSocket& operator=(TCPSocket&& s) noexcept;
+    TCPSocket(TCPSocket &&s) noexcept;
+    TCPSocket &operator=(TCPSocket &&s) noexcept;
 
-	    // disable copy construction and assignment
-	    TCPSocket(const TCPSocket& s) = delete;
-	    TCPSocket& operator=(const TCPSocket& s) = delete;
-     private:
-	   SOCKET sock_fd;
+    // disable copy construction and assignment
+    TCPSocket(const TCPSocket &s) = delete;
+    TCPSocket &operator=(const TCPSocket &s) = delete;
+
+  private:
+    SOCKET sock_fd;
   };
 
   // class for deferring socket options to the application
-  // (for client and server side)
-  
+  // (for client side and server side)
+
   class TCPSocketOptions
   {
-      public:
-	      friend TCPSocket;
-	      TCPSocketOptions(int level, int option_names);
-      private:
-	      int SetSocketOptions(TCPSocket* soc);
-	      int level_;
-        int option_names_;
+  public:
+    friend TCPSocket;
+    TCPSocketOptions(int level, int option_names);
+
+  private:
+    int SetSocketOptions(TCPSocket *soc);
+    int level_;
+    int option_names_;
   };
 
-  inline TCPSocketOptions::TCPSocketOptions(int level, int option_names): level_(level),
+  inline TCPSocketOptions::TCPSocketOptions(int level, int option_names) : level_(level),
                                                                            option_names_(option_names)
-  {}
-
-  inline int TCPSocketOptions::SetSocketOptions(TCPSocket* soc)
   {
-	  int optval = 1;
-	  return setsockopt(soc->GetSockFd(),level_, option_names_, (char*) &optval, sizeof(optval));
+  }
+
+  inline int TCPSocketOptions::SetSocketOptions(TCPSocket *soc)
+  {
+    int optval = 1;
+    return setsockopt(soc->GetSockFd(), level_, option_names_, (char *)&optval, sizeof(optval));
   }
 
   inline SOCKET TCPSocket::GetSockFd()
   {
-  	 return sock_fd;
+    return sock_fd;
   }
 
-  inline TCPSocket::operator SOCKET ()
+  inline TCPSocket::operator SOCKET()
   {
-	 return sock_fd;
+    return sock_fd;
   }
 
   inline bool TCPSocket::IsValid() const
   {
-	  return (sock_fd != INVALID_SOCKET);
+    return (sock_fd != INVALID_SOCKET);
   }
 
   inline bool TCPSocket::IsConnected() const
   {
-	  return (sock_fd != INVALID_SOCKET);
+    return (sock_fd != INVALID_SOCKET);
   }
 
   inline int TCPSocket::Shutdown()
   {
-	  return shutdown(sock_fd, SD_BOTH);
+    return shutdown(sock_fd, SD_BOTH);
   }
 
   inline int TCPSocket::ShutdownSend()
   {
-	  return shutdown(sock_fd, SD_SEND);
+    return shutdown(sock_fd, SD_SEND);
   }
 
   inline int TCPSocket::ShutdownRecv()
   {
-	  return shutdown(sock_fd, SD_RECEIVE);
+    return shutdown(sock_fd, SD_RECEIVE);
   }
 
   inline int TCPSocket::Close()
   {
-	 int ret = closesocket(sock_fd);
-	 if(ret == 0)
-		 sock_fd = -1;
-	 return ret;
+    int ret = closesocket(sock_fd);
+    if (ret == 0)
+      sock_fd = -1;
+    return ret;
   }
-};
+}; // namespace CSE384
 
 #endif /* TCPSOCKET_H_ */
