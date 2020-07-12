@@ -1,5 +1,5 @@
 // Note: the purpose of the this is really just for managing the platform differences 
-// between Windows and Linux coket libraries
+// between Windows and Linux socket libraries
 
 #ifndef _MPL_PLATFORM_H
 #define _MPL_PLATFORM_H
