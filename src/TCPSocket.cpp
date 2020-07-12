@@ -267,7 +267,7 @@ namespace CSE384
   {
     unsigned int port;
     char ipstr[INET6_ADDRSTRLEN];
-    if (GetPeerEndPoint(sock_fd, ipstr, port) == 0)
+    if (GetPeerEndPoint((int) sock_fd, ipstr, port) == 0)
       return EndPoint(std::string(ipstr), port);
     return EndPoint();
   }

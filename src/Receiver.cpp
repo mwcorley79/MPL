@@ -169,7 +169,7 @@ namespace CSE384
           Message msg;
           while( (msg = GetMessage()).GetType() != MessageType::DISCONNECT)
           {
-             std::cout << "Got a message:" << msg << "from:" RemoteEP() << std::endl;
+             std::cout << "Got a message:" << msg << "from:" << RemoteEP() << std::endl;
              PostMessage(Message( std::string("Reply from server: ") +  GetServiceEndPoint().ToString()));
           }
        }
