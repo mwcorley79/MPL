@@ -114,7 +114,7 @@ void FTSClientHandler::DoSendFile(const std::string &filename)
   {
     //chuck the file over the channel in fixed size messages
     Block b = file.getBlock(msg_size_);
-    PostMessage(Message(&b[0], b.size(), (int)Commands::FILE_BLOCK));
+    PostMessage(Message(&b[0], (int) b.size(), (int)Commands::FILE_BLOCK));
     std::cout << "Sent block of size: " << b.size()
               << " bytes\n"
               << std::endl;

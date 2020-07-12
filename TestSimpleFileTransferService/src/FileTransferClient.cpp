@@ -152,7 +152,7 @@ void FTSClient::DoSendFile(const std::string &filename)
    {
       Block b = file.getBlock(msg_size_);
       if (b.size())
-         PostMessage(Message(&b[0], b.size(), (int)Commands::FILE_BLOCK));
+         PostMessage(Message(&b[0], (int) b.size(), (int)Commands::FILE_BLOCK));
    }
 
    file.close();
