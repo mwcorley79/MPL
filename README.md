@@ -4,13 +4,11 @@ One goal is to enable cross-platform portability (TCP socket level compatibility
 <b> The See TCPSocket.h/.cpp for details on the TCP socket wrapper code </b> <br><br>
 This project uses CMake to manage the build process for Linux and Windows.  <br> <br>
 The current objective (purpose) for this repo is to participate in a joint effort with Dr. James Fawcett (https://github.com/JimFawcett) to compare various (primarily performance related) aspects of the C++ and the (newer) Rust programming language.
-
 <b> Prerequisites for Linux </b>
 <ol>
   <li> install cmake 3.10 or greater (debian based:  sudo apt-get install cmake) </li>
   <li> toolchain: e.g. gcc/g++ etc. </li>
 </ol>
-
 <b> Build and install the MPL library on Linux: MPL.a (static library installed in MPL/install/lib) </b>
 <ol> 
   <li> open a terminal/console window and type the following commands in the shell ... </li>
@@ -21,7 +19,7 @@ The current objective (purpose) for this repo is to participate in a joint effor
 </ol>
 <b> Testing the MPL library on Linux </b>
 <ol>
-  <li>  ... in the same terminal from the previous step, type the following commands </li>
+  <li>  From the same terminal from the previous step, type the following commands </li>
   <li> cd ../MPLtests && mkdir build && cd build </li>
   <li> cmake .. </li>
   <li> make all </li>
