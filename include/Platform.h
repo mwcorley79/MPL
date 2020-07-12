@@ -58,7 +58,7 @@ const int PORTABLE_SOCK_ERR_BUF_SIZE = 512;
   #pragma warning(disable:4522)
   #pragma comment(lib, "Ws2_32.lib")
 
-  // helper function to make error handling portable:  on Linux return WSAGetLastError()
+  // helper function to make error handling portable:  on Windows return WSAGetLastError()
   inline int getlasterror_portable() { return  WSAGetLastError(); }
 
   // helper function to get socket errors in a portable way (windows and linux)
