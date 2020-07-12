@@ -5,14 +5,12 @@ One goal is to enable cross-platform portability (TCP socket level compatibility
 This project uses CMake to manage the build process for Linux and Windows.  <br> <br>
 The current objective (purpose) for this repo is to participate in a joint effort with Dr. James Fawcett (https://github.com/JimFawcett) to compare various (primarily performance related) aspects of the C++ and the (newer) Rust programming language. <br><br>
 
-<b> Steps to Build MPL (shared library: MPL.so -- Linux and MPL.dll -- on Windows) </b> <br> 
-(Note: only Linux vesrion is functional as of 7/6/20)
-Prerequisites for Linux
+<b> Prerequisites for Linux </b>
 <ol>
   <li> install cmake 3.10 or greater (debian based:  sudo apt-get install cmake) </li>
   <li> toolchain: e.g. gcc/g++ etc. </li>
 </ol>
-Build and install the MPL library on Linux: MPL.a (static library installed in MPL/install/lib)
+<b> Build and install the MPL library on Linux: MPL.a (static library installed in MPL/install/lib) </b>
 <ol> 
   <li> open a terminal/console window and type the following commands in the shell ... </li>
   <li> git clone https://github.com/mwcorley79/MPL.git </li>
@@ -20,7 +18,7 @@ Build and install the MPL library on Linux: MPL.a (static library installed in M
   <li> cmake .. -DCMAKE_INSTALL_PREFIX=../install </li>
   <li> make install </li>
 </ol>
-Testing the MPL library on Linux
+<b> Testing the MPL library on Linux </b>
 <ol>
   <li>  ... in the same terminal from the previous step, type the following commands </li>
   <li> cd ../MPLtests && mkdir build && cd build </li>
@@ -31,12 +29,12 @@ Testing the MPL library on Linux
        This should produce output such as the following: </i>
   <img src="./png/output.PNG"/>  
 </ol> 
-Prerequisites for Windows
+<b> Prerequisites for Windows <b>
   <ol>
     <li> Install CMake for Windows: https://cmake.org/download/ </li>
     <li> Visual Studio 2019 (installed, using as default generator)</li>
   </ol>
- Build and install the MPL library on Windows: MPL.lib (static library installed in MPL/install/lib)
+ <b> Build and install the MPL library on Windows: MPL.lib (static library installed in MPL/install/lib) </b>
   <ol> 
     <li> open a terminal/command window and type the following commands in the shell ... </li>
     <li> git clone https://github.com/mwcorley79/MPL.git </li>
@@ -51,7 +49,7 @@ Prerequisites for Windows
     <li> right click on the "INSTALL" and click "Build" <br>
          Note: Leave Visual Studio and terminal (from step 3) running
     </li>
-  Testing the MPL library on Windows
+    <b> Testing the MPL library on Windows </b>
    
        
   
