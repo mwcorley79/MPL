@@ -29,7 +29,7 @@ The current objective (purpose) for this repo is to participate in a joint effor
        This should produce output such as the following: </i>
   <img src="./png/output.PNG"/>  
 </ol> 
-<b> Prerequisites for Windows <b>
+<b> Prerequisites for Windows </b>
   <ol>
     <li> Install CMake for Windows: https://cmake.org/download/ </li>
     <li> Visual Studio 2019 (installed, using as default generator)</li>
@@ -49,12 +49,30 @@ The current objective (purpose) for this repo is to participate in a joint effor
     <li> right click on the "INSTALL" and click "Build" <br>
          Note: Leave Visual Studio and terminal (from step 3) running
     </li>
-    <b> Testing the MPL library on Windows </b>
+  </ol>
+  
+  <b> Testing the MPL library on Windows </b>
+  <ol> 
+    <li> From the same terminal in step 3 (above), type the following: </li>
+    <li> cd ../MPLtests && mkdir build && cd build </li>
+    <li> cmake .. <br>
+        (this generate the Visual Studio solution and projects in "MPL/MPLtests/build" folder)
+    </li>
+    <li> 6. From Visual Studion 2019, right click "MPL" solution, and select: 
+         "Add" -> "Existing Project".  Selected folder "MPLtests/build" and choose
+          the "ReceiverTest.vcxprog" project and click "Open"
+    </li>
+    <li> Repeat step 6, but substitute "SenderTest.vcxproj" for "ReceiverTest.vcxprog" </li>
+    <li> In Visual Studio, Right click "ReceiverTest" -> "Build" </li>
+    <li> In Visual Studio, Right click "SenderTest" -> "Build" <li>
+    <li> Right click "ReceiverTest" -> "Set as Startup Project" and type Ctrl-F5 </li>
+    <li> Right click "SenderTest" -> "Set as Startup Project" and type Ctrl-F5 </li>
+  </ol>
    
        
   
     
-</ol>
+
   
   
   <H2>Description:</H2>
