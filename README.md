@@ -3,7 +3,7 @@ Reusable message passing library (MPL) framework for developing network (client/
 One goal is to enable cross-platform portability (TCP socket level compatibility between Linux and Windows) by providing a TCPSocket class that wraps the (basic) differences between the low-level (C-based) Windows and Linux socket APIs.  (note: this not a complete, but minimal port to support the TCP communication required to enable message passing.) <br> <br>
 <b> The See TCPSocket.h/.cpp for details on the TCP socket wrapper code </b> <br><br>
 This project uses CMake to manage the build process for Linux and Windows.  <br> <br>
-The current objective (purpose) for this repo is to participate in a joint effort with Dr. James Fawcett (https://github.com/JimFawcett) to compare various (primarily performance related) aspects of the C++ and the (newer) Rust programming language.
+The current objective (purpose) for this repo is to participate in a joint effort with Dr. James Fawcett (https://github.com/JimFawcett) to compare various (primarily performance related) aspects of the C++ and the (newer) Rust programming language. <br>
 <b> Prerequisites for Linux </b>
 <ol>
   <li> install cmake 3.10 or greater (debian based:  sudo apt-get install cmake) </li>
