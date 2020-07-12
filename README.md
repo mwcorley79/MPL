@@ -24,8 +24,8 @@ The current objective (purpose) for this repo is to participate in a joint effor
   <li> cd ../MPLtests && mkdir build && cd build </li>
   <li> cmake .. </li>
   <li> make all </li>
-  The previous step should have produced two executable files: SenderTest and ReceiverTest. </br></br>
-  <li> Open two (separate terminal windows and type ./ReceiverTest in one terminal, and ./SenderTest in the other trerminal
+  The previous step should have produced two executable files: SenderTest and ReceiverTest. </br>
+  <li> Open two (separate terminal windows and type ./ReceiverTest in one terminal, and ./SenderTest in the other terminal
        This should produce output such as the following: </li>
   <img src="./png/output.PNG"/>  
 </ol> 
