@@ -26,7 +26,7 @@ The current objective (purpose) for this repo is to participate in a joint effor
   <li> make all </li>
   The previous step should have produced two executable files: SenderTest and ReceiverTest. </br></br>
   <li> Open two (separate terminal windows and type ./ReceiverTest in one terminal, and ./SenderTest in the other trerminal
-       This should produce output such as the following: </i>
+       This should produce output such as the following: </li>
   <img src="./png/output.PNG"/>  
 </ol> 
 <b> Prerequisites for Windows </b>
@@ -43,11 +43,11 @@ The current objective (purpose) for this repo is to participate in a joint effor
       <ol><li> this generate the Visual Studio solution and projects in "MPL/build" folder <br>
         and set install mpl library install folder to "MPL/INSTALL") </li></ol>
     </li>   
-    <li>  Start Visual Studio 2019, choose "Open and Project or solution", <br>
+    <li>  Start Visual Studio 2019, choose "Open a Project or solution", <br>
           navigate to the "MPL/build" folder and open solution file (MPL.sln) 
     </li>
-    <li> right click on the "INSTALL" and click "Build" <br>
-         Note: Leave Visual Studio and terminal (from step 3) running
+    <li> Right click on the "INSTALL" and click "Build" <br>
+         Note: Leave Visual Studio and the terminal (from step 3) running
     </li>
   </ol>
   
@@ -58,7 +58,7 @@ The current objective (purpose) for this repo is to participate in a joint effor
     <li> cmake .. <br>
         (this generate the Visual Studio solution and projects in "MPL/MPLtests/build" folder)
     </li>
-    <li> 6. From Visual Studion 2019, right click "MPL" solution, and select: 
+    <li>  From Visual Studion 2019, Right click "MPL" solution, and select: 
          "Add" -> "Existing Project".  Selected folder "MPLtests/build" and choose
           the "ReceiverTest.vcxprog" project and click "Open"
     </li>
@@ -67,14 +67,12 @@ The current objective (purpose) for this repo is to participate in a joint effor
     <li> In Visual Studio, Right click "SenderTest" -> "Build" <li>
     <li> Right click "ReceiverTest" -> "Set as Startup Project" and type Ctrl-F5 </li>
     <li> Right click "SenderTest" -> "Set as Startup Project" and type Ctrl-F5 </li>
+  <li> 
+       This should produce output such as the following: </li>
+       <img src="./png/winoutput.PNG"/>  
   </ol>
    
        
-  
-    
-
-  
-  
-  <H2>Description:</H2>
+  <H2>MPL Framework Synopsis:</H2>
   Three (3) primary classes comprise the framework: <b> Sender - </b> encapsulates client-side message passing. <b> Receiver </b> and <b> ClientHandler - </b>         encapsulate server-side message passing. Full-duplex infers bidirectional communication in which both the Sender and (derived) ClientHandler instances support GetMessage() and PostMessage() operations simultaneously.  The following picture illustrates the high-level concept: 
   <img src="./png/concept.PNG"/>  
