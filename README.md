@@ -10,6 +10,7 @@ The current objective (purpose) for this repo is to participate in a joint effor
   <li> install cmake 3.10 or greater (debian based:  sudo apt-get install cmake) </li>
   <li> toolchain: e.g. gcc/g++ etc. </li>
 </ol>
+
 <b> Build and install the MPL library on Linux: MPL.a (static library installed in MPL/install/lib) </b>
 <ol> 
   <li> open a terminal/console window and type the following commands in the shell ... </li>
