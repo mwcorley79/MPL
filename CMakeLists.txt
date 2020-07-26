@@ -13,13 +13,13 @@ include_directories(include)
 set (SOURCES src/Cpp11-BlockingQueue.cpp
              src/ClientHandler.cpp
              src/Logger.cpp
-             src/Sender.cpp 
+             src/TCPConnector.cpp 
              src/ThreadPool.cpp
              src/Message.cpp
              src/Task.cpp
              src/Utilities.cpp
              src/EndPoint.cpp         
-             src/Receiver.cpp
+             src/TCPResponder.cpp
              src/TCPSocket.cpp
              src/Platform.cpp)
 
@@ -31,14 +31,14 @@ set (INCLUDES include/ClientHandler.h
               include/mpl.h
               include/Platform.h
               include/ReceiverExceptions.h
-              include/Receiver.h
+              include/TCPResponder.h
               include/SenderExceptions.h
-              include/Sender.h
+              include/TCPConnector.h
               include/Task.h
               include/TCPSocketExceptions.h
               include/TCPSocket.h
               include/ThreadPool.h
-              include/Utilities.h)                 
+              include/Utilities.h)  
 
 # generate the MPL (shared) library target (.so / .dll) from the SOURCES
 # add_library(MPLshared SHARED ${SOURCES} )
@@ -48,5 +48,56 @@ add_library(MPL STATIC ${SOURCES} )
 
 # install the lib(s) and includes into the respeective the install directories
 install(TARGETS MPL DESTINATION lib)
-install(FILES ${INCLUDES} DESTINATION include)
+install(FILES ${INCLUDES} DESTINATION include)    
+         
+
+# *** This section is for compiling test stub targets *****
+
+# 1. generate the TCP socket test stub target (executable test) 
+add_executable(TCPSocketsTest src/TCPSocket.cpp src/EndPoint.cpp src/Platform.cpp)
+target_compile_definitions(TCPSocketsTest PUBLIC TEST_SOCKETS)  
+
+# 2. generate the Message class test stub target (executable test)
+add_executable(MessageTest src/Message.cpp src/Platform.cpp)
+target_compile_definitions(MessageTest PUBLIC TEST_MESSAGE) 
+
+# 3. generate the BloclingQueue class test stub target (executable test)
+add_executable(BQueueTest src/Cpp11-BlockingQueue.cpp)
+target_compile_definitions(BQueueTest PUBLIC TEST_BLOCKING_QUEUE) 
+
+# 4. generate the TCPConnector class test stub target (executable test)
+add_executable(TCPConnectorTest  src/TCPConnector.cpp 
+                           src/Message.cpp
+                           src/EndPoint.cpp         
+                           src/TCPSocket.cpp
+                           src/Platform.cpp)
+target_compile_definitions(TCPConnectorTest PUBLIC TEST_CONNECTOR) 
+
+# 5. generate the TCPResponder class test stub target (executable test)
+add_executable(TCPResponderTest src/TCPResponder.cpp 
+                            src/ClientHandler.cpp
+                            src/Logger.cpp
+                            src/Task.cpp
+                            src/ThreadPool.cpp
+                            src/Message.cpp
+                            src/EndPoint.cpp         
+                            src/TCPSocket.cpp
+                            src/Platform.cpp)
+target_compile_definitions(TCPResponderTest PUBLIC TEST_RESPONDER) 
+
+
+if (UNIX)
+    # link target to pthread library for LINUX
+    target_link_libraries (TCPSocketsTest pthread)
+    target_link_libraries (BQueueTest pthread)
+    target_link_libraries (TCPConnectorTest pthread)
+    target_link_libraries (TCPResponderTest pthread)
+else (NOT UNIX) 
+     # no need to link to pthread on Windows
+endif (UNIX)
+
+# ***  End test stub target section ***
+    
+
+
 

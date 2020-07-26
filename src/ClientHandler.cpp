@@ -15,9 +15,9 @@ namespace CSE384
 
           while(IsReceiving())
           {
-             Message msg = RecvSocketMessage();
+             MessagePtr msg = RecvSocketMessage();
              recv_queue_.enQ(msg);
-             if(msg.GetType() == MessageType::DISCONNECT)
+             if(msg->GetType() == MessageType::DISCONNECT)
              {
                 IsReceiving(false);
              }
@@ -31,7 +31,7 @@ namespace CSE384
     }
 
     // serialize the message header and message and write them into the socket
-    Message ClientHandler::RecvSocketMessage()
+    MessagePtr ClientHandler::RecvSocketMessage()
     {   
         struct MSGHEADER mhdr;
         int recv_bytes;
@@ -43,19 +43,19 @@ namespace CSE384
         
           //construct a Message using the Message header read from the socket channel
           // *** critical that mhdr is host byte order ****
-          Message msg(mhdr);
+          MessagePtr msgPtr(new Message(mhdr));
         
           // send message data
-          if(data_socket.Recv(msg.GetData(), msg.Length()) == -1)
+          if(data_socket.Recv(msgPtr->GetData(), msgPtr->Length()) == -1)
             throw ReceiverReceiveMessageDataException(getlasterror_portable());
         
-          return msg;
+          return msgPtr;
         }
 
         // if read zero bytes, thyen this is the zero length message signaling client shutdown
         if(recv_bytes == 0)
         {
-          return Message(NULL,0,DISCONNECT);
+          return MessagePtr(new Message(NULL,0,DISCONNECT));
         }
         else
         {
@@ -64,19 +64,23 @@ namespace CSE384
     }
 
     // serialize the message header and message and write them into the socket
-   void ClientHandler::SendSocketMessage(const Message& msg)
+   void ClientHandler::SendSocketMessage(const MessagePtr& msg)
    {
        // convert the wire protocol (message header) to big endian (network byte order)
-       struct MSGHEADER mhdr =  *(const_cast<Message&>(msg).GetHeader());
-       mhdr.ToNetworkByteOrder();
+       //struct MSGHEADER mhdr =  *(const_cast<Message&>(msg).GetHeader());
+       //mhdr.ToNetworkByteOrder();
+        int msg_len = msg->RawMsgLength();
+        msg->GetHeader()->ToNetorkByteOrder();
+        if(data_socket.Send(msg->GetRawMsg(), msg_len) == -1)
+          throw SenderTransmitMessageDataException(getlasterror_portable());
 
       // send message header
-      if(data_socket.Send((const char*) &mhdr, sizeof(struct MSGHEADER)) == -1)
-        throw SenderTransmitMessageHeaderException(getlasterror_portable());
+      //if(data_socket.Send((const char*) &mhdr, sizeof(struct MSGHEADER)) == -1)
+       // throw SenderTransmitMessageHeaderException(getlasterror_portable());
 
       // send message data
-      if(data_socket.Send(msg.GetData(), msg.Length()) == -1)
-         throw SenderTransmitMessageDataException(getlasterror_portable());
+      //if(data_socket.Send(msg.GetData(), msg.Length()) == -1)
+      //   throw SenderTransmitMessageDataException(getlasterror_portable());
    }
 
    void ClientHandler::StartSending()
@@ -94,7 +98,7 @@ namespace CSE384
       if(IsSending())
       {
         //note: only gets deposited into queue if IsSending is true
-        Message stopMsg(nullptr,0,STOP_SENDING);
+        MessagePtr stopMsg(new Message(nullptr,0,STOP_SENDING));
         send_bq_.enQ(stopMsg);
 
         // make the calling thread wait for the send thread to finish
@@ -114,11 +118,11 @@ namespace CSE384
          while(IsSending())
          {
             // deque the next message
-            Message msg = send_bq_.deQ();
+            MessagePtr msg = send_bq_.deQ();
           
             // if this is the stop sending message, signal 
             // the send thread to shutdown
-            if(msg.GetType() == STOP_SENDING)
+            if(msg->GetType() == STOP_SENDING)
             {
               IsSending(false);
             }

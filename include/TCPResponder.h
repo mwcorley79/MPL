@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Receiver.h -   multithreaded (concurrent) server framework              //
+// TCPResponder.h -   multithreaded (concurrent) server framework              //
 //                framework protoype                                       //
 // ver 1.0                                                                 //
 // Language:    Standard C++ (gcc/g++ 7.4)                                 //
@@ -18,24 +18,23 @@
  *  compliant. i.e. standard I/O, sockets (IPv4 - old interface) I/O, and 
  *  Threading model. 
  
- *  USAGE:  See Receiver test stub
+ *  USAGE:  See TCPResponder test stub
 
  * Required Files:
  * ==============
- * Receiver.h, MPUtils.h, Receiver.cpp, Message.cpp, MPUtils.cpp
+ * 
  *
  * Build Process: (for test stub)
- * =============
- * Linux:  g++ -DTEST_RECEIVER -o ReceiverTest Receiver.cpp Message.cpp MPUtils.cpp ClientHandler.cpp -lpthread 
+ * ==============
  *
  * Maintenance:
  * ===========
- *  ver 1.0 : 29 March 2019
+ *  ver 1.2 : 26 July 2020
  *  -- first release 
 */
 
-#ifndef _Receiver_h_
-#define _Receiver_h_
+#ifndef _TCPRESPONDER_H
+#define _TCPRESPONDER_H
 
 #include <thread>
 #include <atomic>
@@ -47,19 +46,19 @@
 
 namespace CSE384
 {
-   class Receiver
+   class TCPResponder
    {
       public:
-        Receiver(const EndPoint& ep, TCPSocketOptions* sc = nullptr);
-        virtual ~Receiver();
+        TCPResponder(const EndPoint& ep, TCPSocketOptions* sc = nullptr);
+        virtual ~TCPResponder();
         void RegisterClientHandler(ClientHandler* ch);
         void Start(int backlog=20);
         void Stop();
         bool IsListening();
 
-        // prevent users from making copies of Receiver objects
-        Receiver(const Receiver&) = delete;
-        Receiver& operator=(Receiver&) = delete;
+        // prevent users from making copies of TCPResponder objects
+        TCPResponder(const TCPResponder&) = delete;
+        TCPResponder& operator=(TCPResponder&) = delete;
 
       private:
         virtual void ServiceClient(ClientHandler* ch);
@@ -70,7 +69,7 @@ namespace CSE384
 
         EndPoint ServiceEP;
         TCPSocketOptions* sc_;
-        TCPSocket listenSocket_;
+        TCPServerSocket listenSocket_;
         ClientHandler* ch_;
         std::atomic<bool> islistening_;
         std::thread listenThread_;
@@ -82,12 +81,12 @@ namespace CSE384
         #endif
    };
 
-   inline bool Receiver::IsListening()
+   inline bool TCPResponder::IsListening()
    {
       return islistening_.load();
    }
 
-   inline void Receiver::IsListening(bool listening)
+   inline void TCPResponder::IsListening(bool listening)
    {
       islistening_.store(listening); 
    }

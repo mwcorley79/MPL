@@ -26,7 +26,7 @@ namespace CSE384
 
   TCPSocket &TCPSocket::operator=(TCPSocket &&s) noexcept
   {
-    if (this != &s)
+    if(this != &s)
     {
       sock_fd = s.sock_fd;
       s.sock_fd = INVALID_SOCKET;
@@ -52,116 +52,13 @@ namespace CSE384
   }
 
   // reference: Beej's guide to network programming: http://beej.us/guide/bgnet/
-  static int GetAddressInfo(const char *node_name, const char *serv_name, int ai_family, struct addrinfo **servinfo)
+  int TCPSocket::GetAddressInfo(const char *node_name, const char *serv_name, int ai_family, struct addrinfo **servinfo)
   {
     struct addrinfo hints;
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = ai_family;     // use IPv6 or IPv4
     hints.ai_socktype = SOCK_STREAM; // for now this will always be TCP
     return getaddrinfo(node_name, serv_name, &hints, servinfo);
-  }
-
-  void TCPSocket::Connect(const EndPoint &ep, TCPSocketOptions *sc)
-  {
-    struct addrinfo *p;
-    struct addrinfo *servinfo;
-    int error = 0;
-    int addr_info_result;
-
-    if ((addr_info_result = GetAddressInfo(ep.IP_STR(), ToString(ep.Port()).c_str(), AF_UNSPEC, &servinfo)) != 0)
-      throw GetAddrInfoException(addr_info_result);
-
-    //iterate over all the results and connect to the first we can
-    for (p = servinfo; p != 0; p = p->ai_next)
-    {
-      if ((sock_fd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1)
-      {
-        error = getlasterror_portable();
-        continue;
-      }
-
-      // if socket options are specified by the application, then apply before connect
-      if (sc != 0)
-      {
-        if (sc->SetSocketOptions(this) == -1)
-        {
-          error = getlasterror_portable();
-          freeaddrinfo(servinfo);
-          throw SocketOptionsException(error);
-        }
-      }
-
-      // attempt current connection result, and get out with first successful attempt
-      if (connect(sock_fd, p->ai_addr, (int)p->ai_addrlen) == INVALID_SOCKET)
-      {
-        error = getlasterror_portable();
-        closesocket(sock_fd);
-        continue;
-      }
-      break; //if we get here we must have connected successfully
-    }
-
-    // if couldn't connect to any of the addrinfo results, then bail with -1 indicator
-    if (p == 0 || sock_fd == INVALID_SOCKET)
-    {
-      sock_fd = INVALID_SOCKET;
-      freeaddrinfo(servinfo);
-      throw SenderConnectException(error);
-    }
-
-    // fill textual address information to return
-    //inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr), address, INET6_ADDRSTRLEN);
-    freeaddrinfo(servinfo);
-  }
-
-  void TCPSocket::Bind(const EndPoint &ep, TCPSocketOptions *sc)
-  {
-    struct addrinfo *p;
-    struct addrinfo *servinfo;
-    int addr_info_result;
-    int error = 0;
-
-    if ((addr_info_result = GetAddressInfo(ep.IP_STR(), ToString(ep.Port()).c_str(), AF_UNSPEC, &servinfo)) != 0)
-      throw GetAddrInfoException(addr_info_result);
-
-    // iterate over all the results and bind to the first we can
-    for (p = servinfo; p != 0; p = p->ai_next)
-    {
-      if ((sock_fd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1)
-      {
-        error = getlasterror_portable();
-        continue;
-      }
-
-      // if socket options are specified by the application, then apply before bind
-      if (sc != 0)
-      {
-        if (sc->SetSocketOptions(this) == -1)
-        {
-          error = getlasterror_portable();
-          freeaddrinfo(servinfo);
-          throw SocketOptionsException(error);
-        }
-      }
-
-      // attempt current connection result, and get out with first successful attempt
-      if (bind(sock_fd, p->ai_addr, (int)p->ai_addrlen) == INVALID_SOCKET)
-      {
-        error = getlasterror_portable();
-        closesocket(sock_fd);
-        continue;
-      }
-      break; //if we get here we must successfully bind
-    }
-
-    // if couldn't bind to any of the addrinfo results, then bail with -1 indicator
-    if (p == 0 || sock_fd == INVALID_SOCKET)
-    {
-      freeaddrinfo(servinfo);
-      throw ReceiverBindException(error);
-    }
-
-    freeaddrinfo(servinfo);
   }
 
   int TCPSocket::Send(const char *block, unsigned int blockLen, int sendRetries, unsigned int wait_time)
@@ -191,6 +88,7 @@ namespace CSE384
     return blockLen;
   }
 
+  //test MSG_WAITALL flag
   int TCPSocket::Recv(const char *block, unsigned int blockLen, int recvRetries, unsigned int wait_time)
   {
     int bytesRecvd, bytesLeft = blockLen;
@@ -220,12 +118,7 @@ namespace CSE384
     return blockLen;
   }
 
-  void TCPSocket::Listen(int backlog)
-  {
-    if (listen(sock_fd, backlog) != 0)
-      throw ReceiverListenException(getlasterror_portable());
-  }
-
+  
   TCPSocket TCPSocket::Accept()
   {
     struct sockaddr_in client_addr;
@@ -263,18 +156,137 @@ namespace CSE384
     return 0;
   }
 
+
+  int TCPSocket::Close()
+  {
+    int ret = closesocket(sock_fd);
+    if (ret == 0)
+      sock_fd = INVALID_SOCKET;
+    return ret;
+  }
+
+  void TCPClientSocket::Connect(const EndPoint &ep, TCPSocketOptions *sc)
+  {
+    struct addrinfo *p;
+    struct addrinfo *servinfo;
+    int error = 0;
+    int addr_info_result;
+
+    if ((addr_info_result = GetAddressInfo(ep.IP_STR(), ToString(ep.Port()).c_str(), AF_UNSPEC, &servinfo)) != 0)
+      throw GetAddrInfoException(addr_info_result);
+
+    // iterate over all the results and connect to the first we can
+    for (p = servinfo; p != 0; p = p->ai_next)
+    {
+    
+      if (SetSockFd(socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == INVALID_SOCKET)
+      {
+        error = getlasterror_portable();
+        continue;
+      }
+
+      // if socket options are specified by the application, then apply before connect
+      if (sc != 0)
+      {
+        if (sc->SetSocketOptions(this) == -1)
+        {
+          error = getlasterror_portable();
+          freeaddrinfo(servinfo);
+          throw SocketOptionsException(error);
+        }
+      }
+
+      // attempt current connection result, and get out with first successful attempt
+      if (connect(GetSockFd(), p->ai_addr, (int)p->ai_addrlen) == INVALID_SOCKET)
+      {
+        error = getlasterror_portable();
+        closesocket(GetSockFd());
+        continue;
+      }
+      break; //if we get here we must have connected successfully
+    }
+
+    // if couldn't connect to any of the addrinfo results, then bail with -1 indicator
+    if (p == 0 || GetSockFd() == INVALID_SOCKET)
+    {
+      SetSockFd(INVALID_SOCKET);
+      freeaddrinfo(servinfo);
+      throw SenderConnectException(error);
+    }
+
+    // fill textual address information to return
+    //inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr), address, INET6_ADDRSTRLEN);
+    freeaddrinfo(servinfo);
+  }
+
+  void TCPServerSocket::Listen(int backlog)
+  {
+    if (listen(GetSockFd(), backlog) != 0)
+      throw ReceiverListenException(getlasterror_portable());
+  }
+
+  void TCPServerSocket::Bind(const EndPoint &ep, TCPSocketOptions *sc)
+  {
+    struct addrinfo *p;
+    struct addrinfo *servinfo;
+    int addr_info_result;
+    int error = 0;
+
+    if((addr_info_result = GetAddressInfo(ep.IP_STR(), ToString(ep.Port()).c_str(), AF_UNSPEC, &servinfo)) != 0)
+      throw GetAddrInfoException(addr_info_result);
+
+    // iterate over all the results and bind to the first we can
+    for (p = servinfo; p != 0; p = p->ai_next)
+    {
+      if(SetSockFd(socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == INVALID_SOCKET)
+      {
+        error = getlasterror_portable();
+        continue;
+      }
+
+      // if socket options are specified by the application, then apply before bind
+      if (sc != 0)
+      {
+        if (sc->SetSocketOptions(this) == INVALID_SOCKET)
+        {
+          error = getlasterror_portable();
+          freeaddrinfo(servinfo);
+          throw SocketOptionsException(error);
+        }
+      }
+
+      // attempt current connection result, and get out with first successful attempt
+      if (bind(GetSockFd(), p->ai_addr, (int)p->ai_addrlen) == INVALID_SOCKET)
+      {
+        error = getlasterror_portable();
+        closesocket(GetSockFd());
+        continue;
+      }
+      break; //if we get here we must successfully bind
+    }
+
+    // if couldn't bind to any of the addrinfo results, then bail with -1 indicator
+    if (p == 0 || GetSockFd() == INVALID_SOCKET)
+    {
+      freeaddrinfo(servinfo);
+      throw ReceiverBindException(error);
+    }
+
+    freeaddrinfo(servinfo);
+  }
+
   EndPoint TCPSocket::RemoteEP()
   {
     unsigned int port;
     char ipstr[INET6_ADDRSTRLEN];
-    if (GetPeerEndPoint((int) sock_fd, ipstr, port) == 0)
+    if(GetPeerEndPoint((int) GetSockFd(), ipstr, port) == 0)
       return EndPoint(std::string(ipstr), port);
     return EndPoint();
   }
 
 }; // namespace CSE384
 
-#ifdef TEST_SOCKET
+#ifdef TEST_SOCKETS
 #include <iostream>
 #include <thread>
 using namespace CSE384;
@@ -285,18 +297,29 @@ void ServiceProc(const EndPoint &service_ep)
   int backlog = 10;
 
   TCPSocketOptions so(SOL_SOCKET, (SO_REUSEPORT | SO_REUSEADDR));
-  TCPSocket sock;
+  TCPServerSocket sock;
   sock.Bind(service_ep, &so);
 
   // set socket socket listening
   sock.Listen(backlog);
 
   // ---accept a connection (creating a data pipe)---
-  TCPSocket client_sock = sock.Accept();
+  TCPSocket channel = sock.Accept();
   char block[11];
-  int n = client_sock.Recv(block, 10);
+  int rn = channel.Recv(block, 10);
   block[10] = '\0';
-  std::cout << "Received: " << block << " : " << n << " bytes" << std::endl;
+  int sn = channel.Send((char *)"rend test!", 10);
+
+  int ret = channel.Close();
+  if(ret != INVALID_SOCKET)
+    std::cout << "server channel socket closed" << std::endl;
+
+  std::cout << "Server Received: " << block << " : " << rn << " bytes" << std::endl;
+  std::cout << "Server Sent: " << sn << " bytes" << std::endl;
+
+  ret = sock.Close();
+  if(ret != INVALID_SOCKET)
+    std::cout << "server listening socket closed" << std::endl;
 }
 
 // start a dedicated server thread for testing
@@ -316,13 +339,21 @@ int main()
   ::sleep(3);
 
   // create client socket for Connect, Send test
-  TCPSocket send_sock;
-  send_sock.Connect(server_ep);
-  if (send_sock.IsConnected())
-  {
-    int n = send_sock.Send((char *)"send test!", 10);
-    closesocket((SOCKET)send_sock);
-    std::cout << "Sent: " << n << " bytes" << std::endl;
+  TCPClientSocket client_sock;
+  client_sock.Connect(server_ep);
+  if (client_sock.IsConnected())
+  { 
+    int sn = client_sock.Send((char *)"cend test!", 10);
+    char block[10];
+    int sr = client_sock.Recv(block, 10);
+    block[10] = '\0';
+
+    int ret = client_sock.Close();
+    if(ret != INVALID_SOCKET)
+       std::cout << "client channel socket closed" << std::endl;
+
+    std::cout << "Client Sent    : " << sn << " bytes" << std::endl;
+    std::cout << "Client Received: " << block << " : " << sr << " bytes" << std::endl;
   }
   // wait until the server thread finishes
   serverThread.join();

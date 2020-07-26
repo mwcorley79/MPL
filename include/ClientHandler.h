@@ -43,15 +43,15 @@ namespace CSE384
     class ClientHandler
     {
        public: 
-         friend class Receiver; // let Receiver access private state
+         friend class TCPResponder; // let TCPResponder access private state
          ClientHandler();
          void SetSocket(TCPSocket& sock);
          int Close();
          bool IsReceiving() const;
          bool IsSending() const;
           
-         Message GetMessage();
-         void PostMessage(const Message& m);
+         MessagePtr GetMessage();
+         void PostMessage(const MessagePtr& m);
 
          EndPoint& GetServiceEndPoint();
 
@@ -73,8 +73,8 @@ namespace CSE384
 
          // can redefine socket level processing (if you wish)
          virtual void RecvProc();
-         virtual Message RecvSocketMessage();
-         virtual void SendSocketMessage(const Message& msg);
+         virtual MessagePtr RecvSocketMessage();
+         virtual void SendSocketMessage(const MessagePtr& msg);
          virtual void sendProc();  
         
          void IsReceiving(bool receiving);  
@@ -89,8 +89,8 @@ namespace CSE384
          std::atomic<bool> isReceiving_;
          std::atomic<bool> isSending_;
          
-         BlockingQueue<Message> recv_queue_;
-         BlockingQueue<Message> send_bq_;
+         BlockingQueue<MessagePtr> recv_queue_;
+         BlockingQueue<MessagePtr> send_bq_;
          EndPoint ServiceEP;
     };
 
@@ -132,12 +132,12 @@ namespace CSE384
        }
     }
 
-    inline Message ClientHandler::GetMessage()
+    inline MessagePtr ClientHandler::GetMessage()
     {
        return recv_queue_.deQ();
     }
      
-    inline void ClientHandler::PostMessage(const Message& msg)
+    inline void ClientHandler::PostMessage(const MessagePtr& msg)
     {
        return send_bq_.enQ(msg);
     }

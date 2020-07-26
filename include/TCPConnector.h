@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Sender.h -   multithreaded (concurrent) TCP client                      //
+// TCPConnector.h -   multithreaded (concurrent) TCP client                //
 //                framework protoype                                       //
 // ver 1.0                                                                 //
 // Language:    Standard C++ (gcc/g++ 7.4)                                 //
@@ -20,22 +20,22 @@
  
  * Required Files:
  * ==============
- * Sender.h, MPUtils.h,  Sender.cpp, MPUtils.cpp
+ * 
  *
- * USAGE: See Sender Test stub
+ * USAGE: See TCPConnector Test stub
  * 
  * Build Process: (for test stub)
  * =============
- * Linux:  g++ -DTEST_SENDER -o  SenderTest Sender.cpp  Message.cpp  MPUtils.cpp -lpthread 
+ * 
  *
  * Maintenance:
  * ===========
- * ver 1.0 : 29 March 2019
+ * ver 1.2 : 26 July 2019
  * -- first release 
 */
 
-#ifndef _Sender_h_
-#define _Sender_h_
+#ifndef _TCPCONNECTOR_H_
+#define _TCPCONNECTOR_H_
 
 #include "Cpp11-BlockingQueue.h"
 #include "EndPoint.h"
@@ -45,43 +45,43 @@
 #include <cstring>
 #include <thread>
 #include <atomic>
+#include <memory>
 
 namespace CSE384
 {
-  class Sender
+  class TCPConnector
   {
     public: 
-     Sender(TCPSocketOptions* sc = nullptr);
-     virtual ~Sender();
+     TCPConnector(TCPSocketOptions* sc = nullptr);
+     virtual ~TCPConnector();
    
     // void Stop();
      bool Close();
      bool IsConnected() const;
      bool IsSending() const;
      bool IsReceiving() const;
-     void PostMessage(const Message& m);
+     void PostMessage(const MessagePtr& m);
 
-     Message GetMessage();
+     MessagePtr GetMessage();
      
-
      void Connect(const EndPoint& ep);
      int  ConnectPersist(const EndPoint& ep,  unsigned retries, 
                          unsigned wtime_secs, unsigned vlevel);   
 
-     // prevent users from making copies of Sender objects  
-     Sender(const Sender&) = delete;
-     Sender& operator=(Sender&) = delete;
+     // prevent users from making copies of TCPConnector objects  
+     TCPConnector(const TCPConnector&) = delete;
+     TCPConnector& operator=(TCPConnector&) = delete;
 
     private:
-        TCPSocket socket;
+        TCPClientSocket socket;
         TCPSocketOptions* sc_;
 
         std::atomic<bool> isSending_;
         std::atomic<bool> isReceiving_;
 
-        BlockingQueue<Message> recv_queue_;
-        BlockingQueue<Message> send_bq_;
-        std::thread  send_thread_;
+        BlockingQueue<MessagePtr> recv_queue_;
+        BlockingQueue<MessagePtr> send_bq_;
+        std::thread send_thread_;
         std::thread recvThread;
         
         void StartReceiving();
@@ -92,10 +92,10 @@ namespace CSE384
         bool Start();
 
         // can redefine socket level processing (if you wish)
-        virtual void SendSocketMessage(const Message& msg);
+        virtual void SendSocketMessage(const MessagePtr& msg);
         virtual void sendProc();  
         virtual void RecvProc();
-        virtual Message RecvSocketMessage();
+        virtual MessagePtr RecvSocketMessage();
 
         void IsSending(bool issending);   
         void StartSending();
@@ -109,27 +109,27 @@ namespace CSE384
         
   };
 
-  inline void Sender::IsSending(bool issending)
+  inline void TCPConnector::IsSending(bool issending)
   {
      isSending_.store(issending);
   }
 
-  inline bool Sender::IsSending() const
+  inline bool TCPConnector::IsSending() const
   {
     return isSending_.load(); 
   }
 
-  inline bool Sender::IsReceiving() const
+  inline bool TCPConnector::IsReceiving() const
   {
     return isReceiving_.load();
   }
 
-  inline void Sender::IsReceiving(bool receiving)
+  inline void TCPConnector::IsReceiving(bool receiving)
   {
        isReceiving_.store(receiving);
   }
 
-  inline bool Sender::IsConnected() const
+  inline bool TCPConnector::IsConnected() const
   {
      return socket.IsConnected();
   }

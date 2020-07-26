@@ -12,21 +12,24 @@ namespace CSE384
   public:
     TCPSocket();
     TCPSocket(SOCKET fd);
-    void Connect(const EndPoint &ep, TCPSocketOptions *sc = nullptr);
-    bool IsConnected() const;
+  
     bool IsValid() const;
-    void Bind(const EndPoint &ep, TCPSocketOptions *sc = nullptr);
-    void Listen(int backlog);
+   
     int Send(const char *block, unsigned int blockLen, int sendRetries = 1, unsigned int wait_time = 1);
     int Recv(const char *block, unsigned int blockLen, int recvRetries = 1, unsigned int wait_time = 1);
     operator SOCKET();
-    SOCKET GetSockFd();
+    SOCKET GetSockFd() const;
+    SOCKET SetSockFd(SOCKET sock_fd);
     TCPSocket Accept();
-    EndPoint RemoteEP();
+
+    int  GetLastMsgSizeTransmitted() const;
+    void SetLastMsgSizeTransmitted(int msg_size);
+   
     int Shutdown();
     int ShutdownSend();
     int ShutdownRecv();
     int Close();
+    EndPoint RemoteEP(); 
 
     TCPSocket(TCPSocket &&s) noexcept;
     TCPSocket &operator=(TCPSocket &&s) noexcept;
@@ -34,10 +37,30 @@ namespace CSE384
     // disable copy construction and assignment
     TCPSocket(const TCPSocket &s) = delete;
     TCPSocket &operator=(const TCPSocket &s) = delete;
-
+  
+  protected:
+     int GetAddressInfo(const char *node_name, const char *serv_name, 
+                         int ai_family, struct addrinfo **servinfo);
   private:
     SOCKET sock_fd;
+    int last_msg_size_;
   };
+
+  class TCPClientSocket : public TCPSocket
+  {
+     public:
+        void Connect(const EndPoint &ep, TCPSocketOptions *sc = nullptr);
+        bool IsConnected() const;
+  };
+
+  class TCPServerSocket : public TCPSocket
+  {
+    public:
+      void Bind(const EndPoint &ep, TCPSocketOptions *sc = nullptr);
+      void Listen(int backlog);
+     
+  };
+
 
   // class for deferring socket options to the application
   // (for client side and server side)
@@ -46,6 +69,8 @@ namespace CSE384
   {
   public:
     friend TCPSocket;
+    friend TCPServerSocket;
+    friend TCPClientSocket;
     TCPSocketOptions(int level, int option_names);
 
   private:
@@ -65,9 +90,14 @@ namespace CSE384
     return setsockopt(soc->GetSockFd(), level_, option_names_, (char *)&optval, sizeof(optval));
   }
 
-  inline SOCKET TCPSocket::GetSockFd()
+  inline SOCKET TCPSocket::GetSockFd() const
   {
     return sock_fd;
+  }
+
+  inline SOCKET TCPSocket::SetSockFd(SOCKET sock)
+  {
+    return (sock_fd = sock);
   }
 
   inline TCPSocket::operator SOCKET()
@@ -75,12 +105,17 @@ namespace CSE384
     return sock_fd;
   }
 
-  inline bool TCPSocket::IsValid() const
+  inline int TCPSocket::GetLastMsgSizeTransmitted() const
   {
-    return (sock_fd != INVALID_SOCKET);
+     return last_msg_size_;
+  }
+  
+  inline void TCPSocket::SetLastMsgSizeTransmitted(int msg_size)
+  {
+    last_msg_size_ = msg_size;
   }
 
-  inline bool TCPSocket::IsConnected() const
+  inline bool TCPSocket::IsValid() const
   {
     return (sock_fd != INVALID_SOCKET);
   }
@@ -100,13 +135,11 @@ namespace CSE384
     return shutdown(sock_fd, SD_RECEIVE);
   }
 
-  inline int TCPSocket::Close()
+  inline bool TCPClientSocket::IsConnected() const
   {
-    int ret = closesocket(sock_fd);
-    if (ret == 0)
-      sock_fd = -1;
-    return ret;
+    return (GetSockFd() != INVALID_SOCKET);
   }
+
 }; // namespace CSE384
 
 #endif /* TCPSOCKET_H_ */

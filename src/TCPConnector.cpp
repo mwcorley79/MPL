@@ -1,31 +1,31 @@
-#include "Sender.h"
+#include "TCPConnector.h"
 #include "SenderExceptions.h"
 #include "ReceiverExceptions.h"
 #include "Platform.h"
 
 namespace CSE384 
 {
-   Sender::Sender(TCPSocketOptions* sc):    sc_(sc),
+   TCPConnector::TCPConnector(TCPSocketOptions* sc):    sc_(sc),
                                             isSending_(false),
                                             isReceiving_(false)
    {}
 
-   void Sender::PostMessage(const Message& m)
+   void TCPConnector::PostMessage(const MessagePtr& m)
    {  
       send_bq_.enQ(m);  
    }
 
-   void Sender::StartSending()
+   void TCPConnector::StartSending()
    {
       if(!IsSending())
       {    
          //start the send the send thread
          IsSending(true);
-         send_thread_ = std::thread(&Sender::sendProc, this);
+         send_thread_ = std::thread(&TCPConnector::sendProc, this);
       }
    }
 
-   bool Sender::Start()
+   bool TCPConnector::Start()
    {
       if(IsConnected())
       {
@@ -38,7 +38,7 @@ namespace CSE384
 
    // dedicated thread function that deques messages 
    // from the blocking queue and writes them into the socket
-   void Sender::sendProc()
+   void TCPConnector::sendProc()
    {
       try
       {
@@ -46,18 +46,18 @@ namespace CSE384
          while(IsSending())
          {
             // deque the next message
-            Message msg = send_bq_.deQ();
+            MessagePtr msgPtr = send_bq_.deQ();
           
             // if this is the stop sending message, signal 
             // the send thread to shutdown
-            if(msg.GetType() == STOP_SENDING)
+            if(msgPtr->GetType() == STOP_SENDING)
             {
               IsSending(false);
             }
             else
             {
                // serialize the message into the socket
-               SendSocketMessage(msg);
+               SendSocketMessage(msgPtr);
             }     
          }
       }
@@ -68,39 +68,44 @@ namespace CSE384
    }
 
    // serialize the message header and message and write them into the socket
-   void Sender::SendSocketMessage(const Message& msg)
+   void TCPConnector::SendSocketMessage(const MessagePtr& msgPtr)
    {
        // convert the wire protocol (message header) to big endian (network byte order)
-       struct MSGHEADER mhdr =  *(const_cast<Message&>(msg).GetHeader());
-       mhdr.ToNetworkByteOrder();
+       //struct MSGHEADER mhdr =  *(const_cast<Message&>(msg).GetHeader());
+       //mhdr.ToNetworkByteOrder();
+
+       int length = msgPtr->RawMsgLength();
+       msgPtr->GetHeader()->ToNetorkByteOrder();
+       if(socket.Send(msgPtr->GetRawMsg(), length) == -1)
+          throw SenderTransmitMessageDataException(getlasterror_portable());
 
       // send message header
-      if(socket.Send( (const char*) &mhdr, sizeof(struct MSGHEADER)) == -1)
-        throw SenderTransmitMessageHeaderException(getlasterror_portable());
+      //if(socket.Send( (const char*) &mhdr, sizeof(struct MSGHEADER)) == -1)
+       // throw SenderTransmitMessageHeaderException(getlasterror_portable());
 
       // send message data
-      if(socket.Send(msg.GetData(), msg.Length()) == -1)
-         throw SenderTransmitMessageDataException(getlasterror_portable());
+      //if(socket.Send(msg.GetData(), msg.Length()) == -1)
+       //  throw SenderTransmitMessageDataException(getlasterror_portable());
    }
 
-   Message Sender::GetMessage()
+   MessagePtr TCPConnector::GetMessage()
    {
-       return this->recv_queue_.deQ();
+       return recv_queue_.deQ();
    }
 
-   void Sender::StartReceiving()
+   void TCPConnector::StartReceiving()
    {
       if(!IsReceiving())
       {    
          //start the send the send thread
          IsReceiving(true);
-         recvThread = std::thread(&Sender::RecvProc, this);
+         recvThread = std::thread(&TCPConnector::RecvProc, this);
       }
    }
 
     // RecvProc is a dedicated thread for servicing the socket
     // by pulling out messasges and enQing in the recv blocking queue
-    void Sender::RecvProc()
+    void TCPConnector::RecvProc()
     {
         try
         {
@@ -108,9 +113,9 @@ namespace CSE384
 
           while(IsReceiving())
           {
-             Message msg = RecvSocketMessage();
-             recv_queue_.enQ(msg);
-             if(msg.GetType() == MessageType::DISCONNECT)
+             MessagePtr msgPtr = RecvSocketMessage();
+             recv_queue_.enQ(msgPtr);
+             if(msgPtr->GetType() == MessageType::DISCONNECT)
             // if(msg.GetType() == MessageType::STOP_RECEIVING)
              {
                 IsReceiving(false);
@@ -125,31 +130,31 @@ namespace CSE384
     }
 
     // serialize the message header and message and write them into the socket
-    Message Sender::RecvSocketMessage()
+    MessagePtr TCPConnector::RecvSocketMessage()
     {   
         struct MSGHEADER mhdr;
         int recv_bytes;
         // receive fixed size message header (see wire protocol in Message.h)
-        if(  (recv_bytes = socket.Recv((const char*) &mhdr, sizeof(MSGHEADER))) == sizeof(MSGHEADER))
+        if((recv_bytes = socket.Recv((const char*) &mhdr, sizeof(MSGHEADER))) == sizeof(MSGHEADER))
         {
           // *** MUST convert message header to host byte order (e.g. Intel CPU == little endian)
           mhdr.ToHostByteOrder();
         
           //construct a Message using the Message header read from the socket channel
           // *** critical that mhdr is host byte order ****
-          Message msg(mhdr);
-        
+          MessagePtr msgPtr(new Message(mhdr));
+          
           // send message data
-          if(socket.Recv(msg.GetData(), msg.Length()) == -1)
-            throw ReceiverReceiveMessageDataException(getlasterror_portable());
+          if(socket.Recv(msgPtr->GetData(), msgPtr->Length()) == -1)
+           // throw ReceiverReceiveMessageDataException(getlasterror_portable());
         
-          return msg;
+          return msgPtr;
         }
 
         // if read zero bytes, then this is the zero length message signaling client shutdown
         if(recv_bytes == 0)
         {
-          return Message(NULL,0,DISCONNECT);
+          return MessagePtr(new Message(NULL,0,DISCONNECT));
         }
         else
         {
@@ -158,23 +163,23 @@ namespace CSE384
     }   
 
 
-   void Sender::StopSending()
+   void TCPConnector::StopSending()
    {
       if(IsSending())
       {
         //note: only gets deposited into queue if IsSending is true
-        Message stopMsg(nullptr,0,STOP_SENDING);
-        send_bq_.enQ(stopMsg);
+        MessagePtr StopMsgPtr(new Message(nullptr,0,STOP_SENDING));
+        send_bq_.enQ(StopMsgPtr);
       }
    }
 
-   //void Sender::Stop()
+   //void TCPConnector::Stop()
    // {
     //    StopSending();
    // }
 
    /* 
-   void Sender::StopReceiving()
+   void TCPConnector::StopReceiving()
    {
       if(IsReceiving())
       {
@@ -186,7 +191,7 @@ namespace CSE384
    */
 
  
-   bool Sender::Close()
+   bool TCPConnector::Close()
    {
       bool ret = false;
       if(IsConnected())
@@ -213,13 +218,13 @@ namespace CSE384
       return ret; 
    }
 
-   Sender::~Sender()
+   TCPConnector::~TCPConnector()
    {
       // call close in case the client forgot
       Close();
    }
 
-   void Sender::Connect(const EndPoint& ep)
+   void TCPConnector::Connect(const EndPoint& ep)
    {
 	    socket.Connect(ep, sc_);
 
@@ -229,7 +234,7 @@ namespace CSE384
 
 
 
-   int Sender::ConnectPersist(const EndPoint& ep,  unsigned retries,
+   int TCPConnector::ConnectPersist(const EndPoint& ep,  unsigned retries,
                              unsigned wtime_secs, unsigned vlevel)
    {
      unsigned int runAttempts = 0;
@@ -260,22 +265,25 @@ namespace CSE384
 
 };
 
-// *** SENDER TEST STUB ****
+// *** TCPConnector TEST STUB ****
 // ** For testing: run against "Receiver test stub **
-#ifdef TEST_SENDER
+#ifdef TEST_CONNECTOR
 #include <string>
 #include <vector>
 #include<iostream>
-#include <mpl.h>
+
+#ifdef LINK_MPL
+  #include <mpl.h>
+#endif 
 
 using namespace CSE384;
 
-void SenderProc(Sender* sender)
+void SenderProc(TCPConnector* connector)
 {
-   Message msg;
-   while( (msg = sender->GetMessage()).GetType() != MessageType::DISCONNECT)
+   MessagePtr msg;
+   while( (msg = connector->GetMessage())->GetType() != MessageType::DISCONNECT)
    {
-      std::cout << msg.ToString() << std::endl;
+      std::cout << msg->ToString() << std::endl;
    }   
 }
 
@@ -289,7 +297,7 @@ void TestSenderAsync(const std::string& name)
    //EndPoint serverEp("::1", 6060);
    
    // instantiate a sender 
-   Sender sender;
+   TCPConnector connector;
 
    int wait_secs = 1; // wait time between connection attempts
    int verbose_level = 1;  // verbose (display connect attempts)
@@ -309,10 +317,10 @@ void TestSenderAsync(const std::string& name)
    if(sender.IsConnected())
    */
 
-   if (sender.ConnectPersist(serverEp, connect_attempts, wait_secs, verbose_level) < 10)
+   if (connector.ConnectPersist(serverEp, connect_attempts, wait_secs, verbose_level) < 10)
    {
        //handle messages received in separate thread
-       std::thread receiverProc(SenderProc, &sender);
+       std::thread receiverProc(SenderProc, &connector);
 
        int num_messages = 10;
        // loop to send 10 messages 
@@ -320,18 +328,18 @@ void TestSenderAsync(const std::string& name)
        {
            // build an and print each string message 
            std::string strMsg = name + " [ Message #: " + std::to_string(j + 1) + " ]";
-           Message msg(strMsg.c_str(), (int) strMsg.length(),  MessageType::STRING);
-           std::cout << "Message is: " << msg << std::endl;
+           MessagePtr msg(new Message(strMsg.c_str(), (int) strMsg.length(),  MessageType::STRING));
+           std::cout << "Message is: " << *msg << std::endl;
 
            // post message into the send queue
-           sender.PostMessage(msg);
+           connector.PostMessage(msg);
            //std::cout << sender.GetMessage() << std::endl;
 
            // sleep for a second so we can see what's going on
           std::this_thread::sleep_for(std::chrono::seconds(1));
        }
 
-       sender.Close();
+       connector.Close();
        receiverProc.join();
    }
    else
