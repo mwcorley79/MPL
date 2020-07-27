@@ -23,9 +23,9 @@ The current objective (purpose) for this repo is to participate in a joint effor
   <li> cd ../MPLtests && mkdir build && cd build </li>
   <li> cmake .. </li>
   <li> make all </li>
-  The previous step should have produced two executable files: SenderTest and ReceiverTest. </br>
-  <li> Open two (separate terminal windows and type ./ReceiverTest in one terminal, and ./SenderTest in the other terminal
-       This should produce output such as the following: </li>
+  The previous step should have produced two executable files: TCPConnectorTest (was previously SenderTest) and TCPResponderTest (was previously ReceiverTest). </br>
+  <li> Open two (separate terminal windows and type ./TCPResponderTest in one terminal, and ./TCPConnectorTest in the other terminal
+       This should produce output such as the following: (note: rpelace ReceiverTest with TCPResponderTest and SenderTest with TCPConnectorTest </li>
   <img src="./png/output.PNG"/>  
 </ol> 
 <hr>
@@ -60,18 +60,18 @@ The current objective (purpose) for this repo is to participate in a joint effor
     </li>
     <li>  From Visual Studion 2019, Right click "MPL" solution, and select: 
          "Add" -> "Existing Project".  Selected folder "MPLtests/build" and choose
-          the "ReceiverTest.vcxprog" project and click "Open"
+          the "TCPResponderTest.vcxprog" project and click "Open"
     </li>
-    <li> Repeat step 6, but substitute "SenderTest.vcxproj" for "ReceiverTest.vcxprog" </li>
-    <li> In Visual Studio, Right click "ReceiverTest" -> "Build" </li>
-    <li> In Visual Studio, Right click "SenderTest" -> "Build" </li>
-    <li> Right click "ReceiverTest" -> "Set as Startup Project" and type Ctrl-F5 </li>
-    <li> Right click "SenderTest" -> "Set as Startup Project" and type Ctrl-F5 </li>
+    <li> Repeat step 6, but substitute "TCPConnectorTest.vcxproj" for "TCPResponderTest.vcxprog" </li>
+    <li> In Visual Studio, Right click "TCPResponderTest" -> "Build" </li>
+    <li> In Visual Studio, Right click "TCPConnectorTest" -> "Build" </li>
+    <li> Right click "TCPResponderTest" -> "Set as Startup Project" and type Ctrl-F5 </li>
+    <li> Right click "TCPConnectorTest" -> "Set as Startup Project" and type Ctrl-F5 </li>
   <li> 
        This should produce output such as the following: </li>
        <img src="./png/winoutput.PNG"/>  
   </ol>
    <hr>     
   <H2>MPL Framework Synopsis:</H2>
-  Three (3) primary classes comprise the framework: <b> Sender - </b> encapsulates client-side message passing. <b> Receiver </b> and <b> ClientHandler - </b>         encapsulate server-side message passing. Full-duplex infers bidirectional communication in which both the Sender and (derived) ClientHandler instances support GetMessage() and PostMessage() operations simultaneously.  The following picture illustrates the high-level concept: 
+  Three (3) primary classes comprise the framework: <b> TCPConnector (Sender) - </b> encapsulates client-side message passing. <b> TCPResponder (Receiver) </b> and <b> ClientHandler - </b>encapsulate server-side message passing. Full-duplex infers bidirectional communication in which both the Sender and (derived) ClientHandler instances support GetMessage() and PostMessage() operations simultaneously.  The following picture illustrates the high-level concept: 
   <img src="./png/concept.PNG"/>  
