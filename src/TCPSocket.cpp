@@ -118,19 +118,6 @@ namespace CSE384
     return blockLen;
   }
 
-  
-  TCPSocket TCPSocket::Accept()
-  {
-    struct sockaddr_in client_addr;
-    socklen_t addrlen = sizeof(client_addr);
-    // ---accept a connection (creating a data pipe)---
-
-    // std::cout << "Hello New Client From: " << inet_ntoa(client_addr.sin_addr) << " : "
-    //           << ntohs(client_addr.sin_port) << std::endl;
-
-    return TCPSocket(accept(sock_fd, (struct sockaddr *)&client_addr, &addrlen));
-  }
-
   static int GetPeerEndPoint(int sock_fd, char ipstr[], unsigned int &port)
   {
     socklen_t len;
@@ -156,6 +143,14 @@ namespace CSE384
     return 0;
   }
 
+  EndPoint TCPSocket::RemoteEP()
+  {
+    unsigned int port;
+    char ipstr[INET6_ADDRSTRLEN];
+    if(GetPeerEndPoint((int) GetSockFd(), ipstr, port) == 0)
+      return EndPoint(std::string(ipstr), port);
+    return EndPoint();
+  }
 
   int TCPSocket::Close()
   {
@@ -275,13 +270,16 @@ namespace CSE384
     freeaddrinfo(servinfo);
   }
 
-  EndPoint TCPSocket::RemoteEP()
+  TCPSocket TCPServerSocket::Accept()
   {
-    unsigned int port;
-    char ipstr[INET6_ADDRSTRLEN];
-    if(GetPeerEndPoint((int) GetSockFd(), ipstr, port) == 0)
-      return EndPoint(std::string(ipstr), port);
-    return EndPoint();
+    struct sockaddr_in client_addr;
+    socklen_t addrlen = sizeof(client_addr);
+    // ---accept a connection (creating a data pipe)---
+
+    // std::cout << "Hello New Client From: " << inet_ntoa(client_addr.sin_addr) << " : "
+    //           << ntohs(client_addr.sin_port) << std::endl;
+
+    return TCPSocket(accept(GetSockFd(), (struct sockaddr *)&client_addr, &addrlen));
   }
 
 }; // namespace CSE384

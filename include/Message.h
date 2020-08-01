@@ -102,7 +102,7 @@ namespace CSE384
 
   inline Message::~Message()
   {
-    delete raw_msg_;
+    delete[] raw_msg_;
   }
 
   inline MessageType Message::GetType() const

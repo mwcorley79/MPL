@@ -101,8 +101,9 @@ namespace CSE384
 
     inline int ClientHandler::Close()
     {   
-       data_socket.Shutdown();
-       return  data_socket.Close();
+       data_socket.ShutdownSend();
+       data_socket.ShutdownRecv();
+       return data_socket.Close();
     }
 
     inline void ClientHandler::SetServiceEndPoint(const EndPoint& ep)

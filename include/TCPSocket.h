@@ -57,6 +57,7 @@ namespace CSE384
   {
     public:
       void Bind(const EndPoint &ep, TCPSocketOptions *sc = nullptr);
+      TCPSocket Accept();
       void Listen(int backlog);
      
   };

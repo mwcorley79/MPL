@@ -103,35 +103,32 @@ namespace CSE384
       }
    }
 
-    // RecvProc is a dedicated thread for servicing the socket
-    // by pulling out messasges and enQing in the recv blocking queue
-    void TCPConnector::RecvProc()
-    {
-        try
-        {
-          //IsReceiving(true);
+   // RecvProc is a dedicated thread for servicing the socket
+   // by pulling out messasges and enQing in the recv blocking queue
+   void TCPConnector::RecvProc()
+   {
+      try
+      {
+         while (IsReceiving())
+         {
+            MessagePtr msgPtr = RecvSocketMessage();
+            recv_queue_.enQ(msgPtr);
+            if (msgPtr->GetType() == MessageType::DISCONNECT)
+            {
+               IsReceiving(false);
+            }
+         }
+      }
+      catch (const std::exception &ex)
+      {
+         std::cerr << ex.what() << std::endl;
+         IsReceiving(false);
+      }
+   }
 
-          while(IsReceiving())
-          {
-             MessagePtr msgPtr = RecvSocketMessage();
-             recv_queue_.enQ(msgPtr);
-             if(msgPtr->GetType() == MessageType::DISCONNECT)
-            // if(msg.GetType() == MessageType::STOP_RECEIVING)
-             {
-                IsReceiving(false);
-             }
-          }
-        }
-        catch(const std::exception& ex)
-        {
-           std::cerr << ex.what() << std::endl;
-           IsReceiving(false);
-        }
-    }
-
-    // serialize the message header and message and write them into the socket
-    MessagePtr TCPConnector::RecvSocketMessage()
-    {   
+   // serialize the message header and message and write them into the socket
+   MessagePtr TCPConnector::RecvSocketMessage()
+   {   
         struct MSGHEADER mhdr;
         int recv_bytes;
         // receive fixed size message header (see wire protocol in Message.h)
@@ -139,14 +136,14 @@ namespace CSE384
         {
           // *** MUST convert message header to host byte order (e.g. Intel CPU == little endian)
           mhdr.ToHostByteOrder();
-        
-          //construct a Message using the Message header read from the socket channel
+         
+          // construct a Message using the Message header read from the socket channel
           // *** critical that mhdr is host byte order ****
           MessagePtr msgPtr(new Message(mhdr));
           
           // send message data
           if(socket.Recv(msgPtr->GetData(), msgPtr->Length()) == -1)
-           // throw ReceiverReceiveMessageDataException(getlasterror_portable());
+            throw ReceiverReceiveMessageDataException(getlasterror_portable());
         
           return msgPtr;
         }
@@ -154,7 +151,7 @@ namespace CSE384
         // if read zero bytes, then this is the zero length message signaling client shutdown
         if(recv_bytes == 0)
         {
-          return MessagePtr(new Message(NULL,0,DISCONNECT));
+           return MessagePtr(new Message(NULL,0,DISCONNECT));
         }
         else
         {
@@ -210,8 +207,8 @@ namespace CSE384
              recvThread.join();
         // }
 
-         socket.ShutdownRecv();
-         ret = (socket.Close() == 0);
+        // socket.ShutdownRecv();
+        // ret = (socket.Close() == 0);
 
       }
 

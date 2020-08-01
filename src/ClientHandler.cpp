@@ -9,26 +9,29 @@ namespace CSE384
     // by pulling out messages and enQing in the recv blocking queue
     void ClientHandler::RecvProc()
     {
-        try
-        {
+       try
+       {
           IsReceiving(true);
 
-          while(IsReceiving())
+          while (IsReceiving())
           {
              MessagePtr msg = RecvSocketMessage();
              recv_queue_.enQ(msg);
-             if(msg->GetType() == MessageType::DISCONNECT)
+             if (msg->GetType() == MessageType::DISCONNECT)
              {
                 IsReceiving(false);
              }
           }
-        }
-        catch(const std::exception& ex)
-        {
-           std::cerr << ex.what() << std::endl;
-           IsReceiving(false);
-        }
+       }
+       catch (const std::exception &ex)
+       {
+          std::cerr << ex.what() << std::endl;
+          IsReceiving(false);
+       }
+
+       // std::cout << "recv thread shutdown" << std::endl;
     }
+
 
     // serialize the message header and message and write them into the socket
     MessagePtr ClientHandler::RecvSocketMessage()
@@ -113,8 +116,6 @@ namespace CSE384
    {
       try
       {
-         //IsSending(true);
-
          while(IsSending())
          {
             // deque the next message
@@ -132,6 +133,8 @@ namespace CSE384
                SendSocketMessage(msg);
             }     
          }
+
+         //std::cout << "send thread shutdown" << std::endl;
       }
       catch(...)
       {
