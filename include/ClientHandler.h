@@ -51,7 +51,9 @@ namespace CSE384
          bool IsSending() const;
          TCPSocket&  GetDataSocket(); 
          MessagePtr GetMessage();
+         MessagePtr ReceiveMessage();
          void PostMessage(const MessagePtr& m);
+         void SendMessage(const MessagePtr& m);
 
          EndPoint& GetServiceEndPoint();
 
@@ -142,12 +144,22 @@ namespace CSE384
     {
        return recv_queue_.deQ();
     }
-     
+
+    inline MessagePtr ClientHandler::ReceiveMessage()
+    {
+       return RecvSocketMessage();
+    }
+
     inline void ClientHandler::PostMessage(const MessagePtr& msg)
     {
        return send_bq_.enQ(msg);
     }
 
+    inline void ClientHandler::SendMessage(const MessagePtr& msg)
+    {
+       SendSocketMessage(msg);
+    }
+    
     inline void ClientHandler::SetSocket(TCPSocket& sock)
     {
       data_socket = std::move(sock);

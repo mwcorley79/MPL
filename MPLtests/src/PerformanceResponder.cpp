@@ -24,7 +24,7 @@ public:
    {
       // while there are messages in the blocking queue, and you have seen the disconnect
       // message, pull messages out and dispaly them.
-    
+      
       high_resolution_clock::time_point t1 = high_resolution_clock::now();
 
       MessagePtr msg;
@@ -34,7 +34,12 @@ public:
          MessagePtr msgPtr = Message::CreateFixedSizeMessage(GetMessageSize(),
                          std::string("Reply from server: ") + GetServiceEndPoint().ToString() 
          );
-         PostMessage(msgPtr);
+
+         // queue reply message
+         // PostMessage(msgPtr);
+
+         // send reply message directly (no queue)
+         SendMessage(msgPtr);
       }
 
       high_resolution_clock::time_point t2 = high_resolution_clock::now();

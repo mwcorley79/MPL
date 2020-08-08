@@ -97,7 +97,7 @@ namespace CSE384
 
     while (bytesLeft > 0)
     {
-      bytesRecvd = recv(sock_fd, (char *)&block[blockIndx], bytesLeft, 0);
+      bytesRecvd = recv(sock_fd, (char *)&block[blockIndx], bytesLeft, MSG_WAITALL);
 
       if (bytesRecvd > 0)
       {

@@ -71,9 +71,9 @@ namespace CSE384
       // convert the wire protocol (message header) to big endian (network byte order)
       //struct MSGHEADER mhdr =  *(const_cast<Message&>(msg).GetHeader());
       //mhdr.ToNetworkByteOrder();
-      int msg_len = msg->RawMsgLength();
+    
       msg->GetHeader()->ToNetorkByteOrder();
-      if (data_socket.Send(msg->GetRawMsg(), msg_len) == -1)
+      if (data_socket.Send(msg->GetRawMsg(), msg->RawMsgLength()) == -1)
          throw SenderTransmitMessageDataException(getlasterror_portable());
 
       // send message header

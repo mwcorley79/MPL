@@ -46,7 +46,10 @@ int main()
          std::cout << "Message is: " << *msg << std::endl;
 
          // post message into the send queue
-         perfConnector.PostMessage(msg);
+         // perfConnector.PostMessage(msg);
+
+         //send message directly (no queue)
+         perfConnector.SendMessage(msg);
          //std::cout << sender.GetMessage() << std::endl;
 
          // sleep for a second so we can see what's going on

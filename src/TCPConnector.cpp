@@ -11,11 +11,6 @@ namespace CSE384
    {
    }
 
-   void TCPConnector::PostMessage(const MessagePtr &m)
-   {
-      send_bq_.enQ(m);
-   }
-
    void TCPConnector::StartSending()
    {
       if (!IsSending())
@@ -75,9 +70,8 @@ namespace CSE384
       //struct MSGHEADER mhdr =  *(const_cast<Message&>(msg).GetHeader());
       //mhdr.ToNetworkByteOrder();
 
-      int length = msgPtr->RawMsgLength();
       msgPtr->GetHeader()->ToNetorkByteOrder();
-      if (socket.Send(msgPtr->GetRawMsg(), length) == -1)
+      if (socket.Send(msgPtr->GetRawMsg(), msgPtr->RawMsgLength()) == -1)
          throw SenderTransmitMessageDataException(getlasterror_portable());
 
       // send message header
@@ -89,10 +83,7 @@ namespace CSE384
       //  throw SenderTransmitMessageDataException(getlasterror_portable());
    }
 
-   MessagePtr TCPConnector::GetMessage()
-   {
-      return recv_queue_.deQ();
-   }
+  
 
    void TCPConnector::StartReceiving()
    {
