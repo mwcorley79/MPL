@@ -49,7 +49,7 @@ namespace CSE384
          int Close();
          bool IsReceiving() const;
          bool IsSending() const;
-          
+         TCPSocket&  GetDataSocket(); 
          MessagePtr GetMessage();
          void PostMessage(const MessagePtr& m);
 
@@ -60,22 +60,22 @@ namespace CSE384
          // pure virtual function: must implement 
          virtual void AppProc() = 0;
          virtual ClientHandler* Clone() = 0;
-
+         
          virtual ~ClientHandler();
 
          // prevent users from making explicit copies of ClientHandler ojects  
         ClientHandler(const ClientHandler&) = delete;
         ClientHandler& operator=(ClientHandler&) = delete;
-
+        
        private:
          void StartSending();
          void StopSending();
 
          // can redefine socket level processing (if you wish)
          virtual void RecvProc();
+         virtual void sendProc();  
          virtual MessagePtr RecvSocketMessage();
          virtual void SendSocketMessage(const MessagePtr& msg);
-         virtual void sendProc();  
         
          void IsReceiving(bool receiving);  
          void IsSending(bool issending);
@@ -93,10 +93,10 @@ namespace CSE384
          BlockingQueue<MessagePtr> send_bq_;
          EndPoint ServiceEP;
     };
-
+    
+    
     inline ClientHandler::ClientHandler(): isReceiving_(false),
-                                           isSending_(false)
-                             
+                                           isSending_(false)                         
     {}
 
     inline int ClientHandler::Close()
@@ -104,6 +104,11 @@ namespace CSE384
        data_socket.ShutdownSend();
        data_socket.ShutdownRecv();
        return data_socket.Close();
+    }
+
+    inline TCPSocket& ClientHandler::GetDataSocket()
+    {
+       return data_socket;
     }
 
     inline void ClientHandler::SetServiceEndPoint(const EndPoint& ep)
@@ -166,6 +171,27 @@ namespace CSE384
     inline bool ClientHandler::IsSending() const
     {
        return isSending_.load();
+    }
+
+    ////////////////////////////////////////
+    //  fix size message client handler   //
+    ///////////////////////////////////////
+    class FixedSizeMsgClientHander : public ClientHandler
+    {
+       public:
+          FixedSizeMsgClientHander(int msg_size);
+          int GetMessageSize() const;
+       private: 
+          int msg_size_;
+          // redefine socket level processing for fixed message handling 
+          // only one send and recv system call
+          virtual MessagePtr RecvSocketMessage();
+          virtual void SendSocketMessage(const MessagePtr& msg);
+    };
+
+    inline int FixedSizeMsgClientHander::GetMessageSize() const
+    {
+       return msg_size_;
     }
 }
 

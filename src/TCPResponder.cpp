@@ -8,7 +8,6 @@ namespace CSE384
                                                                           ch_(nullptr),
                                                                           islistening_(false)
    {
-
       listenSocket_.Bind(ep, sc);
    }
 

@@ -14,7 +14,8 @@ namespace CSE384
   using MessagePtr = std::shared_ptr<Message>;
   using MessageType = enum { DISCONNECT = -1,
                              STOP_SENDING = -2,
-                             STRING = -3 };
+                             STRING = -3, 
+                             BINARY = -4};
 
   // binary message structure: (wire protocol as used by messaging interface)
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__) || defined(_WIN64)
@@ -29,7 +30,7 @@ namespace CSE384
     {
     }
 
-    MSGHEADER(int l, int t)
+    MSGHEADER(uint32_t l, int32_t t)
     {
       // store "length" in upper half of the word,
       // store "type" in the lower half   
@@ -68,17 +69,25 @@ namespace CSE384
   {
   public:
     Message(const std::string &str, int type = 0);  
-    Message(const char *data = 0, uint16_t length = 0, int16_t type = 0);
+    Message(const char *data = 0, unsigned int length = 0, int type = 0);
     Message(const MSGHEADER &mhdr);
-    
+    Message(int fixed_size, const char* data, int length, int type=0);
+    Message(int fixed_size, int length, int type=0);
     Message &operator=(const Message &msg); 
     Message &operator=(Message &&msg);
     
     Message(const Message &msg);
     Message(Message &&msg);
 
-    
-   
+    //static MessagePtr AllocateEmptyFixedSizeMessage(int msg_size);
+    static MessagePtr CreateMessage(const MSGHEADER &mhdr);
+    static MessagePtr CreateMessage(const char *data, unsigned int length, int type=0);
+    static MessagePtr CreateMessage(const std::string &str, int type = 0); 
+
+    static MessagePtr CreateFixedSizeMessage(int msg_size, const char *data, unsigned int length, int type=0);
+    static MessagePtr CreateFixedSizeMessage(int msg_size, const std::string &str, int type = 0);
+    static MessagePtr CreateEmptyFixedSizeMessage(int msg_size);
+
     char& operator[](int index);
     const char& operator[](int index) const;
 
@@ -95,19 +104,99 @@ namespace CSE384
 
     int RawMsgLength() const;
     char* GetRawMsg() const;
-
-  private:
-    char *raw_msg_;
+    
+  private:  
+    int raw_len_;
+    char *raw_msg_; 
   };
 
-  inline Message::~Message()
+  inline MessagePtr Message::CreateFixedSizeMessage(int msg_size, const char *data, unsigned int length, int type)
   {
-    delete[] raw_msg_;
+     return MessagePtr (new Message(msg_size, data, length, type));
+  }
+
+  inline MessagePtr Message::CreateFixedSizeMessage(int msg_size, const std::string &str, int type)
+  {
+     return CreateFixedSizeMessage(msg_size, str.c_str(), str.length(), type); 
+  }
+
+  inline MessagePtr Message::CreateEmptyFixedSizeMessage(int msg_size)
+  {
+      return MessagePtr (  new Message(msg_size, msg_size));
+  }
+
+  inline MessagePtr Message::CreateMessage(const MSGHEADER &mhdr)
+  {
+     return MessagePtr(new Message(mhdr));
+  }
+
+  inline MessagePtr Message::CreateMessage(const std::string &str, int type)
+  {
+     return MessagePtr(new Message(str, type));
+  } 
+
+  inline MessagePtr Message::CreateMessage(const char *data, unsigned int length, int type)
+  {
+     return MessagePtr(new Message(data, length, type));
+  }
+
+  inline Message::Message(int fixed_size, int length, int type): raw_len_(sizeof(MSGHEADER) + fixed_size),
+                                                                 raw_msg_(new char[raw_len_])
+  {
+    // use placement new to init MSG_HDR in raw_msg_ memory space
+    new (raw_msg_) MSGHEADER(length, type);
+    std::memset((raw_msg_ + sizeof(MSGHEADER)), 0, fixed_size);
+  }
+
+  inline Message::Message(int fixed_size, const char* data, int length, int type): raw_len_(sizeof(MSGHEADER) + fixed_size),
+                                                                                   raw_msg_(new char[raw_len_])
+  {
+    // use placement new to init MSG_HDR in raw_msg_ memory space
+    new (raw_msg_) MSGHEADER(length, type);
+    std::memset((raw_msg_ + sizeof(MSGHEADER)), 0, fixed_size);
+    std::memcpy((raw_msg_ + sizeof(MSGHEADER)), data, length);
+  }
+
+  inline Message::Message(const char *data, unsigned int length, int type) : raw_len_(sizeof(MSGHEADER) + length),
+                                                                             raw_msg_(new char[raw_len_])
+  {
+    // use placement new to instantiate MSG_HDR in raw_msg_ memory space
+    new (raw_msg_) MSGHEADER(length, type);
+
+    // copy the message into the data portion of the raw message
+    std::memcpy((raw_msg_ + sizeof(MSGHEADER)), data, length);
+  }
+
+  inline Message::Message(const std::string &str, int type) : Message(str.c_str(), str.length(), type)
+  {
+  }
+ 
+  inline Message::Message(const MSGHEADER &hdr) :  raw_len_(sizeof(MSGHEADER) + hdr.len()),
+                                                   raw_msg_(new char[raw_len_])
+  {
+    // use placement new to instantiate MSG_HDR in raw_msg_ memory space
+    new (raw_msg_) MSGHEADER(hdr.len(), hdr.type()); 
+    std::memset((raw_msg_ + sizeof(MSGHEADER)), 0, Length());
+  }
+
+  inline int Message::RawMsgLength() const
+  {
+    return raw_len_;
+  }
+
+  inline char* Message::GetRawMsg() const
+  {
+      return raw_msg_;
   }
 
   inline MessageType Message::GetType() const
   {
     return (MessageType)((MSGHEADER *)raw_msg_)->type();
+  }
+
+  inline int Message::Length() const
+  {
+    return ((MSGHEADER *)raw_msg_)->len();
   }
 
   inline MSGHEADER *Message::GetHeader()
@@ -117,7 +206,25 @@ namespace CSE384
 
   inline char *Message::GetData() const
   {
-    return (raw_msg_ + HeaderSize());
+    return (raw_msg_ + sizeof(MSGHEADER));
+  }
+
+  inline Message::Message(Message &&msg) : raw_msg_(msg.raw_msg_)
+  {
+    raw_len_ = msg.raw_len_;
+    msg.raw_msg_ = nullptr;
+    msg.raw_len_ = 0;
+  }
+
+  inline Message::Message(const Message &msg) : raw_msg_(new char[msg.RawMsgLength()])
+  {
+    std::memcpy(raw_msg_, msg.raw_msg_, msg.RawMsgLength());
+    raw_len_ = msg.raw_len_;
+  }
+
+  inline Message::~Message()
+  {
+    delete[] raw_msg_;
   }
 
   inline char& Message::operator[](int index)
@@ -138,21 +245,6 @@ namespace CSE384
   inline int Message::HeaderSize() const
   {
     return sizeof(MSGHEADER);
-  }
-
-  inline int Message::Length() const
-  {
-    return ((MSGHEADER *)raw_msg_)->len();
-  }
-
-  inline int Message::RawMsgLength() const
-  {
-    return (Length() + HeaderSize());
-  }
-
-  inline char* Message::GetRawMsg() const
-  {
-      return raw_msg_;
   }
 
   std::ostream &operator<<(std::ostream &outs, Message &msg);

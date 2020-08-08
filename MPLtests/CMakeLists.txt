@@ -14,27 +14,26 @@ project(TEST_MPL)
 # set to c++ 17 (standard) 
 set(CMAKE_CXX_STANDARD 17)
 
-# include all the headers from the include folder
-include_directories(../../MPL/install/include)
+# include all the headers from the install include folder
+include_directories(../../MPL/install/include ./include )
 
+# add install folder to linker search path: enable linker to find libMPL
 link_directories( ../../MPL/install/lib)
 
-# generate the TCPResponder test stub target (executable test) from the SOURCES
-add_executable(TCPResponderTest ../../MPL/src/TCPResponder.cpp)
-target_compile_definitions(TCPResponderTest PUBLIC TEST_RESPONDER LINK_MPL)
+# generate the TCPResponderPerfTest test stub target (executable test) from the SOURCES
+add_executable(TCPResponderPerfTest ./src/PerformanceResponder.cpp)
 
 # generate the TCPConnector test stub target (executable test) from the SOURCES
-add_executable(TCPConnectorTest ../../MPL/src/TCPConnector.cpp)
-target_compile_definitions(TCPConnectorTest PUBLIC TEST_CONNECTOR)
+add_executable(TCPConnectorPerfTest ./src/PerformanceConnector.cpp)
 
 if (UNIX)
-    # link MPL.so and pthread to the ReceiverTest and SenderTest targets for LINUX
-    target_link_libraries (TCPResponderTest MPL.a pthread)
-    target_link_libraries (TCPConnectorTest MPL.a pthread)
+    # link libMPL and pthread to the targets for LINUX
+    target_link_libraries (TCPResponderPerfTest MPL.a pthread)
+    target_link_libraries (TCPConnectorPerfTest MPL.a pthread)
 else (NOT UNIX) 
     # link MPL.dll to TCPResponderTest  and TCPConnectorTest targets for WINDOWS
-    target_link_libraries (TCPResponderTest MPL.lib)
-    target_link_libraries (TCPConnectorTest MPL.lib)
+    target_link_libraries (TCPResponderPerfTest MPL.lib)
+    target_link_libraries (TCPConnectorPerfTest MPL.lib)
 endif (UNIX)
 
 
