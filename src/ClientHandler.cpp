@@ -74,8 +74,12 @@ namespace CSE384
     
       msg->GetHeader()->ToNetorkByteOrder();
       if (data_socket.Send(msg->GetRawMsg(), msg->RawMsgLength()) == -1)
+      {
+         msg->GetHeader()->ToHostByteOrder();
          throw SenderTransmitMessageDataException(getlasterror_portable());
+      }
 
+      msg->GetHeader()->ToHostByteOrder();
       // send message header
       //if(data_socket.Send((const char*) &mhdr, sizeof(struct MSGHEADER)) == -1)
       // throw SenderTransmitMessageHeaderException(getlasterror_portable());
@@ -170,11 +174,12 @@ namespace CSE384
    }
 
    // serialize the message header and message and write them into the socket
-   void FixedSizeMsgClientHander::SendSocketMessage(const MessagePtr &msg)
+   /* void FixedSizeMsgClientHander::SendSocketMessage(const MessagePtr &msg)
    {
       msg->GetHeader()->ToNetorkByteOrder();
       if (GetDataSocket().Send(msg->GetRawMsg(), msg->RawMsgLength()) == -1)
          throw SenderTransmitMessageDataException(getlasterror_portable());
    }
+   */
 
 } // namespace CSE384

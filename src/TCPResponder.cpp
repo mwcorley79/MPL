@@ -6,7 +6,9 @@ namespace CSE384
    TCPResponder::TCPResponder(const EndPoint &ep, TCPSocketOptions *sc) : ServiceEP(ep),
                                                                           sc_(sc),
                                                                           ch_(nullptr),
-                                                                          islistening_(false)
+                                                                          islistening_(false),
+                                                                          useClientRecvQueue_(true),
+                                                                          useClientSendQueue_(true)
    {
       listenSocket_.Bind(ep, sc);
    }
@@ -79,11 +81,13 @@ namespace CSE384
          std::thread clientThread;
          try
          {
-            //start the client processing thread
-            clientThread = std::thread(&ClientHandler::RecvProc, ch);
+            //start the client processing thread, if use specifies to 
+            if(UseClientReceiveQueue())
+               clientThread = std::thread(&ClientHandler::RecvProc, ch);
 
             // start the send thread
-            ch->StartSending();
+            if(UseClientSendQueue())
+                ch->StartSending();
 
             // start the user defined AppProc() on a new thread
             // std::thread app_thread_ = std::thread(&ClientHandler::AppProc, ch);
@@ -98,11 +102,13 @@ namespace CSE384
 
          try
          {
-            if (clientThread.joinable())
-               clientThread.join();
+            if(UseClientReceiveQueue())
+              if(clientThread.joinable())
+                 clientThread.join();
 
             // stop the send thread
-            ch->StopSending();
+            if(UseClientSendQueue())
+               ch->StopSending();
 
             // signal client to shutdown
             ch->Close();
@@ -156,9 +162,7 @@ namespace CSE384
    // ***  TCPResponder TEST STUB ***
 #ifdef TEST_RESPONDER
 #include <iostream>
-#ifdef LINK_MPL
-#include <mpl.h>
-#endif
+
 /*  Note: use either "SenderTest" for test */
 using namespace CSE384;
 
@@ -180,11 +184,21 @@ public:
       // message, pull messages out and dispaly them.
 
       MessagePtr msg;
-      while ((msg = GetMessage())->GetType() != MessageType::DISCONNECT)
+
+      // when UseReceiveQueue == false, then we must ReceiveMessage instead of GetMessage()
+      while ((msg = ReceiveMessage())->GetType() != MessageType::DISCONNECT)
+      {
+         std::cout << "Got a message:" << *msg << "from:" << RemoteEP() << std::endl;      
+         SendMessage(Message::CreateMessage(std::string("Reply from server: ") + GetServiceEndPoint().ToString()));
+         //PostMessage(MessagePtr(new Message(std::string("Reply from server: ") + GetServiceEndPoint().ToString())));
+      } 
+
+     /* while ((msg = GetMessage())->GetType() != MessageType::DISCONNECT)
       {
          std::cout << "Got a message:" << *msg << "from:" << RemoteEP() << std::endl;
          PostMessage(MessagePtr(new Message(std::string("Reply from server: ") + GetServiceEndPoint().ToString())));
       }
+      */  
    }
 
    ~TestClientHandler()
@@ -211,6 +225,15 @@ int main(int argc, char *argv[])
 
    // register the custom client handler with TCPResponder instance
    responder.RegisterClientHandler(&th);
+
+   // false: does not start the receive thread, and does not enQ  messages into the receive blocking Queue
+   // note: when false, user must call ReceiveMessage() in the ClientHandler AppProc(), not GetMessage()
+   responder.UseClientReceiveQueue(false);
+   
+   // false: does not start the send thread, and does not deQ messages and send via the send blocking Queue
+   // note: when false, user must call SendMessage() in the ClientHandler AppProc(), not PostMessage() which enQ into the send blocking Queue
+   responder.UseClientSendQueue(false);
+   // responder.UseClientSendReceiveQueues(false);
 
    // start the server listening thread
    responder.Start();

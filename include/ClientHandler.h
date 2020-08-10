@@ -198,7 +198,7 @@ namespace CSE384
           // redefine socket level processing for fixed message handling 
           // only one send and recv system call
           virtual MessagePtr RecvSocketMessage();
-          virtual void SendSocketMessage(const MessagePtr& msg);
+          //virtual void SendSocketMessage(const MessagePtr& msg);
     };
 
     inline int FixedSizeMsgClientHander::GetMessageSize() const

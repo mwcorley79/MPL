@@ -54,6 +54,12 @@ namespace CSE384
         void RegisterClientHandler(ClientHandler* ch);
         void Start(int backlog=20);
         void Stop();
+        bool UseClientReceiveQueue();
+        void UseClientSendReceiveQueues(bool use_qs);
+        void UseClientReceiveQueue(bool use_q);
+        bool UseClientSendQueue();
+        void UseClientSendQueue(bool use_q);
+
         bool IsListening();
 
         // prevent users from making copies of TCPResponder objects
@@ -75,6 +81,8 @@ namespace CSE384
         std::thread listenThread_;
 
         ThreadPool<8> threadPool_;
+        std::atomic<bool> useClientRecvQueue_;
+        std::atomic<bool> useClientSendQueue_;
 
         #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__) || defined(_WIN64)
         SocketSystem s;
@@ -89,6 +97,32 @@ namespace CSE384
    inline void TCPResponder::IsListening(bool listening)
    {
       islistening_.store(listening); 
+   }
+
+   inline void TCPResponder::UseClientSendReceiveQueues(bool use_qs)
+   {
+      UseClientReceiveQueue(use_qs);
+      UseClientSendQueue(use_qs);
+   }
+
+   inline bool TCPResponder::UseClientReceiveQueue()
+   {
+      return useClientRecvQueue_.load();
+   }
+
+   inline void TCPResponder::UseClientReceiveQueue(bool use_q)
+   {
+      useClientRecvQueue_.store(use_q);
+   }
+
+   inline bool TCPResponder::UseClientSendQueue()
+   {
+      return useClientSendQueue_.load();
+   }
+
+   inline void TCPResponder::UseClientSendQueue(bool use_q)
+   {
+      useClientSendQueue_.store(use_q);
    }
 }
 #endif 

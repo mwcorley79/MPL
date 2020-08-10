@@ -60,6 +60,11 @@ namespace CSE384
         bool IsConnected() const;
         bool IsSending() const;
         bool IsReceiving() const;
+        void UseSendReceiveQueues(bool use_qs);
+        void UseSendQueue(bool use_q);
+        bool UseSendQueue();
+        void UseReceiveQueue(bool use_q);
+        bool UseReceiveQueue();
         void PostMessage(const MessagePtr &m);
         void SendMessage(const MessagePtr &m);
         MessagePtr GetMessage();
@@ -90,6 +95,9 @@ namespace CSE384
 
         std::atomic<bool> isSending_;
         std::atomic<bool> isReceiving_;
+
+        std::atomic<bool> useSendQueue_;
+        std::atomic<bool> useRecvQueue_;
 
         BlockingQueue<MessagePtr> recv_queue_;
         BlockingQueue<MessagePtr> send_bq_;
@@ -130,12 +138,12 @@ namespace CSE384
 
     inline MessagePtr TCPConnector::GetMessage()
     {
-       return recv_queue_.deQ();
+        return recv_queue_.deQ();
     }
 
     inline MessagePtr TCPConnector::ReceiveMessage()
     {
-       return RecvSocketMessage();
+        return RecvSocketMessage();
     }
 
     inline bool TCPConnector::IsSending() const
@@ -163,6 +171,32 @@ namespace CSE384
         return socket;
     }
 
+    inline void TCPConnector::UseSendReceiveQueues(bool use_qs)
+    {
+        UseReceiveQueue(use_qs);
+        UseSendQueue(use_qs);
+    }
+
+    inline bool TCPConnector::UseReceiveQueue()
+    {
+        return useRecvQueue_.load();
+    }
+
+    inline void TCPConnector::UseReceiveQueue(bool use_q)
+    {
+        useRecvQueue_.store(use_q);
+    }
+
+    inline bool TCPConnector::UseSendQueue()
+    {
+        return useSendQueue_.load();
+    }
+
+    inline void TCPConnector::UseSendQueue(bool use_q)
+    {
+        useSendQueue_.store(use_q);
+    }
+
     ////////////////////////////////////////
     //  fix size message connector       //
     ///////////////////////////////////////
@@ -173,7 +207,7 @@ namespace CSE384
     private:
         // redefine socket level processing for fixed message handling 
         // only one send and recv system call
-        virtual void SendSocketMessage(const MessagePtr &msg);
+        // virtual void SendSocketMessage(const MessagePtr &msg);
         virtual MessagePtr RecvSocketMessage();
         int msg_size_;
     };

@@ -108,6 +108,7 @@ namespace CSE384
   private:  
     int raw_len_;
     char *raw_msg_; 
+    MSGHEADER shadow_hdr;
   };
 
   inline MessagePtr Message::CreateFixedSizeMessage(int msg_size, const char *data, unsigned int length, int type)
@@ -144,7 +145,8 @@ namespace CSE384
                                                                  raw_msg_(new char[raw_len_])
   {
     // use placement new to init MSG_HDR in raw_msg_ memory space
-    new (raw_msg_) MSGHEADER(length, type);
+    // shadow hdr is a local copy of the hdr, becuase MSGHDR must be logically immutable
+    shadow_hdr =  *(new (raw_msg_) MSGHEADER(length, type));
     std::memset((raw_msg_ + sizeof(MSGHEADER)), 0, fixed_size);
   }
 
@@ -152,7 +154,8 @@ namespace CSE384
                                                                                    raw_msg_(new char[raw_len_])
   {
     // use placement new to init MSG_HDR in raw_msg_ memory space
-    new (raw_msg_) MSGHEADER(length, type);
+     // shadow hdr is a local copy of the hdr, becuase MSGHDR must be logically immutable
+    shadow_hdr =  *(new (raw_msg_) MSGHEADER(length, type));
     std::memset((raw_msg_ + sizeof(MSGHEADER)), 0, fixed_size);
     std::memcpy((raw_msg_ + sizeof(MSGHEADER)), data, length);
   }
@@ -161,7 +164,8 @@ namespace CSE384
                                                                              raw_msg_(new char[raw_len_])
   {
     // use placement new to instantiate MSG_HDR in raw_msg_ memory space
-    new (raw_msg_) MSGHEADER(length, type);
+     // shadow hdr is a local copy of the hdr, becuase MSGHDR must be logically immutable
+    shadow_hdr =  *(new (raw_msg_) MSGHEADER(length, type));
 
     // copy the message into the data portion of the raw message
     std::memcpy((raw_msg_ + sizeof(MSGHEADER)), data, length);
@@ -175,7 +179,8 @@ namespace CSE384
                                                    raw_msg_(new char[raw_len_])
   {
     // use placement new to instantiate MSG_HDR in raw_msg_ memory space
-    new (raw_msg_) MSGHEADER(hdr.len(), hdr.type()); 
+    // shadow hdr is a local copy of the hdr, becuase MSGHDR must be logically immutable
+    shadow_hdr =  *(new (raw_msg_) MSGHEADER(hdr.len(), hdr.type()));
     std::memset((raw_msg_ + sizeof(MSGHEADER)), 0, Length());
   }
 
@@ -191,16 +196,19 @@ namespace CSE384
 
   inline MessageType Message::GetType() const
   {
-    return (MessageType)((MSGHEADER *)raw_msg_)->type();
+    return (MessageType) shadow_hdr.type();
+    //return (MessageType)((MSGHEADER *)raw_msg_)->type();
   }
 
   inline int Message::Length() const
   {
-    return ((MSGHEADER *)raw_msg_)->len();
+    return shadow_hdr.len();
+   // return ((MSGHEADER *)raw_msg_)->len();
   }
 
   inline MSGHEADER *Message::GetHeader()
   {
+    // must return the actual message hdr (not shadow hdr) because socket Send/Receive will perform endianess conversions
     return ((MSGHEADER *)raw_msg_);
   }
 
@@ -214,12 +222,15 @@ namespace CSE384
     raw_len_ = msg.raw_len_;
     msg.raw_msg_ = nullptr;
     msg.raw_len_ = 0;
+    shadow_hdr = msg.shadow_hdr;
+    msg.shadow_hdr.data = 0;
   }
 
   inline Message::Message(const Message &msg) : raw_msg_(new char[msg.RawMsgLength()])
   {
     std::memcpy(raw_msg_, msg.raw_msg_, msg.RawMsgLength());
     raw_len_ = msg.raw_len_;
+    shadow_hdr = msg.shadow_hdr;
   }
 
   inline Message::~Message()

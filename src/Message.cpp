@@ -11,6 +11,8 @@ namespace CSE384
       raw_len_ = msg.raw_len_;
       msg.raw_msg_ = nullptr;
       msg.raw_len_ = 0;
+      shadow_hdr = msg.shadow_hdr;
+      msg.shadow_hdr.data = 0;
     }
     return *this;
   }
@@ -22,6 +24,7 @@ namespace CSE384
       delete[] raw_msg_;
       raw_msg_ = new char[msg.RawMsgLength()];
       raw_len_ = msg.raw_len_;
+      shadow_hdr = msg.shadow_hdr;
       std::memcpy(raw_msg_, msg.raw_msg_, msg.RawMsgLength());
     }
 
