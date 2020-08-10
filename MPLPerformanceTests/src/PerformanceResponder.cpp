@@ -30,7 +30,7 @@ public:
       MessagePtr msg;
       while ((msg = GetMessage())->GetType() != MessageType::DISCONNECT)
       {   
-         std::cout << "Got a message:" << *msg << "from: " << RemoteEP() << std::endl;
+        // std::cout << "Got a message:" << *msg << "from: " << RemoteEP() << std::endl;
          MessagePtr msgPtr = Message::CreateFixedSizeMessage(GetMessageSize(),
                          std::string("Reply from server: ") + GetServiceEndPoint().ToString() 
          );

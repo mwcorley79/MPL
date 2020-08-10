@@ -61,7 +61,7 @@ namespace CSE384
     return getaddrinfo(node_name, serv_name, &hints, servinfo);
   }
 
-  int TCPSocket::Send(const char *block, unsigned int blockLen, int sendRetries, unsigned int wait_time)
+  int TCPSocket::Send(const char *block, unsigned int blockLen, int flags, int sendRetries, unsigned int wait_time)
   {
     int bytesSent;
     int bytesLeft = blockLen;
@@ -70,7 +70,7 @@ namespace CSE384
 
     while (bytesLeft > 0)
     {
-      bytesSent = send(sock_fd, &block[blockIndx], bytesLeft, 0);
+      bytesSent = send(sock_fd, &block[blockIndx], bytesLeft, flags);
       if (bytesSent > 0)
       {
         bytesLeft -= bytesSent;
@@ -89,7 +89,7 @@ namespace CSE384
   }
 
   //test MSG_WAITALL flag
-  int TCPSocket::Recv(const char *block, unsigned int blockLen, int recvRetries, unsigned int wait_time)
+  int TCPSocket::Recv(const char *block, unsigned int blockLen, int flags, int recvRetries, unsigned int wait_time)
   {
     int bytesRecvd, bytesLeft = blockLen;
     int blockIndx = 0;
@@ -97,7 +97,7 @@ namespace CSE384
 
     while (bytesLeft > 0)
     {
-      bytesRecvd = recv(sock_fd, (char *)&block[blockIndx], bytesLeft, MSG_WAITALL);
+      bytesRecvd = recv(sock_fd, (char *)&block[blockIndx], bytesLeft, flags);
 
       if (bytesRecvd > 0)
       {
@@ -304,9 +304,9 @@ void ServiceProc(const EndPoint &service_ep)
   // ---accept a connection (creating a data pipe)---
   TCPSocket channel = sock.Accept();
   char block[11];
-  int rn = channel.Recv(block, 10);
+  int rn = channel.Recv(block, 10, MSG_WAITALL, 1);
   block[10] = '\0';
-  int sn = channel.Send((char *)"rend test!", 10);
+  int sn = channel.Send((char *)"rend test!", 10,0,1);
 
   int ret = channel.Close();
   if(ret != INVALID_SOCKET)
@@ -341,9 +341,9 @@ int main()
   client_sock.Connect(server_ep);
   if (client_sock.IsConnected())
   { 
-    int sn = client_sock.Send((char *)"cend test!", 10);
+    int sn = client_sock.Send((char *)"cend test!", 10,0,1);
     char block[10];
-    int sr = client_sock.Recv(block, 10);
+    int sr = client_sock.Recv(block, 10, MSG_WAITALL, 1);
     block[10] = '\0';
 
     int ret = client_sock.Close();

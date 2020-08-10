@@ -11,7 +11,7 @@ void SenderProc(TCPConnector *connector)
    MessagePtr msg;
    while ((msg = connector->GetMessage())->GetType() != MessageType::DISCONNECT)
    {
-      std::cout << msg->ToString() << std::endl;
+     // std::cout << msg->ToString() << std::endl;
    }
 }
 
@@ -35,7 +35,7 @@ int main()
       //handle messages received in separate thread
       std::thread receiverProc(SenderProc, &perfConnector);
 
-      int num_messages = 10;
+      int num_messages = 1000000;
       // loop to send 10 messages
       for (int j = 0; j < num_messages; j++)
       {
@@ -43,7 +43,7 @@ int main()
          std::string strMsg = "[ Message #: " + std::to_string(j + 1) + " ]";
        
          MessagePtr msg = Message::CreateFixedSizeMessage(MSG_SIZE, strMsg);
-         std::cout << "Message is: " << *msg << std::endl;
+        // std::cout << "Message is: " << *msg << std::endl;
 
          // post message into the send queue
          // perfConnector.PostMessage(msg);
@@ -53,7 +53,7 @@ int main()
          //std::cout << sender.GetMessage() << std::endl;
 
          // sleep for a second so we can see what's going on
-         std::this_thread::sleep_for(std::chrono::seconds(1));
+         //std::this_thread::sleep_for(std::chrono::seconds(1));
       }
 
       perfConnector.Close();

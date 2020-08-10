@@ -38,7 +38,7 @@ namespace CSE384
       struct MSGHEADER mhdr;
       int recv_bytes;
       // receive fixed size message header (see wire protocol in Message.h)
-      if ((recv_bytes = data_socket.Recv((const char *)&mhdr, sizeof(MSGHEADER))) == sizeof(MSGHEADER))
+      if ((recv_bytes = data_socket.Recv((const char *)&mhdr, sizeof(MSGHEADER),MSG_WAITALL,1)) == sizeof(MSGHEADER))
       {
          // *** MUST convert message header to host byte order (e.g. Intel CPU == little endian)
          mhdr.ToHostByteOrder();
@@ -48,7 +48,7 @@ namespace CSE384
          MessagePtr msgPtr(new Message(mhdr));
 
          // send message data
-         if (data_socket.Recv(msgPtr->GetData(), msgPtr->Length()) == -1)
+         if (data_socket.Recv(msgPtr->GetData(), msgPtr->Length(), MSG_WAITALL,1) == -1)
             throw ReceiverReceiveMessageDataException(getlasterror_portable());
 
          return msgPtr;
@@ -73,12 +73,11 @@ namespace CSE384
       //mhdr.ToNetworkByteOrder();
     
       msg->GetHeader()->ToNetorkByteOrder();
-      if (data_socket.Send(msg->GetRawMsg(), msg->RawMsgLength()) == -1)
+      if (data_socket.Send(msg->GetRawMsg(), msg->RawMsgLength(),0,1) == -1)
       {
          msg->GetHeader()->ToHostByteOrder();
          throw SenderTransmitMessageDataException(getlasterror_portable());
       }
-
       msg->GetHeader()->ToHostByteOrder();
       // send message header
       //if(data_socket.Send((const char*) &mhdr, sizeof(struct MSGHEADER)) == -1)
@@ -155,7 +154,7 @@ namespace CSE384
       // create the fixed message recieve that message size from the socket
       MessagePtr msgPtr = Message::CreateEmptyFixedSizeMessage(msg_size_);
       int recv_bytes;
-      if ((recv_bytes = GetDataSocket().Recv(msgPtr->GetRawMsg(), msgPtr->RawMsgLength())) == msgPtr->RawMsgLength())
+      if ((recv_bytes = GetDataSocket().Recv(msgPtr->GetRawMsg(), msgPtr->RawMsgLength(), MSG_WAITALL,1)) == msgPtr->RawMsgLength())
       {
          // *** MUST convert message header to host byte order (e.g. Intel CPU == little endian)
          msgPtr->GetHeader()->ToHostByteOrder();

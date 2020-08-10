@@ -15,8 +15,8 @@ namespace CSE384
   
     bool IsValid() const;
    
-    int Send(const char *block, unsigned int blockLen, int sendRetries = 1, unsigned int wait_time = 1);
-    int Recv(const char *block, unsigned int blockLen, int recvRetries = 1, unsigned int wait_time = 1);
+    int Send(const char *block, unsigned int blockLen, int flags, int sendRetries, unsigned int wait_time = 1);
+    int Recv(const char *block, unsigned int blockLen, int flags, int recvRetries, unsigned int wait_time = 1);
     operator SOCKET();
     SOCKET GetSockFd() const;
     SOCKET SetSockFd(SOCKET sock_fd);

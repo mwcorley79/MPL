@@ -78,7 +78,7 @@ namespace CSE384
         //mhdr.ToNetworkByteOrder();
 
         msgPtr->GetHeader()->ToNetorkByteOrder();
-        if (socket.Send(msgPtr->GetRawMsg(), msgPtr->RawMsgLength()) == -1)
+        if (socket.Send(msgPtr->GetRawMsg(), msgPtr->RawMsgLength(),0,1) == -1)
         {
             msgPtr->GetHeader()->ToHostByteOrder();
             throw SenderTransmitMessageDataException(getlasterror_portable());
@@ -135,7 +135,7 @@ namespace CSE384
         struct MSGHEADER mhdr;
         int recv_bytes;
         // receive fixed size message header (see wire protocol in Message.h)
-        if ((recv_bytes = socket.Recv((const char *)&mhdr, sizeof(MSGHEADER))) == sizeof(MSGHEADER))
+        if ((recv_bytes = socket.Recv((const char *)&mhdr, sizeof(MSGHEADER), MSG_WAITALL, 1)) == sizeof(MSGHEADER))
         {
             // *** MUST convert message header to host byte order (e.g. Intel CPU == little endian)
             mhdr.ToHostByteOrder();
@@ -145,7 +145,7 @@ namespace CSE384
             MessagePtr msgPtr(new Message(mhdr));
 
             // send message data
-            if (socket.Recv(msgPtr->GetData(), msgPtr->Length()) == -1)
+            if (socket.Recv(msgPtr->GetData(), msgPtr->Length(), MSG_WAITALL, 1) == -1)
                 throw ReceiverReceiveMessageDataException(getlasterror_portable());
 
             return msgPtr;
@@ -280,7 +280,7 @@ namespace CSE384
         MessagePtr msgPtr = Message::CreateEmptyFixedSizeMessage(msg_size_);
         int recv_bytes;
 
-        if ((recv_bytes = socket.Recv(msgPtr->GetRawMsg(), msgPtr->RawMsgLength())) == msgPtr->RawMsgLength())
+        if ((recv_bytes = socket.Recv(msgPtr->GetRawMsg(), msgPtr->RawMsgLength(),MSG_WAITALL,1 )) == msgPtr->RawMsgLength())
         {
             // *** MUST convert message header to host byte order (e.g. Intel CPU == little endian)
             msgPtr->GetHeader()->ToHostByteOrder();
