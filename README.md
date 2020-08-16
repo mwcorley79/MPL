@@ -6,10 +6,9 @@ This project uses CMake to manage the build process for Linux and Windows.  <br>
 The primary objective for this repo is to supply C++ network communication facility in a joint effort with Dr. James Fawcett (https://github.com/JimFawcett) with the intent to compare various (initially performance related) aspects of modern C++ and the (new) Rust programming language. <hr>
 <b>Prerequisites for getting started on Linux:</b>
 <ol>
-  <li> Download and install CMake (debian based distros): <b> sudo apt-get install cmake </b> </li>
+  <li> Download and install CMake (Debian-based distros): <b> sudo apt-get install cmake </b> </li>
   <li> Download and install git:   <b> sudo apt-get install git </b> </li>
-  <li> Download and install git:   <b> sudo apt-get install git </b> </li>
-  <li> Download and install Visual Studio Code (VScode): <b> https://code.visualstudio.com/download </b>
+  <li> Download and install Visual Studio Code editor (VScode): <b> https://code.visualstudio.com/download </b>
      <ol>
        <li> Start VScode and install Microsoft C/C++ VScode extension (ms-vscode.cpptools) </li>
        <li> Install Microsoft CMake Tools VScode extension (ms-vscode.cmake-tools) </li>
