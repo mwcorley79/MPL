@@ -45,11 +45,14 @@ The current objective of this repo is to provide an effcient C++ network communi
   <li> Start VSCode: click File -> Open Folder and Select the project MPL folder
     <img src="./png/open_project.PNG"/>  
   </li>
-  <li> As illusrated below, Select a compiler kit: (gcc/g++ for Linux), (Visual Studio Build Tools 2019 Release for Windows)  
+  <li> As illusrated below: Select a compiler kit: (gcc/g++ for Linux), (Visual Studio Build Tools 2019 Release for Windows)  
     <img src="./png/no-kit2.PNG"/>  
     <img src="./png/vscode-windows-kit.PNG"/>  
   </li>
   
+   <li> As illustrated below: Select and Build the MPL static library target: (generates libMPL.a on Linux and MPL.lib on Windows) 
+    <img src="./png/build-MPL-target.PNG"/>  
+  </li>
   
   
   
