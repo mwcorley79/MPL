@@ -38,19 +38,28 @@ The current objective of this repo is to provide an effcient C++ network communi
   <li> open a windows command prompt (cmd.exe) and the command: <b> git clone https://github.com/mwcorley79/MPL.git </b> </li>
 </ol>
 
-<b>  Setup the MPL CMake project in VScode (thes steps steps work for both Windows and Linux) </b>
+<br>
+
+<b>  Setup the MPL CMake project in VScode (these steps apply to both Windows and Linux) </b>
 <ol> 
   <li> Start VSCode: click File -> Open Folder and Select the project MPL folder
     <img src="./png/open_project.PNG"/>  
   </li>
-  <li> git clone https://github.com/mwcorley79/MPL.git </li>
+  <li> As illusrated below, Select a compiler kit: (gcc/g++ for Linux), (Visual Studio Build Tools 2019 Release for Windows)  
+    <img src="./png/no-kit2.PNG"/>  
+    <img src="./png/vscode-windows-kit.PNG"/>  
+  </li>
+  
+  
+  
+  
   <li> cd MPL && mkdir build && cd build </li>
   <li> cmake .. -DCMAKE_INSTALL_PREFIX=../install </li>
   <li> make install </li>
 </ol>
 <b> Testing the MPL library on Linux </b>
 <ol>
-  <li>  From the same terminal from the previous step, type the following commands </li>
+  <li> From the same terminal from the previous step, type the following commands </li>
   <li> cd ../MPLtests && mkdir build && cd build </li>
   <li> cmake .. </li>
   <li> make all </li>
