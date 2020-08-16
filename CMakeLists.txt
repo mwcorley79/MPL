@@ -6,8 +6,8 @@ project(MPL)
 # set to c++ 17 (standard) 
 set(CMAKE_CXX_STANDARD 17)
 
-# include all the headers from the include folder
-include_directories(include)
+# include all the headers from the MPL include folder, and Performance test folder
+include_directories(./include ./MPLPerformanceTests/include)
 
 # add the sources (.cpp) files for the MPL library and test stub targets
 set (SOURCES src/Cpp11-BlockingQueue.cpp
@@ -86,18 +86,34 @@ add_executable(TCPResponderTest src/TCPResponder.cpp
 target_compile_definitions(TCPResponderTest PUBLIC TEST_RESPONDER) 
 
 
+#  6. Performance Test Targets:
+# *** NOTE must build MPL target first to libMPL.a for linking ***
+# ******************************************************************
+link_directories( ./build)
+
+# generate the TCPResponderPerfTest test stub target (executable test) from the SOURCES
+add_executable(TCPResponderPerfTest ./MPLPerformanceTests/src/PerformanceResponder.cpp)
+
+# generate the TCPConnector test stub target (executable test) from the SOURCES
+add_executable(TCPConnectorPerfTest ../MPLPerformanceTests/src/PerformanceConnector.cpp)
+
 if (UNIX)
     # link target to pthread library for LINUX
     target_link_libraries (TCPSocketsTest pthread)
     target_link_libraries (BQueueTest pthread)
     target_link_libraries (TCPConnectorTest pthread)
     target_link_libraries (TCPResponderTest pthread)
+
+    # Performance test targets
+    # link libMPL and pthread to the targets for LINUX
+    target_link_libraries (TCPResponderPerfTest MPL.a pthread)
+    target_link_libraries (TCPConnectorPerfTest MPL.a pthread)
+
 else (NOT UNIX) 
      # no need to link to pthread on Windows
+     # link MPL.dll to TCPResponderTest  and TCPConnectorTest targets for WINDOWS
+    target_link_libraries (TCPResponderPerfTest MPL.lib)
+    target_link_libraries (TCPConnectorPerfTest MPL.lib)
 endif (UNIX)
 
 # ***  End test stub target section ***
-    
-
-
-

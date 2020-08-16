@@ -97,7 +97,7 @@ const int PORTABLE_SOCK_ERR_BUF_SIZE = 512;
 		
 		static std::atomic<int> rcount;
 		inline static int iResult;
-        inline static WSADATA wsaData;
+    inline static WSADATA wsaData;
   };
 #endif
 
