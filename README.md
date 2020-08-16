@@ -40,7 +40,7 @@ The current objective of this repo is to provide an effcient C++ network communi
 
 <br>
 
-<b>  Setup the MPL CMake project in VScode (these steps apply to both Windows and Linux) </b>
+<b>Setup the MPL CMake project in VScode (these steps apply to both Windows and Linux) </b>
 <ol> 
   <li> Start VSCode: click File -> Open Folder and Select the project MPL folder
     <img src="./png/open_project.PNG"/>  
@@ -49,9 +49,17 @@ The current objective of this repo is to provide an effcient C++ network communi
     <img src="./png/no-kit2.PNG"/>  
     <img src="./png/vscode-windows-kit.PNG"/>  
   </li>
-   <li> As illustrated below: Select and Build the MPL static library target: (generates libMPL.a on Linux and MPL.lib on Windows) 
+   <li> As illustrated below: Build the MPL (static library) by selecting the MPL STATIC_LIBARY target and clicking Build.
+        On Windows this generates MPL.lib, and Linux: libMPL.a
     <img src="./png/build-MPL-target.png"/>  
+  </li> 
+  <li> In similar fashion, Select and Build the TCPConnectorPerfTest EXECUTABLE target, and TCPResponderTest EXECULABLE target </li>
+  <li>  As illustrated below: run the MPL performace test on Windows by clicking the TERMINAL tab, and splitting the terminal into two   
+        seperate panes as shown in the output. <br> Run MPL performance exemplar by using the commands as shown in the output. <br>
+        The exemplar provides throughput/latency measurements for 1024 byte message sizes, running Windows 10 (VMWARE). 
+   <img src="./png/perf_test_windows.png"/> 
   </li>
+message size
 </ol>
 
   
