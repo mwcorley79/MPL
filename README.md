@@ -1,14 +1,29 @@
 # Message Passing Library (MPL) 
-Reusable message passing library (MPL) framework for developing network (client/server) applications by wrapping full duplex TCP sockets.  <br> <br>
-One goal is to enable cross-platform portability (TCP socket level compatibility between Linux and Windows) by providing a TCPSocket class that wraps the (basic) differences between the low-level (C-based) Windows and Linux socket APIs.  (note: this not a complete, but minimal port to support the TCP communication required to enable message passing.) <br> <br>
-<b> The See TCPSocket.h/.cpp for details on the TCP socket wrapper code </b> <br><br>
+Reusable message passing library (MPL) framework for developing network (client/server) applications.  Wraps full duplex TCP sockets On Linux and Windows. <br> <br>
+One goal is to enable cross-platform portability (TCP socket level compatibility between Linux and Windows) by providing a TCPSocket class that encapsulates the (basic) differences between the low-level (C-based) Windows and Linux APIs. <br> <br>
+<b> The See TCPSocket.h/.cpp for details on the TCP socket wrapper code. </b> <br><br>
 This project uses CMake to manage the build process for Linux and Windows.  <br> <br>
-The current objective (purpose) for this repo is to participate in a joint effort with Dr. James Fawcett (https://github.com/JimFawcett) to compare various (primarily performance related) aspects of the C++ and the (newer) Rust programming language. <hr>
-<b> Prerequisites for Linux </b>
+The primary objective for this repo is to supply C++ network communication facility in a joint effort with Dr. James Fawcett (https://github.com/JimFawcett) with the intent to compare various (initially performance related) aspects of modern C++ and the (new) Rust programming language. <hr>
+<b>Prerequisites for getting started on Linux:</b>
 <ol>
-  <li> install cmake 3.10 or greater (debian based:  sudo apt-get install cmake) </li>
-  <li> toolchain: e.g. gcc/g++ etc. </li>
+  <li> Download and install CMake (debian based distros): <b> sudo apt-get install cmake </b> </li>
+  <li> Download and install git:   <b> sudo apt-get install git </b> </li>
+  <li> Download and install git:   <b> sudo apt-get install git </b> </li>
+  <li> Download and install Visual Studio Code (VScode): <b> https://code.visualstudio.com/download </b>
+     <ol>
+       <li> Start VScode and install Microsoft C/C++ VScode extension (ms-vscode.cpptools) </li>
+       <li> Install Microsoft CMake Tools VScode extension (ms-vscode.cmake-tools) </li>
+     </ol>
+  </li>
+  <li> Download and install gcc/g++ compiler toolchain): <b> sudo apt-get install g++ </b> </li>
+  <li> Open a terminal/console and type command: </b> git clone https://github.com/mwcorley79/MPL.git </b> </li>
 </ol>
+
+
+
+
+
+
 <b> Build and install the MPL library on Linux: MPL.a (static library installed in MPL/install/lib) </b>
 <ol> 
   <li> open a terminal/console window and type the following commands in the shell ... </li>
