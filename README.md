@@ -29,7 +29,9 @@ The current objective of this repo is to provide an effcient C++ network communi
   </li>
   <li> Download and install Microsoft C++ Build Tools  (MSVC compiler tools): <b> https://visualstudio.microsoft.com/visual-cpp-build-tools/ </b> 
      <ol>
-       <li> Run vs_buildtools (Visual Studio) installer. Check the workload for C++ build tools </li>
+       <li> Run vs_buildtools (Visual Studio) installer. Check the workload for C++ build tools 
+           <img src="./png/output.PNG"/>  
+       </li>
      </ol>
   </li>  
   <li> open a windows command prompt (cmd.exe) and the command: <b> git clone https://github.com/mwcorley79/MPL.git </b> </li>
