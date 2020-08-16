@@ -14,10 +14,26 @@ The current objective of this repo is to provide an effcient C++ network communi
        <li> Install Microsoft CMake Tools VScode extension (ms-vscode.cmake-tools) </li>
      </ol>
   </li>
-  <li> Download and install gcc/g++ compiler toolchain): <b> sudo apt-get install g++ </b> </li>
+  <li> Download and install gcc/g++ (compiler toolchain): <b> sudo apt-get install g++ </b> </li>
   <li> Open a terminal/console and type command: </b> git clone https://github.com/mwcorley79/MPL.git </b> </li>
 </ol>
-
+<b>Prerequisites for getting started on Windows:</b>
+<ol>
+  <li> Download and install CMake: https://cmake.org/download/</b> </li>
+  <li> Download and install git:   <b> https://git-scm.com/download/win </b> </li>
+  <li> Download and install Visual Studio Code editor (VScode): <b> https://code.visualstudio.com/download </b>
+     <ol>
+       <li> Start VScode and install Microsoft C/C++ VScode extension (ms-vscode.cpptools) </li>
+       <li> Install Microsoft CMake Tools VScode extension (ms-vscode.cmake-tools) </li>
+     </ol> 
+  </li>
+  <li> Download and install Microsoft C++ Build Tools  (MSVC compiler tools): <b> https://visualstudio.microsoft.com/visual-cpp-build-tools/ </b> 
+     <ol>
+       <li> Run vs_buildtools (Visual Studio) installer. Check the workload for C++ build tools </li>
+     </ol>
+  </li>  
+  <li> open a windows command prompt (cmd.exe) and the command: <b> git clone https://github.com/mwcorley79/MPL.git </b> </li>
+</ol>
 
 
 
