@@ -17,6 +17,7 @@ The current objective of this repo is to provide an effcient C++ network communi
   <li> Download and install gcc/g++ (compiler toolchain): <b> sudo apt-get install g++ </b> </li>
   <li> Open a terminal/console and type command: </b> git clone https://github.com/mwcorley79/MPL.git </b> </li>
 </ol>
+<br>
 <b>Prerequisites for getting started on Windows:</b>
 <ol>
   <li> Download and install CMake: https://cmake.org/download/</b> </li>
@@ -37,13 +38,11 @@ The current objective of this repo is to provide an effcient C++ network communi
   <li> open a windows command prompt (cmd.exe) and the command: <b> git clone https://github.com/mwcorley79/MPL.git </b> </li>
 </ol>
 
-
-
-
-
-<b> Build and install the MPL library on Linux: MPL.a (static library installed in MPL/install/lib) </b>
+<b>  Setup the MPL CMake project in VScode (thes steps steps work for both Windows and Linux) </b>
 <ol> 
-  <li> open a terminal/console window and type the following commands in the shell ... </li>
+  <li> Start VSCode: click File -> Open Folder and Select the project MPL folder
+    <img src="./png/build-tools.PNG"/>  
+  </li>
   <li> git clone https://github.com/mwcorley79/MPL.git </li>
   <li> cd MPL && mkdir build && cd build </li>
   <li> cmake .. -DCMAKE_INSTALL_PREFIX=../install </li>
