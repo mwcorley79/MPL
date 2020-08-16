@@ -57,7 +57,7 @@ The current objective of this repo is to provide an effcient C++ network communi
   <li>  As illustrated below: run the MPL performace test on Windows by clicking the TERMINAL tab, and splitting the terminal into two   
         seperate panes as shown in the output. <br> Run MPL performance exemplar by using the commands as shown in the output. <br>
         The exemplar provides throughput/latency measurements for 1024 byte message sizes, running Windows 10 (VMWARE). 
-   <img src="./png/perf_test_windows.png"/> 
+   <img src="./png/perf_test_windows.PNG"/> 
   </li>
 message size
 </ol>
