@@ -293,8 +293,8 @@ using namespace CSE384;
 void ServiceProc(const EndPoint &service_ep)
 {
   int backlog = 10;
-
-  TCPSocketOptions so(SOL_SOCKET, (SO_REUSEPORT | SO_REUSEADDR));
+// TCPSocketOptions so(SOL_SOCKET, (SO_REUSEPORT | SO_REUSEADDR));
+  TCPSocketOptions so(SOL_SOCKET, (SO_REUSEADDR));
   TCPServerSocket sock;
   sock.Bind(service_ep, &so);
 
