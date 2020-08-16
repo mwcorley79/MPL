@@ -51,7 +51,7 @@ The current objective of this repo is to provide an effcient C++ network communi
   </li>
   
    <li> As illustrated below: Select and Build the MPL static library target: (generates libMPL.a on Linux and MPL.lib on Windows) 
-    <img src="./png/build-MPL-target.PNG"/>  
+    <img src="./png/build-MPL-target.png"/>  
   </li>
   
   
