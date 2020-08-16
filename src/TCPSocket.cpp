@@ -287,6 +287,8 @@ namespace CSE384
 #ifdef TEST_SOCKETS
 #include <iostream>
 #include <thread>
+#include <chrono>
+
 using namespace CSE384;
 
 // dedicated server thread
@@ -334,7 +336,7 @@ int main()
   std::thread serverThread = ServerTest(server_ep);
 
   // give server thread a change to start
-  ::sleep(3);
+   std::this_thread::sleep_for(std::chrono::seconds(3));
 
   // create client socket for Connect, Send test
   TCPClientSocket client_sock;
