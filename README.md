@@ -41,7 +41,7 @@ The current objective of this repo is to provide an effcient C++ network communi
 <b>  Setup the MPL CMake project in VScode (thes steps steps work for both Windows and Linux) </b>
 <ol> 
   <li> Start VSCode: click File -> Open Folder and Select the project MPL folder
-    <img src="./png/build-tools.PNG"/>  
+    <img src="./png/open_project.PNG"/>  
   </li>
   <li> git clone https://github.com/mwcorley79/MPL.git </li>
   <li> cd MPL && mkdir build && cd build </li>
