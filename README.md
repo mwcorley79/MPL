@@ -62,7 +62,7 @@ The current objective of this repo is to provide an effcient C++ network communi
    <li>  As illustrated below: run the MPL performace test on Lunux by clicking the TERMINAL tab, and splitting the terminal into two   
         seperate panes as shown in the output. <br> Run MPL performance exemplar by using the commands as shown in the output. <br>
         The exemplar provides throughput/latency measurements for 1024 byte message sizes, running Linux Mint (VMWARE). 
-   <img src="./png/perf_test_linux.PNG"/> 
+   <img src="./png/per_test_linux.PNG"/> 
   </li>
 
 </ol>
