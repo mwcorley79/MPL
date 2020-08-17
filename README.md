@@ -47,6 +47,7 @@ The current objective is to provide an efficient C++ network communication facil
   </li>
   <li> As illusrated (below): Select a compiler kit: (i.e. gcc/g++ for Linux, and Visual Studio Build Tools 2019 Release for Windows)  
     <img src="./png/no-kit2.PNG"/>  
+    <b> ... and on the Windows ... </b>
     <img src="./png/vscode-windows-kit.PNG"/>  
   </li>
    <li> As illustrated (below): Build the MPL (library) by selecting the MPL STATIC_LIBARY target and clicking "Build".
