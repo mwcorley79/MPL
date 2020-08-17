@@ -71,7 +71,7 @@ The current objective is to provide an efficient C++ network communication facil
   <li> cd MPL && mkdir build && cd build </li>
   <li> cmake .. -DCMAKE_INSTALL_PREFIX=../install </li>
   <li> make install </li>
-  <li> Also: (** Windows only) you can use the (full) Visual Studio 2019 IDE <li>
+  <li> Also: (** Windows only) you can use the (full) Visual Studio 2019 IDE </li>
  </ul>
 
   
