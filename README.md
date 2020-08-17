@@ -1,9 +1,9 @@
 # Message Passing Library (MPL) 
-Reusable message passing library (MPL) framework for developing network (client/server) applications.  Wraps full duplex TCP sockets On Linux and Windows. <br> <br>
+This repository provides a reusable C++ message passing library (MPL) framework for developing TCP/IP network (client/server) applications by wrapping full duplex TCP socket communucation on Linux and Windows. <br> <br>
 One goal is to enable cross-platform portability (TCP socket level compatibility between Linux and Windows) by providing a TCPSocket class that encapsulates the (basic) differences between the low-level (C-based) Windows and Linux APIs. <br> <br>
-<b> The See TCPSocket.h/.cpp for details on the TCP socket wrapper code. </b> <br><br>
+<b> See TCPSocket.h/.cpp for details of the TCP socket wrapper code. </b> <br><br>
 This project uses CMake to manage the build process for Linux and Windows.  <br> <br>
-The current objective of this repo is to provide an effcient C++ network communication facility for a joint effort with Dr. James Fawcett (https://github.com/JimFawcett) to compare various (initially performance related) aspects of modern C++ and the Rust programming language. <hr>
+The current objective is to provide an efficient C++ network communication facility for a joint experiment with Dr. James Fawcett (https://github.com/JimFawcett) to compare various (initially performance related) aspects of modern C++ and the Rust programming language. <hr>
 <b>Prerequisites for getting started on Linux:</b>
 <ol>
   <li> Download and install CMake (Debian-based distros): <b> sudo apt-get install cmake </b> </li>
@@ -30,38 +30,38 @@ The current objective of this repo is to provide an effcient C++ network communi
   </li>
   <li> Download and install Microsoft C++ Build Tools  (MSVC compiler tools): <b> https://visualstudio.microsoft.com/visual-cpp-build-tools/ </b> 
      <ol>
-       <li> Run vs_buildtools (Visual Studio) installer. Check the workload for C++ build tools 
+       <li> Run vs_buildtools (Visual Studio) installer. Check the workload for C++ build tools (as shown below) 
            <img src="./png/build-tools.PNG"/>  
        </li>
      </ol>
   </li>  
-  <li> open a windows command prompt (cmd.exe) and the command: <b> git clone https://github.com/mwcorley79/MPL.git </b> </li>
+  <li> Open a windows command prompt (cmd.exe) and type command: <b> git clone https://github.com/mwcorley79/MPL.git </b> </li>
 </ol>
 
-<br>
+<hr>
 
-<b>Setup the MPL CMake project in VScode (these steps apply to both Windows and Linux) </b>
+<b>Setup the MPL CMake project for use with VScode (these steps apply to both Windows and Linux) </b>
 <ol> 
-  <li> Start VSCode: click File -> Open Folder and Select the project MPL folder
+  <li> Start VScode: click File -> Open Folder and Select the project MPL folder
     <img src="./png/open_project.PNG"/>  
   </li>
-  <li> As illusrated below: Select a compiler kit: (gcc/g++ for Linux), (Visual Studio Build Tools 2019 Release for Windows)  
+  <li> As illusrated (below): Select a compiler kit: (i.e. gcc/g++ for Linux, and Visual Studio Build Tools 2019 Release for Windows)  
     <img src="./png/no-kit2.PNG"/>  
     <img src="./png/vscode-windows-kit.PNG"/>  
   </li>
-   <li> As illustrated below: Build the MPL (static library) by selecting the MPL STATIC_LIBARY target and clicking Build.
-        On Windows this generates MPL.lib, and Linux: libMPL.a
+   <li> As illustrated (below): Build the MPL (library) by selecting the MPL STATIC_LIBARY target and clicking "Build".
+        On Windows this generates library: MPL.lib, and on Linux: libMPL.a
     <img src="./png/build-MPL-target.png"/>  
   </li> 
-  <li> In similar fashion, Select and Build the TCPConnectorPerfTest EXECUTABLE target, and TCPResponderTest EXECULABLE target </li>
-  <li>  As illustrated below: run the MPL performace test on Windows by clicking the TERMINAL tab, and splitting the terminal into two   
-        seperate panes as shown in the output. <br> Run MPL performance exemplar by using the commands as shown in the output. <br>
-        The exemplar provides throughput/latency measurements for 1024 byte message sizes, running Windows 10 (VMWARE). 
+  <li> In similar fashion, build and run the included MPL performance test. Select and Build the TCPConnectorPerfTest EXECUTABLE target, and TCPResponderTest EXECULABLE target </li>
+  <li>  As illustrated( below): run the MPL performace test on Windows by clicking the TERMINAL tab, and splitting the terminal into two   
+        separate panes (as shown in the output). <br> Run the MPL performance exemplar by using the commands shown in the output. <br>
+        The exemplar provides throughput/latency measurements for 1024 byte message sizes running on a Windows 10 virtual machine (VMWARE). 
    <img src="./png/perf_test_windows.PNG"/> 
   </li>
-   <li>  As illustrated below: run the MPL performace test on Lunux by clicking the TERMINAL tab, and splitting the terminal into two   
-        seperate panes as shown in the output. <br> Run MPL performance exemplar by using the commands as shown in the output. <br>
-        The exemplar provides throughput/latency measurements for 1024 byte message sizes, running Linux Mint (VMWARE). 
+   <li> Run the MPL performace test on Linux by clicking the TERMINAL tab, and splitting the terminal into two   
+        seperate panes (as shown in the output). <br> Run MPL performance exemplar by using the commands shown in the output. <br>
+        The exemplar provides throughput/latency measurements for 1024 byte message sizes running on a Linux Mint virtual machine (VMWARE). 
    <img src="./png/perf_test_linux.PNG"/> 
   </li>
 
