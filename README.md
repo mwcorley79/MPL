@@ -64,7 +64,14 @@ The current objective is to provide an efficient C++ network communication facil
         The exemplar provides throughput/latency measurements for 1024 byte message sizes running on a Linux Mint virtual machine (VMWARE). 
    <img src="./png/perf_test_linux.PNG"/> 
   </li>
-
 </ol>
+<b> Getting started on Linux and Windows with CMake only (if you prefer not to use VSCode) </b>
+<ul>
+  <li> NOTE:  you will need a compiler toolchain (i.e. Build Tools - Windows,  gcc/g++ - Linux) </li>
+  <li> cd MPL && mkdir build && cd build </li>
+  <li> cmake .. -DCMAKE_INSTALL_PREFIX=../install </li>
+  <li> make install </li>
+  <li> Also: (** Windows only) you can use the (full) Visual Studio 2019 IDE <li>
+ </ul>
 
   
