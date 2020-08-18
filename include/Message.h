@@ -69,10 +69,10 @@ namespace CSE384
   {
   public:
     Message(const std::string &str, int type = 0);  
-    Message(const char *data = 0, unsigned int length = 0, int type = 0);
+    Message(const char *data = 0, size_t length = 0, int type = 0);
     Message(const MSGHEADER &mhdr);
-    Message(int fixed_size, const char* data, int length, int type=0);
-    Message(int fixed_size, int length, int type=0);
+    Message(int fixed_size, const char* data, size_t length, int type=0);
+    Message(int fixed_size, size_t length, int type=0);
     Message &operator=(const Message &msg); 
     Message &operator=(Message &&msg);
     
@@ -81,10 +81,10 @@ namespace CSE384
 
     //static MessagePtr AllocateEmptyFixedSizeMessage(int msg_size);
     static MessagePtr CreateMessage(const MSGHEADER &mhdr);
-    static MessagePtr CreateMessage(const char *data, unsigned int length, int type=0);
+    static MessagePtr CreateMessage(const char *data, size_t length, int type=0);
     static MessagePtr CreateMessage(const std::string &str, int type = 0); 
 
-    static MessagePtr CreateFixedSizeMessage(int msg_size, const char *data, unsigned int length, int type=0);
+    static MessagePtr CreateFixedSizeMessage(int msg_size, const char *data, size_t length, int type=0);
     static MessagePtr CreateFixedSizeMessage(int msg_size, const std::string &str, int type = 0);
     static MessagePtr CreateEmptyFixedSizeMessage(int msg_size);
 
@@ -111,7 +111,7 @@ namespace CSE384
     MSGHEADER shadow_hdr;
   };
 
-  inline MessagePtr Message::CreateFixedSizeMessage(int msg_size, const char *data, unsigned int length, int type)
+  inline MessagePtr Message::CreateFixedSizeMessage(int msg_size, const char *data, size_t length, int type)
   {
      return MessagePtr (new Message(msg_size, data, length, type));
   }
@@ -123,7 +123,7 @@ namespace CSE384
 
   inline MessagePtr Message::CreateEmptyFixedSizeMessage(int msg_size)
   {
-      return MessagePtr (  new Message(msg_size, msg_size));
+      return MessagePtr(new Message(msg_size, msg_size));
   }
 
   inline MessagePtr Message::CreateMessage(const MSGHEADER &mhdr)
@@ -136,36 +136,36 @@ namespace CSE384
      return MessagePtr(new Message(str, type));
   } 
 
-  inline MessagePtr Message::CreateMessage(const char *data, unsigned int length, int type)
+  inline MessagePtr Message::CreateMessage(const char *data, size_t length, int type)
   {
      return MessagePtr(new Message(data, length, type));
   }
 
-  inline Message::Message(int fixed_size, int length, int type): raw_len_(sizeof(MSGHEADER) + fixed_size),
+  inline Message::Message(int fixed_size, size_t length, int type): raw_len_(sizeof(MSGHEADER) + fixed_size),
                                                                  raw_msg_(new char[raw_len_])
   {
     // use placement new to init MSG_HDR in raw_msg_ memory space
     // shadow hdr is a local copy of the hdr, becuase MSGHDR must be logically immutable
-    shadow_hdr =  *(new (raw_msg_) MSGHEADER(length, type));
+    shadow_hdr =  *(new (raw_msg_) MSGHEADER( (uint32_t) length, type));
     std::memset((raw_msg_ + sizeof(MSGHEADER)), 0, fixed_size);
   }
 
-  inline Message::Message(int fixed_size, const char* data, int length, int type): raw_len_(sizeof(MSGHEADER) + fixed_size),
+  inline Message::Message(int fixed_size, const char* data, size_t length, int type): raw_len_(sizeof(MSGHEADER) + fixed_size),
                                                                                    raw_msg_(new char[raw_len_])
   {
     // use placement new to init MSG_HDR in raw_msg_ memory space
      // shadow hdr is a local copy of the hdr, becuase MSGHDR must be logically immutable
-    shadow_hdr =  *(new (raw_msg_) MSGHEADER(length, type));
+    shadow_hdr =  *(new (raw_msg_) MSGHEADER( (uint32_t) length, type));
     std::memset((raw_msg_ + sizeof(MSGHEADER)), 0, fixed_size);
     std::memcpy((raw_msg_ + sizeof(MSGHEADER)), data, length);
   }
 
-  inline Message::Message(const char *data, unsigned int length, int type) : raw_len_(sizeof(MSGHEADER) + length),
+  inline Message::Message(const char *data, size_t length, int type) : raw_len_(sizeof(MSGHEADER) + length),
                                                                              raw_msg_(new char[raw_len_])
   {
     // use placement new to instantiate MSG_HDR in raw_msg_ memory space
      // shadow hdr is a local copy of the hdr, becuase MSGHDR must be logically immutable
-    shadow_hdr =  *(new (raw_msg_) MSGHEADER(length, type));
+    shadow_hdr =  *(new (raw_msg_) MSGHEADER((uint32_t)length, type));
 
     // copy the message into the data portion of the raw message
     std::memcpy((raw_msg_ + sizeof(MSGHEADER)), data, length);
