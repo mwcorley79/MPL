@@ -95,7 +95,7 @@ link_directories( ./build)
 add_executable(TCPResponderPerfTest ./MPLPerformanceTests/src/PerformanceResponder.cpp)
 
 # generate the TCPConnector test stub target (executable test) from the SOURCES
-add_executable(TCPConnectorPerfTest ../MPLPerformanceTests/src/PerformanceConnector.cpp)
+add_executable(TCPConnectorPerfTest ./MPLPerformanceTests/src/PerformanceConnector.cpp)
 
 if (UNIX)
     # link target to pthread library for LINUX
