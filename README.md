@@ -15,7 +15,7 @@ The current objective is to provide an efficient C++ network communication facil
      </ol>
   </li>
   <li> Download and install gcc/g++ (compiler toolchain): <b> sudo apt-get install g++ </b> </li>
-  <li> Open a terminal/console and type command: </b> git clone https://github.com/mwcorley79/MPL.git </b> </li>
+  <li> Open a terminal/console and type command: <b> git clone https://github.com/mwcorley79/MPL.git </b> </li>
 </ol>
 <br>
 <b>Prerequisites for getting started on Windows:</b>
@@ -45,9 +45,10 @@ The current objective is to provide an efficient C++ network communication facil
   <li> Start VScode: click File -> Open Folder and Select the project MPL folder
     <img src="./png/open_project.PNG"/>  
   </li>
-  <li> As illusrated (below): Select a compiler kit: (i.e. gcc/g++ for Linux, and Visual Studio Build Tools 2019 Release for Windows)  
+  <li> As illustrated (below): Select a compiler kit: (i.e. gcc/g++ for Linux, and Visual Studio Build Tools 2019 Release for Windows)  
+     <b> ... on Linux ... </b>
     <img src="./png/no-kit2.PNG"/>  
-    <b> ... and on the Windows ... </b>
+    <b> ... and on Windows ... </b>
     <img src="./png/vscode-windows-kit.PNG"/>  
   </li>
    <li> As illustrated (below): Build the MPL (library) by selecting the MPL STATIC_LIBARY target and clicking "Build".
