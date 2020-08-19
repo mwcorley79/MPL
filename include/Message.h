@@ -160,7 +160,7 @@ namespace CSE384
     std::memcpy((raw_msg_ + sizeof(MSGHEADER)), data, length);
   }
 
-  inline Message::Message(const char *data, size_t length, int type) : raw_len_(sizeof(MSGHEADER) + length),
+  inline Message::Message(const char *data, size_t length, int type) : raw_len_(sizeof(MSGHEADER) + (int) length),
                                                                              raw_msg_(new char[raw_len_])
   {
     // use placement new to instantiate MSG_HDR in raw_msg_ memory space
