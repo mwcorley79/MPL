@@ -77,5 +77,5 @@ The current objective is to provide an efficient C++ network communication facil
  </ul>
  <hr>
    <img src="./png/MPL.png"/> 
-   <center> MPL class Diagram </center>
+   MPL class diagram
   
