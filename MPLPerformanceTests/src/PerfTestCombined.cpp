@@ -63,7 +63,7 @@ void client_wait_for_reply(const EndPoint &addr,    // endpoint (address, port)
    conn.Connect(addr);
 
    // construct message of sz_bytes (pertains to message body, not including header)
-   char body[sz_bytes];
+   char* body = new char[sz_bytes];
    std::memset(body, '\0', sz_bytes);
    MessagePtr msg = Message::CreateFixedSizeMessage(sz_bytes, body, sz_bytes, MessageType::DEFAULT);
    StopWatch tmr;
@@ -78,6 +78,7 @@ void client_wait_for_reply(const EndPoint &addr,    // endpoint (address, port)
       // std::cout << "\n received msg: " << msg->GetType();
    }
 
+   delete[] body;
    tmr.stop();
    int64_t et = tmr.elapsed_micros();
    conn.Close(); // shutdown connection (end message etc.)
@@ -114,16 +115,16 @@ void client_no_wait_for_reply(const EndPoint &addr,    // endpoint (address, por
       });
 
       // construct message of sz_bytes (pertains to message body, not including header)
-      char body[sz_bytes];
+      char* body = new char[sz_bytes];
       std::memset(body, '0', sz_bytes);
       MessagePtr msg = Message::CreateFixedSizeMessage(sz_bytes, body, sz_bytes, MessageType::DEFAULT);
     
       for (unsigned _i = 0; _i < num_msgs; ++_i)
       {
          //std::cout << "\n posting msg " << name << " of size " << sz_bytes;
-         conn.PostMessage(msg);
+          conn.PostMessage(msg);
       }
-    
+      delete [] body;
       conn.Close();
 
       if(handle.joinable())
@@ -189,11 +190,12 @@ public:
    {
       // construct message of sz_bytes (pertains to message body, not including header)
       int sz_bytes = GetMessageSize();
-      char body[sz_bytes];
+      char* body = new char[sz_bytes];
       std::memset(body, '\0', sz_bytes);
       MessagePtr msgSend = Message::CreateFixedSizeMessage(sz_bytes, body, sz_bytes, MessageType::DEFAULT);
+      delete [] body;
+
       MessagePtr msg;
-      
       // use of Queue
       // while ((msg = GetMessage())->GetType() != MessageType::DISCONNECT)
       
@@ -202,8 +204,8 @@ public:
       {
          // PostMessage(msg); // post to send queue
          SendMessage(msg); //direct send 
-         //std::cout << "RECEIVED" << std::endl;
-      }
+         // std::cout << "RECEIVED" << std::endl;
+      }   
    }
 
    ~PerfClientHandler()
@@ -257,6 +259,8 @@ int main(int argc, char* argv[])
    std::cout << "\n  num thrdpool thrds: " << nt;
 
    multiple_clients(NUM_CLIENTS, addr, TEST_NAME, NUM_MSGS, MSG_SIZE);
+
+   std::cin.get();
 
    // stop the listener and quit
    responder.Stop();

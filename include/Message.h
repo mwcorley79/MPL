@@ -104,11 +104,11 @@ namespace CSE384
     char *GetData() const;
     MSGHEADER *GetHeader();
 
-    int RawMsgLength() const;
+    size_t RawMsgLength() const;
     char* GetRawMsg() const;
     
   private:  
-    int raw_len_;
+    size_t raw_len_;
     char *raw_msg_; 
     MSGHEADER shadow_hdr;
   };
@@ -186,7 +186,7 @@ namespace CSE384
     std::memset((raw_msg_ + sizeof(MSGHEADER)), 0, Length());
   }
 
-  inline int Message::RawMsgLength() const
+  inline size_t Message::RawMsgLength() const
   {
     return raw_len_;
   }

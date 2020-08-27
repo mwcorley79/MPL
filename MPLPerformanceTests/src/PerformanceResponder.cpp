@@ -110,14 +110,15 @@ int main(int argc, char *argv[])
    // register the custom client handler with TCPResponder instance
    responder.RegisterClientHandler(&rh);
 
+  // number of clients to service before exiting
+   responder.NumClients(1);
+
    // start the server listening thread
    responder.Start();
    std::cout << "Server listening on: " << serverEP << std::endl;
    std::cout << "Press any key to quit" << std::endl;
-   std::cin.get();
+   //std::cin.get();
 
    // stop the listener and quit
-   responder.Stop();
-
-   exit(0);
+   responder.Stop(); 
 }

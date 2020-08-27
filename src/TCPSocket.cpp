@@ -61,10 +61,11 @@ namespace CSE384
     return getaddrinfo(node_name, serv_name, &hints, servinfo);
   }
 
-  int TCPSocket::Send(const char *block, unsigned int blockLen, int flags, int sendRetries, unsigned int wait_time)
+  int TCPSocket::Send(const char *block, size_t blockLen, int flags, int sendRetries, unsigned int wait_time)
   {
     int bytesSent;
-    int bytesLeft = blockLen;
+
+    int bytesLeft = (int) blockLen;
     int blockIndx = 0;
     int count = 0;
 
@@ -79,19 +80,19 @@ namespace CSE384
       else if (bytesSent == -1)
       {
         ++count;
-        if (count > sendRetries)
+        if(count > sendRetries)
           return -1;
         std::this_thread::sleep_for(std::chrono::microseconds(wait_time));
         //usleep(wait_time);
       }
     }
-    return blockLen;
+    return (int) blockLen;
   }
 
   //test MSG_WAITALL flag
-  int TCPSocket::Recv(const char *block, unsigned int blockLen, int flags, int recvRetries, unsigned int wait_time)
+  int TCPSocket::Recv(const char *block, size_t blockLen, int flags, int recvRetries, unsigned int wait_time)
   {
-    int bytesRecvd, bytesLeft = blockLen;
+    int bytesRecvd, bytesLeft = (int) blockLen;
     int blockIndx = 0;
     int count = 0;
 
@@ -112,10 +113,10 @@ namespace CSE384
         if (count > recvRetries)
           return -1;
         std::this_thread::sleep_for(std::chrono::microseconds(wait_time));
-        //usleep(wait_time);
+         //usleep(wait_time);
       }
     }
-    return blockLen;
+    return (int) blockLen;
   }
 
   static int GetPeerEndPoint(int sock_fd, char ipstr[], unsigned int &port)

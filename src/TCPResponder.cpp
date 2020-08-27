@@ -30,7 +30,7 @@ namespace CSE384
          int client_count = 0;
          // set socket listening
          listenSocket_.Listen(backlog);
-
+         IsListening(true);
          // loop around accepting)
          while(IsListening() &&  (client_count++ < NumClients() || NumClients() == -1))
          {
@@ -136,18 +136,20 @@ namespace CSE384
       if (IsListening())
       {
          try
-         {
-            IsListening(false);
-            listenSocket_.Close();
-
-            // listenThread_.~thread();
-
-            if (listenThread_.joinable())
+         {     
+            if(listenThread_.joinable())
                listenThread_.join();
+
+            listenSocket_.Close(); 
+            IsListening(false);
+
+            ThreadPool<8>::CallObj exit = []() ->bool { return false; };
+            threadPool_.workItem(exit);
+            threadPool_.wait();
 
             //listenThread_.detach();
          }
-         catch (...)
+         catch (std::exception& ex)
          {
             IsListening(false);
          }
@@ -191,7 +193,7 @@ public:
       while ((msg = ReceiveMessage())->GetType() != MessageType::DISCONNECT)
       {
          std::cout << "Got a message:" << *msg << "from:" << RemoteEP() << std::endl;      
-         SendMessage(Message::CreateMessage(std::string("Reply from server: ") + GetServiceEndPoint().ToString()));
+         SendMessage(Message::CreateMessage(std::string("Reply from server: ") + GetServiceEndPoint().ToString(), MessageType::DEFAULT));
          //PostMessage(MessagePtr(new Message(std::string("Reply from server: ") + GetServiceEndPoint().ToString())));
       } 
 
@@ -212,7 +214,7 @@ public:
 int main(int argc, char *argv[])
 {
    // define server endpoint ip address and port for listening
-   EndPoint serverEP("127.0.0.1", 6060);
+   EndPoint serverEP("127.0.0.1", 6060); 
    //EndPoint serverEP("::1", 6060);
 
    // define instance of custom server processing (ccustom client handler)
@@ -237,15 +239,16 @@ int main(int argc, char *argv[])
    responder.UseClientSendQueue(false);
    // responder.UseClientSendReceiveQueues(false);
 
+
    // start the server listening thread
    responder.Start();
    std::cout << "Server listening on: " << serverEP << std::endl;
    std::cout << "Press any key to quit" << std::endl;
-   ::getchar();
+  // ::getchar();
 
    // stop the listener and quit
    responder.Stop();
 
-   exit(0);
+  // exit(0);
 }
 #endif
