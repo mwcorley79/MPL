@@ -120,13 +120,14 @@ void client_no_wait_for_reply(const EndPoint &addr,    // endpoint (address, por
       char* body = new char[sz_bytes];
       std::memset(body, '0', sz_bytes);
       MessagePtr msg = Message::CreateFixedSizeMessage(sz_bytes, body, sz_bytes, MessageType::DEFAULT);
-    
+      delete [] body;
+     
       for (unsigned _i = 0; _i < num_msgs; ++_i)
       {
          //std::cout << "\n posting msg " << name << " of size " << sz_bytes;
           conn.PostMessage(msg);
       }
-      delete [] body;
+      
       conn.Close();
 
       if(handle.joinable())
