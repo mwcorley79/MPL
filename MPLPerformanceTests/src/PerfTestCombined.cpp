@@ -206,7 +206,7 @@ public:
       while ((msg = ReceiveMessage())->GetType() != MessageType::DISCONNECT)
       {
          // PostMessage(msg); // post to send queue
-         SendMessage(msg); //direct send 
+         SendMessage(msgSend); //direct send 
          // std::cout << "RECEIVED" << std::endl;
       }   
    }
