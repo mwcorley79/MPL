@@ -66,6 +66,8 @@ void client_wait_for_reply(const EndPoint &addr,    // endpoint (address, port)
    char* body = new char[sz_bytes];
    std::memset(body, '\0', sz_bytes);
    MessagePtr msg = Message::CreateFixedSizeMessage(sz_bytes, body, sz_bytes, MessageType::DEFAULT);
+   delete[] body;
+   
    StopWatch tmr;
 
    //std::thread handle = std::thread( [&]() {
@@ -78,7 +80,7 @@ void client_wait_for_reply(const EndPoint &addr,    // endpoint (address, port)
       // std::cout << "\n received msg: " << msg->GetType();
    }
 
-   delete[] body;
+ 
    tmr.stop();
    int64_t et = tmr.elapsed_micros();
    conn.Close(); // shutdown connection (end message etc.)
@@ -234,7 +236,7 @@ int main(int argc, char* argv[])
    // define instance of the TCPResponder (server host)
    TCPResponder responder(addr, &sock_opts);
 
-    // set number of clients to server
+    // set number of clients for the server process to service before exiting (-1 runs indefinitely)
    responder.NumClients(NUM_CLIENTS);
 
    responder.UseClientSendReceiveQueues(false);  // uncomment if you use SendMessage/ReceiveMessage
@@ -245,10 +247,7 @@ int main(int argc, char* argv[])
    // start the server listening thread
    responder.Start();
 
-   std::cout << std::endl
-             << "Listening on: " << addr << std::endl;
-   std::cout << "Press any key to quit" << std::endl;
-
+   // give the server a 
    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
    // std::thread test3 = std::thread(client_wait_for_reply, addr, "test3", 1000, 1024);
@@ -260,7 +259,7 @@ int main(int argc, char* argv[])
 
    multiple_clients(NUM_CLIENTS, addr, TEST_NAME, NUM_MSGS, MSG_SIZE);
 
-   std::cin.get();
+  // std::cin.get();
 
    // stop the listener and quit
    responder.Stop();
