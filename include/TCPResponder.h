@@ -59,8 +59,9 @@ namespace CSE384
         void UseClientReceiveQueue(bool use_q);
         bool UseClientSendQueue();
         void UseClientSendQueue(bool use_q);
-
         bool IsListening();
+        int NumClients();
+        void NumClients(int client_count);
 
         // prevent users from making copies of TCPResponder objects
         TCPResponder(const TCPResponder&) = delete;
@@ -83,6 +84,7 @@ namespace CSE384
         ThreadPool<8> threadPool_;
         std::atomic<bool> useClientRecvQueue_;
         std::atomic<bool> useClientSendQueue_;
+        std::atomic<int>  num_clients_;
 
         #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__) || defined(_WIN64)
         SocketSystem s;
@@ -124,6 +126,17 @@ namespace CSE384
    {
       useClientSendQueue_.store(use_q);
    }
+
+   inline int TCPResponder::NumClients()
+   {
+      return  num_clients_.load();
+   }
+
+   inline void TCPResponder::NumClients(int client_count)
+   {
+      num_clients_.store(client_count);
+   }
+
 }
 #endif 
 

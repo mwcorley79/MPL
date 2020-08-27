@@ -36,11 +36,10 @@ void ReceiverProc(TCPConnector *connector)
 }
 
 
-
 int main()
 {
    // specify the server Endpoint we wish to connect
-   EndPoint serverEp("127.0.0.1", 6060);
+   EndPoint serverEp("127.0.0.1", 8080);
    //EndPoint serverEp("::1", 6060);
 
    // instantiate a sender
@@ -64,7 +63,7 @@ int main()
       // loop to send messages
       for (int j = 0; j < num_messages; j++)
       {
-         MessagePtr msg = Message::CreateFixedSizeMessage(MSG_SIZE, "[ Message #: " + std::to_string(j + 1) + " ]");
+         MessagePtr msg = Message::CreateFixedSizeMessage(MSG_SIZE, "[ Message #: " + std::to_string(j + 1) + " ]", MessageType::DEFAULT );
          // std::cout << "Message is: " << *msg << std::endl;
 
          // post message into the send queue

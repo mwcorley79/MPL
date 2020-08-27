@@ -8,7 +8,8 @@ namespace CSE384
                                                                           ch_(nullptr),
                                                                           islistening_(false),
                                                                           useClientRecvQueue_(true),
-                                                                          useClientSendQueue_(true)
+                                                                          useClientSendQueue_(true),
+                                                                          num_clients_(-1)
    {
       listenSocket_.Bind(ep, sc);
    }
@@ -26,11 +27,12 @@ namespace CSE384
    {
       try
       {
+         int client_count = 0;
          // set socket listening
          listenSocket_.Listen(backlog);
 
-         // loop around accepting
-         while (IsListening())
+         // loop around accepting)
+         while(IsListening() &&  (client_count++ < NumClients() || NumClients() == -1))
          {
             // ---accept a connection (creating a data pipe)---
             TCPSocket client_socket = listenSocket_.Accept();
@@ -39,28 +41,28 @@ namespace CSE384
             {
                if (ch_ != nullptr)
                {
-                  // clone the registered client hander, and hand the socket to the client handler
-                  ClientHandler *ch = ch_->Clone();
+                 // clone the registered client hander, and hand the socket to the client handler
+                 ClientHandler *ch = ch_->Clone();
 
-                  // give service end point the client handler instance
-                  ch->SetServiceEndPoint(ServiceEP);
+                 // give service end point the client handler instance
+                 ch->SetServiceEndPoint(ServiceEP);
 
-                  // give the TCPSocket to the client handler instance
-                  ch->SetSocket(client_socket);
+                 // give the TCPSocket to the client handler instance
+                 ch->SetSocket(client_socket);
 
-                  // service the current client request using a threadPool thread
-                 //ThreadPool<8>::CallObj service_client = [this, ch]() -> bool {
-                 //    ServiceClient(ch);
-                 //    return true;
-                 // };
-
-                 // threadPool_.workItem(service_client);
-
-                  // spawn a thread to service the current client request
-                  std::thread clientThread = std::thread(&TCPResponder::ServiceClient, this, ch);
-                  clientThread.detach();
+                 // service the current client request using a threadPool thread
+                 ThreadPool<8>::CallObj service_client = [this, ch]() -> bool 
+                 {
+                    ServiceClient(ch);
+                    return true;
+                 };
+                 threadPool_.workItem(service_client);
+                 
+                 // spawn a thread to service the current client request
+                 // std::thread clientThread = std::thread(&TCPResponder::ServiceClient, this, ch);
+                 // clientThread.detach();
                }
-               else
+               else 
                {
                   throw ReceiverNoRegisteredClientHandlerException();
                }

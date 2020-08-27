@@ -204,6 +204,7 @@ namespace CSE384
     {
     public:
         FixedSizeMsgConnector(int msg_size, TCPSocketOptions *sc = nullptr);
+        int GetMessageSize() const;
     private:
         // redefine socket level processing for fixed message handling 
         // only one send and recv system call
@@ -211,6 +212,12 @@ namespace CSE384
         virtual MessagePtr RecvSocketMessage();
         int msg_size_;
     };
+
+    inline int FixedSizeMsgConnector::GetMessageSize() const
+    {
+        return msg_size_;
+    }
+    
 }; // namespace CSE384
 
 #endif

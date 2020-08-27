@@ -12,7 +12,9 @@ namespace CSE384
 {
   class Message;
   using MessagePtr = std::shared_ptr<Message>;
-  using MessageType = enum { DISCONNECT = -1,
+  using MessageType = enum { 
+                             DEFAULT = 0,
+                             DISCONNECT = -1,
                              STOP_SENDING = -2,
                              STRING = -3, 
                              BINARY = -4};
@@ -68,11 +70,11 @@ namespace CSE384
   class Message
   {
   public:
-    Message(const std::string &str, int type = 0);  
-    Message(const char *data = 0, size_t length = 0, int type = 0);
+    Message(const std::string &str, int type);  
+    Message(const char *data, size_t length, int type);
     Message(const MSGHEADER &mhdr);
-    Message(int fixed_size, const char* data, size_t length, int type=0);
-    Message(int fixed_size, size_t length, int type=0);
+    Message(size_t fixed_size, const char* data, size_t length, int type);
+    Message(size_t fixed_size, size_t length, int type);
     Message &operator=(const Message &msg); 
     Message &operator=(Message &&msg);
     
@@ -81,12 +83,12 @@ namespace CSE384
 
     //static MessagePtr AllocateEmptyFixedSizeMessage(int msg_size);
     static MessagePtr CreateMessage(const MSGHEADER &mhdr);
-    static MessagePtr CreateMessage(const char *data, size_t length, int type=0);
-    static MessagePtr CreateMessage(const std::string &str, int type = 0); 
+    static MessagePtr CreateMessage(const char *data, size_t length, int type);
+    static MessagePtr CreateMessage(const std::string &str, int type); 
 
-    static MessagePtr CreateFixedSizeMessage(int msg_size, const char *data, size_t length, int type=0);
-    static MessagePtr CreateFixedSizeMessage(int msg_size, const std::string &str, int type = 0);
-    static MessagePtr CreateEmptyFixedSizeMessage(int msg_size);
+    static MessagePtr CreateFixedSizeMessage(size_t msg_size, const char *data, size_t length, int type);
+    static MessagePtr CreateFixedSizeMessage(size_t msg_size, const std::string &str, int type);
+    static MessagePtr CreateEmptyFixedSizeMessage(size_t msg_size);
 
     char& operator[](int index);
     const char& operator[](int index) const;
@@ -111,19 +113,19 @@ namespace CSE384
     MSGHEADER shadow_hdr;
   };
 
-  inline MessagePtr Message::CreateFixedSizeMessage(int msg_size, const char *data, size_t length, int type)
+  inline MessagePtr Message::CreateFixedSizeMessage(size_t msg_size, const char *data, size_t length, int type)
   {
      return MessagePtr (new Message(msg_size, data, length, type));
   }
 
-  inline MessagePtr Message::CreateFixedSizeMessage(int msg_size, const std::string &str, int type)
+  inline MessagePtr Message::CreateFixedSizeMessage(size_t msg_size, const std::string &str, int type)
   {
      return CreateFixedSizeMessage(msg_size, str.c_str(), str.length(), type); 
   }
 
-  inline MessagePtr Message::CreateEmptyFixedSizeMessage(int msg_size)
+  inline MessagePtr Message::CreateEmptyFixedSizeMessage(size_t msg_size)
   {
-      return MessagePtr(new Message(msg_size, msg_size));
+      return MessagePtr(new Message(msg_size, msg_size,DEFAULT));
   }
 
   inline MessagePtr Message::CreateMessage(const MSGHEADER &mhdr)
@@ -141,7 +143,7 @@ namespace CSE384
      return MessagePtr(new Message(data, length, type));
   }
 
-  inline Message::Message(int fixed_size, size_t length, int type): raw_len_(sizeof(MSGHEADER) + fixed_size),
+  inline Message::Message(size_t fixed_size, size_t length, int type): raw_len_(sizeof(MSGHEADER) + fixed_size),
                                                                  raw_msg_(new char[raw_len_])
   {
     // use placement new to init MSG_HDR in raw_msg_ memory space
@@ -150,7 +152,7 @@ namespace CSE384
     std::memset((raw_msg_ + sizeof(MSGHEADER)), 0, fixed_size);
   }
 
-  inline Message::Message(int fixed_size, const char* data, size_t length, int type): raw_len_(sizeof(MSGHEADER) + fixed_size),
+  inline Message::Message(size_t fixed_size, const char* data, size_t length, int type): raw_len_(sizeof(MSGHEADER) + fixed_size),
                                                                                    raw_msg_(new char[raw_len_])
   {
     // use placement new to init MSG_HDR in raw_msg_ memory space

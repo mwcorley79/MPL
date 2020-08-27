@@ -23,7 +23,7 @@ void SendProc(FixedSizeMsgClientHander *handler)
    // loop to send messages
    for (int j = 0; j < num_messages; j++)
    {
-      handler->SendMessage(Message::CreateFixedSizeMessage(MSG_SIZE, "[ Message #: " + std::to_string(j + 1) + " ]"));
+      handler->SendMessage(Message::CreateFixedSizeMessage(MSG_SIZE, "[ Message #: " + std::to_string(j + 1) + " ]", MessageType::DEFAULT));
    }
    high_resolution_clock::time_point t2 = high_resolution_clock::now();
    duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
@@ -57,6 +57,7 @@ public:
       int count = 0;
       high_resolution_clock::time_point t1 = high_resolution_clock::now();
 
+
       MessagePtr msg;
       while ((msg = ReceiveMessage())->GetType() != MessageType::DISCONNECT)
       //while ((msg = GetMessage())->GetType() != MessageType::DISCONNECT)
@@ -64,7 +65,7 @@ public:
          // std::cout << "Got a message:" << *msg << "from: " << RemoteEP() << std::endl;
          ++count;
          MessagePtr msgPtr = Message::CreateFixedSizeMessage(GetMessageSize(),
-                                                             std::string("Reply from server: ") + GetServiceEndPoint().ToString());
+                                                             std::string("Reply from server: ") + GetServiceEndPoint().ToString(), MessageType::DEFAULT);
 
          // queue reply message
          // PostMessage(msgPtr);
@@ -91,7 +92,7 @@ public:
 int main(int argc, char *argv[])
 {
    // define server endpoint ip address and port for listening
-   EndPoint serverEP("127.0.0.1", 6060);
+   EndPoint serverEP("127.0.0.1", 8080);
    //EndPoint serverEP("::1", 6060);
 
    ResponderClientHandler rh(MSG_SIZE);
