@@ -80,7 +80,7 @@ The current objective is to provide an efficient C++ network communication facil
   <li> Build the PerfTestCombined target by selecting the PerfTestCombined EXECUTABLE target and clicking "Build".
        <img src="./png/perf_test_combined2.PNG"/>  
   </li> 
-  <li> Finally, PerfTestCombined target by clicking Run (shown below) 
+  <li> Finally, Run the PerfTestCombined target by clicking Run (shown below) 
        <img src="./png/perf_test_combined3.PNG"/>  
   </li> 
 </ol>
