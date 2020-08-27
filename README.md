@@ -67,6 +67,25 @@ The current objective is to provide an efficient C++ network communication facil
    <img src="./png/perf_test_linux.PNG"/> 
   </li>
 </ol>
+ 
+ <b> Running the combined test target (PerfTestCombined) is complementary to Dr. Fawcett's testing of the same in Rust (located here: https://jimfawcett.github.io/RustCommWithThreadPool.html) </b>
+<ol>
+  <li> Start VScode: click File -> Open Folder and Select the project MPL folder
+       <img src="./png/perf_test_combined0.PNG"/>  
+  </li>
+  <li> Build the MPL (library) by selecting the MPL STATIC_LIBARY target and clicking "Build".
+       On Windows this generates library: MPL.lib, and on Linux: libMPL.a
+       <img src="./png/perf_test_combined.PNG"/>  
+  </li> 
+  <li> Build the PerfTestCombined target by selecting the PerfTestCombined EXECUTABLE target and clicking "Build".
+       <img src="./png/perf_test_combined2.PNG"/>  
+  </li> 
+  <li> Finally, PerfTestCombined target by clicking Run (shown below) 
+       <img src="./png/perf_test_combined3.PNG"/>  
+  </li> 
+</ol>
+
+
 <b> Getting started on Linux and Windows with CMake only (if you prefer not to use VSCode) </b>
 <ul>
   <li> NOTE:  you will need a compiler toolchain (i.e. Build Tools - Windows,  gcc/g++ - Linux) </li>
