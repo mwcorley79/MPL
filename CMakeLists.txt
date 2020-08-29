@@ -97,9 +97,11 @@ add_executable(TCPResponderPerfTest ./MPLPerformanceTests/src/PerformanceRespond
 # generate the TCPConnector test stub target (executable test) from the SOURCES
 add_executable(TCPConnectorPerfTest ./MPLPerformanceTests/src/PerformanceConnector.cpp)
 
-# generate the PerfTestCombined test stub target (executable test) from the SOURCES
-add_executable(PerfTestCombined ./MPLPerformanceTests/src/PerfTestCombined.cpp)
+# generate the PerfTestCombinedFixedSizeMsg test stub target (executable test) from the SOURCES
+add_executable(PerfTestCombinedFixedSizeMsg ./MPLPerformanceTests/src/PerfTestCombinedFixedSizeMsg.cpp)
 
+# generate the PerfTestCombinedVariableSizeMsg test stub target (executable test) from the SOURCES
+add_executable(PerfTestCombinedVariableSizeMsg ./MPLPerformanceTests/src/PerfTestCombinedVariableSizeMsg.cpp)
 
 if (UNIX)
     # link target to pthread library for LINUX
@@ -112,14 +114,16 @@ if (UNIX)
     # link libMPL and pthread to the targets for LINUX
     target_link_libraries (TCPResponderPerfTest MPL.a pthread)
     target_link_libraries (TCPConnectorPerfTest MPL.a pthread)
-    target_link_libraries(PerfTestCombined MPL.a pthread)
+    target_link_libraries (PerfTestCombinedFixedSizeMsg MPL.a pthread)
+    target_link_libraries (PerfTestCombinedVariableSizeMsg MPL.a pthread)
 
 else (NOT UNIX) 
      # no need to link the others targets to pthread on Windows
      # here we link MPL.lib to TCPResponderTest , TCPConnectorTest, combined targets for WINDOWS
     target_link_libraries (TCPResponderPerfTest MPL.lib)
     target_link_libraries (TCPConnectorPerfTest MPL.lib)
-    target_link_libraries (PerfTestCombined MPL.lib)
+    target_link_libraries (PerfTestCombinedFixedSizeMsg MPL.lib)
+    target_link_libraries (PerfTestCombinedVariableSizeMsg MPL.lib)
 endif (UNIX)
 
 # ***  End test stub target section ***

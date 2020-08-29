@@ -1,9 +1,10 @@
-/////////////////////////////////////////////////////////////////////////////////
-// A high resolution timer based on std::chrono, but wrapped in class to       //
-// resemble the Rust StopWatch interface.                                      //
-// inspired by example:  https://gist.github.com/mcleary/b0bf4fa88830ff7c882d  //
-// Mike Corley, 23 Aug 2020                                                    //
-/////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
+// A high resolution timer based on std::chrono, but wrapped in class to                        //
+// resemble the Rust StopWatch interface.                                                       //
+// inspired by example:  https://gist.github.com/mcleary/b0bf4fa88830ff7c882d                   // 
+// Clocks reference: https://solarianprogrammer.com/2012/10/14/cpp-11-timing-code-performance/  //
+// Mike Corley, 23 Aug 2020                                                                     //
+//////////////////////////////////////////////////////////////////////////////////////////////////
 #ifndef _STOPWATCH_
 #define _STOPWATCH_
 
@@ -19,24 +20,28 @@ namespace CSE384
         void stop();
         int64_t elapsed_micros();
 
-    private:
-       std::chrono::time_point<std::chrono::high_resolution_clock> tp_start_;
-       std::chrono::time_point<std::chrono::high_resolution_clock> tp_stop_;  
-    };
+    private: 
+         std::chrono::time_point<std::chrono::steady_clock> tp_start_;
+         std::chrono::time_point<std::chrono::steady_clock> tp_stop_;  
 
-    inline StopWatch::StopWatch():  tp_start_(std::chrono::high_resolution_clock::now()),
+      // std::chrono::time_point<std::chrono::high_resolution_clock> tp_start_;
+      // std::chrono::time_point<std::chrono::high_resolution_clock> tp_stop_;  
+    };
+        
+                                            // tp_start_(std::chrono::high_resolution_clock::now()),
+    inline StopWatch::StopWatch():  tp_start_(std::chrono::steady_clock::now()),  
                                     tp_stop_(tp_start_)
     {}
                                      
     inline void StopWatch::start()
     {
-        tp_start_ = tp_stop_ = std::chrono::high_resolution_clock::now();
+        tp_start_ = tp_stop_ = std::chrono::steady_clock::now();  // std::chrono::high_resolution_clock::now();
     }
 
 
     inline void StopWatch::stop()
     {
-        tp_stop_ = std::chrono::high_resolution_clock::now();
+        tp_stop_ = std::chrono::steady_clock::now(); //   std::chrono::high_resolution_clock::now();
     }
 
     inline int64_t StopWatch::elapsed_micros()

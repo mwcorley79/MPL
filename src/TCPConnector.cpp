@@ -73,10 +73,9 @@ namespace CSE384
     // serialize the message header and message and write them into the socket
     void TCPConnector::SendSocketMessage(const MessagePtr &msgPtr)
     {
-        // convert the wire protocol (message header) to big endian (network byte order)
-        //struct MSGHEADER mhdr =  *(const_cast<Message&>(msg).GetHeader());
-        //mhdr.ToNetworkByteOrder();
-
+        // Note: could do the send in one call (same as for the Fixed message), but choosing 
+        // not to here. instead send the fixed size header, followed by the variable length data
+        /* 
         msgPtr->GetHeader()->ToNetorkByteOrder();
         if (socket.Send(msgPtr->GetRawMsg(), msgPtr->RawMsgLength(),0,1) == -1)
         {
@@ -84,16 +83,23 @@ namespace CSE384
             throw SenderTransmitMessageDataException(getlasterror_portable());
         }
         msgPtr->GetHeader()->ToHostByteOrder();
+        */
+
+        // convert the wire protocol (message header) to big endian (network byte order)
+        msgPtr->GetHeader()->ToNetorkByteOrder();  
 
         // send message header
-        //if(socket.Send( (const char*) &mhdr, sizeof(struct MSGHEADER)) == -1)
-        // throw SenderTransmitMessageHeaderException(getlasterror_portable());
+        if(socket.Send( (const char*) msgPtr->GetHeader(), sizeof(struct MSGHEADER), 0,1) == -1)
+        {
+           msgPtr->GetHeader()->ToHostByteOrder();
+           throw SenderTransmitMessageHeaderException(getlasterror_portable());
+        }
+        msgPtr->GetHeader()->ToHostByteOrder();
 
         // send message data
-        //if(socket.Send(msg.GetData(), msg.Length()) == -1)
-        //  throw SenderTransmitMessageDataException(getlasterror_portable());
+        if(socket.Send(msgPtr->GetData(), msgPtr->Length(),0,1) == -1)
+           throw SenderTransmitMessageDataException(getlasterror_portable());
     }
-
 
 
     void TCPConnector::StartReceiving()
@@ -266,14 +272,18 @@ namespace CSE384
     {
     }
 
-    /* void FixedSizeMsgConnector::SendSocketMessage(const MessagePtr &msg)
-    {
+
+    void FixedSizeMsgConnector::SendSocketMessage(const MessagePtr &msg)
+    {   
         msg->GetHeader()->ToNetorkByteOrder();
-        if (socket.Send(msg->GetRawMsg(), msg->RawMsgLength()) == -1)
+        if (socket.Send(msg->GetRawMsg(), msg->RawMsgLength(),0,1) == -1)
+        {
+            msg->GetHeader()->ToHostByteOrder();
             throw SenderTransmitMessageDataException(getlasterror_portable());
+        }
         msg->GetHeader()->ToHostByteOrder();
     }
-    */
+    
 
     MessagePtr FixedSizeMsgConnector::RecvSocketMessage()
     {
@@ -373,7 +383,7 @@ void TestSenderAsync(const std::string &name)
             // build an and print each string message
             std::string strMsg = name + " [ Message #: " + std::to_string(j + 1) + " ]";
             //MessagePtr msg(new Message(strMsg.c_str(), (int)strMsg.length(), MessageType::STRING));
-            MessagePtr msg = Message::CreateMessage(strMsg); 
+            MessagePtr msg = Message::CreateMessage(strMsg, MessageType::DEFAULT); 
              
             connector.SendMessage(msg);
             std::cout << "Message is: " << *msg << std::endl;

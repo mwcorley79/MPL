@@ -239,6 +239,8 @@ int main(int argc, char *argv[])
    responder.UseClientSendQueue(false);
    // responder.UseClientSendReceiveQueues(false);
 
+   // shutdown the listener after one client connection
+   responder.NumClients(1);  
 
    // start the server listening thread
    responder.Start();

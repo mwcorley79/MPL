@@ -208,7 +208,7 @@ namespace CSE384
     private:
         // redefine socket level processing for fixed message handling 
         // only one send and recv system call
-        // virtual void SendSocketMessage(const MessagePtr &msg);
+        virtual void SendSocketMessage(const MessagePtr &msg);
         virtual MessagePtr RecvSocketMessage();
         int msg_size_;
     };

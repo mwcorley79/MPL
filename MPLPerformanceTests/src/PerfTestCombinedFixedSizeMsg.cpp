@@ -254,7 +254,7 @@ int main(int argc, char* argv[])
    // std::thread test3 = std::thread(client_wait_for_reply, addr, "test3", 1000, 1024);
    // test3.join();
   
-   std::cout << "\n  -- test4: c++_comm --\n";
+   std::cout << "\n  -- test4: (fixed size message) c++_comm --\n";
    int nt = 8;
    std::cout << "\n  num thrdpool thrds: " << nt;
 

@@ -68,24 +68,32 @@ namespace CSE384
    // serialize the message header and message and write them into the socket
    void ClientHandler::SendSocketMessage(const MessagePtr &msg)
    {
-      // convert the wire protocol (message header) to big endian (network byte order)
-      //struct MSGHEADER mhdr =  *(const_cast<Message&>(msg).GetHeader());
-      //mhdr.ToNetworkByteOrder();
-    
-      msg->GetHeader()->ToNetorkByteOrder();
-      if (data_socket.Send(msg->GetRawMsg(), msg->RawMsgLength(),0,1) == -1)
-      {
-         msg->GetHeader()->ToHostByteOrder();
-         throw SenderTransmitMessageDataException(getlasterror_portable());
-      }
-      msg->GetHeader()->ToHostByteOrder();
-      // send message header
-      //if(data_socket.Send((const char*) &mhdr, sizeof(struct MSGHEADER)) == -1)
-      // throw SenderTransmitMessageHeaderException(getlasterror_portable());
+      // Note: could do the send in one call (same as for the Fixed message), but choosing 
+        // not to here. instead send the fixed size header, followed by the variable length data
+        /* 
+        msg->GetHeader()->ToNetorkByteOrder();
+        if (data_socket.Send(msg->GetRawMsg(), msg->RawMsgLength(),0,1) == -1)
+        {
+            msg->GetHeader()->ToHostByteOrder();
+            throw SenderTransmitMessageDataException(getlasterror_portable());
+        }
+        msg->GetHeader()->ToHostByteOrder();
+        */
 
-      // send message data
-      //if(data_socket.Send(msg.GetData(), msg.Length()) == -1)
-      //   throw SenderTransmitMessageDataException(getlasterror_portable());
+        // convert the wire protocol (message header) to big endian (network byte order)
+        msg->GetHeader()->ToNetorkByteOrder();  
+
+        // send message header
+        if(data_socket.Send( (const char*) msg->GetHeader(), sizeof(struct MSGHEADER), 0,1) == -1)
+        {
+           msg->GetHeader()->ToHostByteOrder();
+           throw SenderTransmitMessageHeaderException(getlasterror_portable());
+        }
+        msg->GetHeader()->ToHostByteOrder();
+
+        // send message data
+        if(data_socket.Send(msg->GetData(), msg->Length(),0,1) == -1)
+           throw SenderTransmitMessageDataException(getlasterror_portable());
    }
 
    void ClientHandler::StartSending()
@@ -173,12 +181,15 @@ namespace CSE384
    }
 
    // serialize the message header and message and write them into the socket
-   /* void FixedSizeMsgClientHander::SendSocketMessage(const MessagePtr &msg)
+   void FixedSizeMsgClientHander::SendSocketMessage(const MessagePtr &msg)
    {
       msg->GetHeader()->ToNetorkByteOrder();
-      if (GetDataSocket().Send(msg->GetRawMsg(), msg->RawMsgLength()) == -1)
+      if (GetDataSocket().Send(msg->GetRawMsg(), msg->RawMsgLength(),0,1) == -1)
+      {
+         msg->GetHeader()->ToHostByteOrder();
          throw SenderTransmitMessageDataException(getlasterror_portable());
+      }
+      msg->GetHeader()->ToHostByteOrder();
    }
-   */
 
 } // namespace CSE384
