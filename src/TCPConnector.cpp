@@ -217,8 +217,8 @@ namespace CSE384
                     recvThread.join();
             // }
 
-            // socket.ShutdownRecv();
-            // ret = (socket.Close() == 0);
+             socket.ShutdownRecv();
+             ret = (socket.Close() == 0);
         }
 
         return ret;
