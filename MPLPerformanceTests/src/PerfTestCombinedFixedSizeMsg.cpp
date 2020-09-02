@@ -146,7 +146,7 @@ void multiple_clients(int nc,
                      unsigned sz_bytes        // body size in bytes
 )
 {
-   std::cout << "\n  number of clients:  ", nc;
+   std::cout << "\n  number of clients:  " << nc;
    StopWatch tmr;
    tmr.start();
 
