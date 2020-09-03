@@ -28,7 +28,7 @@ The current objective is to provide an efficient C++ network communication facil
 </ol>
 
 <hr>
-<b>Option 1: Building the Project targets with CMake from the command line (these steps apply to both Windows and Linux) </b>
+<b>Option 1: Building the Project targets with CMake from the command line -- Debug and Release Mode  (these steps apply to both Windows and Linux) </b>
 <ol> 
   <li> Open of a command terminal (bash in Linux) and (cmd.exe Windows) </li>
   <b> Building Debug Mode </b> 
@@ -38,6 +38,15 @@ The current objective is to provide an efficient C++ network communication facil
      <li> cd debug </li>
      <li> cmake .. -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=Debug </li>  
    </ol>
+   <b> Build the Performance Testing Targets (one at a time) </b>
+   <ul>
+      <li> cmake --build . --target PerfTestCombinedFixedSizeMsg --config Debug  
+        <ul> <li> Build the fixed size message performance Test  -- comparison with Dr. Fawcett's Rust Performance test </li> </ul>
+      </li>
+       <li> cmake --build . --target PerfTestCombinedVariableSizeMsg --config Debug 
+           <ul> <li> Build the variable size message performance Test  -- comparison with Dr. Fawcett's Rust Performance test </li> </ul>
+       </li>
+   </ul>
    <b> Build all targets </b>
    <ul>
      <li> cmake --build . --target all --config Debug </li>
