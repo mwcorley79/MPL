@@ -8,12 +8,6 @@ The current objective is to provide an efficient C++ network communication facil
 <ol>
   <li> Download and install CMake (Debian-based distros): <b> sudo apt-get install cmake </b> </li>
   <li> Download and install git:   <b> sudo apt-get install git </b> </li>
-  <li> Download and install Visual Studio Code editor (VScode): <b> https://code.visualstudio.com/download </b>
-     <ol>
-       <li> Start VScode and install Microsoft C/C++ VScode extension (ms-vscode.cpptools) </li>
-       <li> Install Microsoft CMake Tools VScode extension (ms-vscode.cmake-tools) </li>
-     </ol>
-  </li>
   <li> Download and install gcc/g++ (compiler toolchain): <b> sudo apt-get install g++ </b> </li>
   <li> Open a terminal/console and type command: <b> git clone https://github.com/mwcorley79/MPL.git </b> </li>
 </ol>
@@ -22,12 +16,7 @@ The current objective is to provide an efficient C++ network communication facil
 <ol>
   <li> Download and install CMake: https://cmake.org/download/</b> </li>
   <li> Download and install git:   <b> https://git-scm.com/download/win </b> </li>
-  <li> Download and install Visual Studio Code editor (VScode): <b> https://code.visualstudio.com/download </b>
-     <ol>
-       <li> Start VScode and install Microsoft C/C++ VScode extension (ms-vscode.cpptools) </li>
-       <li> Install Microsoft CMake Tools VScode extension (ms-vscode.cmake-tools) </li>
-     </ol> 
-  </li>
+  
   <li> Download and install Microsoft C++ Build Tools  (MSVC compiler tools): <b> https://visualstudio.microsoft.com/visual-cpp-build-tools/ </b> 
      <ol>
        <li> Run vs_buildtools (Visual Studio) installer. Check the workload for C++ build tools (as shown below) 
@@ -39,9 +28,27 @@ The current objective is to provide an efficient C++ network communication facil
 </ol>
 
 <hr>
-
-<b>Setup the MPL CMake project for use with VScode (these steps apply to both Windows and Linux) </b>
+<b>Option 1: Building the Project targets with CMake from the command line (these steps apply to both Windows and Linux) </b>
 <ol> 
+  <li>  Open of a command terminal (bash in Linux) and (cmd.exe Windows) </li>
+  <li> Building Debug Mode </li>
+  <ol>
+    <li> cd MPL </l>
+    <li> mkdir debug </li>
+    <li> cd debug </li>
+    <li> cmake .. -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=Debug <li>
+   </ol>
+ </ol>  
+    
+
+<b>Option 2: Use VScode with the CMake extension (these steps apply to both Windows and Linux) </b>
+<ol> 
+  <li> Download and install Visual Studio Code editor (VScode): <b> https://code.visualstudio.com/download </b>
+     <ol>
+       <li> Start VScode and install Microsoft C/C++ VScode extension (ms-vscode.cpptools) </li>
+       <li> Install Microsoft CMake Tools VScode extension (ms-vscode.cmake-tools) </li>
+     </ol> 
+  </li>
   <li> Start VScode: click File -> Open Folder and Select the project MPL folder
     <img src="./png/open_project.PNG"/>  
   </li>
