@@ -30,14 +30,19 @@ The current objective is to provide an efficient C++ network communication facil
 <hr>
 <b>Option 1: Building the Project targets with CMake from the command line (these steps apply to both Windows and Linux) </b>
 <ol> 
-  <li>  Open of a command terminal (bash in Linux) and (cmd.exe Windows) </li>
-  <li> Building Debug Mode </li>
+  <li> Open of a command terminal (bash in Linux) and (cmd.exe Windows) </li>
+  <b> Building Debug Mode </b> 
   <ol>
-    <li> cd MPL </l>
-    <li> mkdir debug </li>
-    <li> cd debug </li>
-    <li> cmake .. -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=Debug <li>
+     <li> cd MPL </l>
+     <li> mkdir debug </li>
+     <li> cd debug </li>
+     <li> cmake .. -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=Debug </li>  
    </ol>
+   <b> Build all targets </b>
+   <ul>
+     <li> cmake --build . --target all --config Debug </li>
+   </ul>
+   
  </ol>  
     
 
