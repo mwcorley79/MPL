@@ -7,25 +7,36 @@
 const int PORTABLE_SOCK_ERR_BUF_SIZE = 512;
 
 #if !defined(WIN32) && !defined(_WIN32) && !defined(__WIN32__) && !defined(__NT__) && !defined(_WIN64)
+  // #define __STDC_WANT_LIB_EXT1__ 
   #include <netdb.h>
   #include <unistd.h>
   #include <sys/types.h> 
   #include <sys/socket.h>
   #include <arpa/inet.h>
-  #include<errno.h>
+  #include <errno.h>
+  #include <cstring>
+  #include <cstdio>
+  #include <errno.h>
+  #include <features.h>
+  #include <strings.h>
+  #include <locale.h>
 
   // for strerror_s on Linux: source: https://en.cppreference.com/w/c/string/byte/strerror
-  #ifndef __STDC_WANT_LIB_EXT1__
-    #define __STDC_WANT_LIB_EXT1__  
-  #endif 
+  // #ifndef __STDC_WANT_LIB_EXT1__
+   //#define __STDC_WANT_LIB_EXT1__ 1 
+  // #endif 
 
   // helper function to get socket errors in a portable way (windows and linux)
   inline const char* strerror_portable(const char* errbuf, int buflen, int error)
   {
-#ifdef __STDC_LIB_EXT1__
-	strerror_s(errbuf, buflen, errno, error);
-	return errbuf;
-#endif   
+//#ifdef __STDC_LIB_EXT1__
+	//strerror_s(errbuf, buflen, errno, error);
+	//return errbuf;
+  return strerror(error);
+//#else
+ // strerror_r(errbuf, buflen, errno, error);
+	//return errbuf;
+//#endif   
   }
 
   // helper function to make error handling portable:  on Linux return errno

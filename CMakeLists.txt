@@ -86,22 +86,26 @@ add_executable(TCPResponderTest src/TCPResponder.cpp
 target_compile_definitions(TCPResponderTest PUBLIC TEST_RESPONDER) 
 
 
-#  6. Performance Test Targets:
-# *** NOTE must build MPL target first to libMPL.a for linking ***
+#  6. Performance Test Targets
 # ******************************************************************
-link_directories( ./build)
+link_directories( ./debug ./release ./install)
 
 # generate the TCPResponderPerfTest test stub target (executable test) from the SOURCES
 add_executable(TCPResponderPerfTest ./MPLPerformanceTests/src/PerformanceResponder.cpp)
+# TCPResponderPerfTest -- depends on MPL target
+add_dependencies(TCPResponderPerfTest MPL)
 
 # generate the TCPConnector test stub target (executable test) from the SOURCES
 add_executable(TCPConnectorPerfTest ./MPLPerformanceTests/src/PerformanceConnector.cpp)
+add_dependencies(TCPConnectorPerfTest MPL)
 
 # generate the PerfTestCombinedFixedSizeMsg test stub target (executable test) from the SOURCES
 add_executable(PerfTestCombinedFixedSizeMsg ./MPLPerformanceTests/src/PerfTestCombinedFixedSizeMsg.cpp)
+add_dependencies(PerfTestCombinedFixedSizeMsg MPL)
 
 # generate the PerfTestCombinedVariableSizeMsg test stub target (executable test) from the SOURCES
 add_executable(PerfTestCombinedVariableSizeMsg ./MPLPerformanceTests/src/PerfTestCombinedVariableSizeMsg.cpp)
+add_dependencies(PerfTestCombinedVariableSizeMsg MPL)
 
 if (UNIX)
     # link target to pthread library for LINUX
