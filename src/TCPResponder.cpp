@@ -149,7 +149,7 @@ namespace CSE384
 
             //listenThread_.detach();
          }
-         catch (std::exception& ex)
+         catch(...)
          {
             IsListening(false);
          }
