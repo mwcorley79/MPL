@@ -53,12 +53,12 @@ The current objective is to provide an efficient C++ network communication facil
      </li>
    </li>
    <li> 
-     <b> Building CMake Project Targets: </b>
+     <b> Building CMake Project Targets </b>
         <ul>
-          <li> <b> Build all targets: </b> cmake --build . --target all </li>
-          <li> <b> Build the (static) MPL Comm: </b> cmake --build . --target MPL  </li>
-          <li> cmake --build . --target PerfTestCombinedFixedSizeMsg  <em> -- builds the fixed size message performance test </em> </li>
-          <li> cmake --build . --target PerfTestCombinedVariableSizeMsg <em> -- builds the variable size message performance test </em> </li>    
+          <li> <b> cmake --build . --target all </b> <em> <-- build all project targets </em> </li>
+          <li> <b> cmake --build . --target MPL </b> <em> <-- build the (static) Message Passing Library (MPL) <em> </li>
+          <li> <b> cmake --build . --target PerfTestCombinedFixedSizeMsg </b> <em> <-- builds the fixed size message performance test </em> </li>
+          <li> <b> cmake --build . --target PerfTestCombinedVariableSizeMsg </b> <em> <-- builds the variable size message performance test </em> </li>    
           <li> cmake --build . --target BQueueTest  -- buil </li>
           <li> cmake --build . --target MessageTest </li>
           <li> cmake --build . --target TCPSocketsTest </li>
