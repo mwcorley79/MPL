@@ -55,19 +55,19 @@ The current objective is to provide an efficient C++ network communication facil
    <li> 
      <b> Building CMake Project Targets </b>
         <ul>
-          <li> <b> cmake --build . --target all </b> <em> <-- build all project targets </em> </li>
-          <li> <b> cmake --build . --target MPL </b> <em> <-- build the (static) Message Passing Library (MPL) </em> </li>
-          <li> <b> cmake --build . --target PerfTestCombinedFixedSizeMsg </b> <em> <-- builds the fixed size message performance test </em> </li>
-          <li> <b> cmake --build . --target PerfTestCombinedVariableSizeMsg </b> <em> <-- builds the variable size message performance test </em> </li>    
-          <li> <b> cmake --build . --target BQueueTest  </b> <em> -- builds the BlockingQueue test </em> </li>
-          <li> <b> cmake --build . --target MessageTest </b> <em> -- builds the Message test </em> </li>
-          <li> <b> cmake --build . --target TCPSocketsTest </b> <em> --builds the TCPSocketsTest </em> </li>
+          <li> <b> cmake --build . --target all </b> <em> <- build all project targets </em> </li>
+          <li> <b> cmake --build . --target MPL </b> <em> <- build the (static) Message Passing Library (MPL) </em> </li>
+          <li> <b> cmake --build . --target PerfTestCombinedFixedSizeMsg </b> <em> <- builds the fixed size message performance test </em> </li>
+          <li> <b> cmake --build . --target PerfTestCombinedVariableSizeMsg </b> <em> <- builds the variable size message performance test </em> </li>    
+          <li> <b> cmake --build . --target BQueueTest  </b> <em> <- builds the BlockingQueue test </em> </li>
+          <li> <b> cmake --build . --target MessageTest </b> <em> <-  builds the Message test </em> </li>
+          <li> <b> cmake --build . --target TCPSocketsTest </b> <em> <- builds the TCPSocketsTest </em> </li>
         </ul>
     </li>
     <li> 
      <b> Running the Targets </b>
         <ul>
-          <li> From a command terminal, type the name of target to run, followed by the Enter key:  e.g. ./PerfTestCombinedFixedSizeMsg, PerfTestCombinedFixedSizeMsg.exe </li>    
+          <li> From a command terminal, type the name of target to run, followed by the Enter key:  e.g. <b> ./PerfTestCombinedFixedSizeMsg (Linux), PerfTestCombinedFixedSizeMsg.exe (Windows) </b> </li>    
         </ul>
     </li>
  </ol>  
@@ -78,7 +78,7 @@ The current objective is to provide an efficient C++ network communication facil
   <li> Download and install Visual Studio Code editor (VScode): <b> https://code.visualstudio.com/download </b>
      <ol>
        <li> Start VScode and install "Microsoft C/C++ VScode extension (ms-vscode.cpptools) </li>
-       <li> Install "Microsoft CMake Tools" extension (ms-vscode.cmake-tools) </li>
+       <li> Install "CMake Tools: Extended CMake support in Visual Studion Code" extension (ms-vscode.cmake-tools) </li>
      </ol> 
   </li>
   <li> Start VScode: click File -> Open Folder and Select the project MPL folder
