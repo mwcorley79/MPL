@@ -65,14 +65,8 @@ The current objective is to provide an efficient C++ network communication facil
            </ol>
              </li> </ul>
           </li>
-          <li> 
-            <ul>
-              <li> For Linux: <b> cmake --build . --target all </b> <em> <- build all project targets </em> </li>
-              <li> For Windows: <b> cmake --build . --target  ALL_BUILD </b> <em> <- build all project targets </em> 
-                  <br> <b> Note: ** </b>
-                </li>
-            </ul>
-          </li> 
+          <li> (Linux)  : <b> cmake --build . --target all </b> <em> <- build all project targets on Linux </em> </li>
+          <li> (Windows): <b> cmake --build . --target  ALL_BUILD </b> <em> <- build all project targets on Windows </em> </li> 
           <li> <b> cmake --build . --target MPL </b> <em> <- build the (static) Message Passing Library (MPL) </em> </li>
           <li> <b> cmake --build . --target PerfTestCombinedFixedSizeMsg </b> <em> <- builds the fixed size message performance test </em> </li>
           <li> <b> cmake --build . --target PerfTestCombinedVariableSizeMsg </b> <em> <- builds the variable size message performance test </em> </li>    
