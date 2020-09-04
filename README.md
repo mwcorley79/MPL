@@ -4,6 +4,8 @@ One goal is to enable cross-platform portability (TCP socket level compatibility
 <b> See TCPSocket.h/.cpp for details of the TCP socket wrapper code. </b> <br><br>
 This project uses CMake to manage the build process for Linux and Windows.  <br> <br>
 The current objective is to provide an efficient C++ network communication facility for a joint experiment with Dr. James Fawcett (https://github.com/JimFawcett) to compare various (initially performance related) aspects of modern C++ and the Rust programming language. 
+
+<br>
 <b>Prerequisites for getting started on Linux:</b>
 <ol>
   <li> Download and install CMake (Debian-based distros): <b> sudo apt-get install cmake </b> </li>
@@ -11,6 +13,7 @@ The current objective is to provide an efficient C++ network communication facil
   <li> Download and install gcc/g++ (compiler toolchain): <b> sudo apt-get install g++ </b> </li>
   <li> Open a terminal/console and type command: <b> git clone https://github.com/mwcorley79/MPL.git </b> </li>
 </ol>
+
 <br>
 <b>Prerequisites for getting started on Windows:</b>
 <ol>
