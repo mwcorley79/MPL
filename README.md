@@ -16,7 +16,6 @@ The current objective is to provide an efficient C++ network communication facil
 <ol>
   <li> Download and install CMake: https://cmake.org/download/</b> </li>
   <li> Download and install git:   <b> https://git-scm.com/download/win </b> </li>
-  
   <li> Note: If Visual Studio 2019 is not installed, then download and install Microsoft C++ Build Tools  (MSVC compiler tools): <b> https://visualstudio.microsoft.com/visual-cpp-build-tools/ </b> 
      <ol>
        <li> Run vs_buildtools (Visual Studio) installer. Check the workload for C++ build tools (as shown below) 
@@ -59,7 +58,7 @@ The current objective is to provide an efficient C++ network communication facil
             <ul>
               <li> For Linux: <b> cmake --build . --target all </b> <em> <- build all project targets </em> </li>
               <li> For Windows: <b> cmake --build . --target  ALL_BUILD </b> <em> <- build all project targets </em> 
-                   Note: ** If you have the Visual Studio 2019 IDE installed, wish may stop at this point and open the MPL.sln solution in the IDE
+                  <br> <b> Note: ** If you have the Visual Studio 2019 IDE installed, wish may stop at this point and open the MPL.sln solution in the IDE </b>
                 </li>
             </ul>
           </li> 
