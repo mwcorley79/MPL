@@ -54,13 +54,14 @@ The current objective is to provide an efficient C++ network communication facil
    
    <li> 
      <b> Building CMake Project Targets </b>
-       <ul>
-         <b> *** Important notes for Building on Windows only *** </b>
-         <li> If you have the Visual Studio 2019 IDE installed, wish may stop at this point and open the MPL.sln solution in the IDE <li>
-         <li> If you wish build from the command line in release mode, then you must explicity specify the Release configuration for the target like this: 
-            <ul> <li> <em> cmake --build . --target  ALL_BUILD --config Release </em> </ul> </li>  
-         </li>
-       </ul>
+         <li> <b> *** Important notes for Building on Windows only *** </b>
+           <ol>
+              <li> If you have the Visual Studio 2019 IDE installed, wish may stop at this point and open the MPL.sln solution in the IDE </li>
+              <li> If you wish build from the command line in release mode, then you must explicity specify the Release configuration for the target like this: 
+                <ul> <li> <b> <em> cmake --build . --target  ALL_BUILD --config Release </em> </b> </li> </ul> 
+              </li>  
+           </ol>
+          </li>
           <li> 
             <ul>
               <li> For Linux: <b> cmake --build . --target all </b> <em> <- build all project targets </em> </li>
