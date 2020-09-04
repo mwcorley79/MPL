@@ -55,7 +55,14 @@ The current objective is to provide an efficient C++ network communication facil
    <li> 
      <b> Building CMake Project Targets </b>
         <ul>
-          <li> <b> cmake --build . --target all </b> <em> <- build all project targets </em> </li>
+          <li> 
+            <ul>
+              <li> For Linux: <b> cmake --build . --target all </b> <em> <- build all project targets </em> </li>
+              <li> For Windows: <b> cmake --build . --target  ALL_BUILD </b> <em> <- build all project targets </em> 
+                   Note: ** If you have the Visual Studio 2019 IDE installed, wish may stop at this point and open the MPL.sln solution in the IDE
+                </li>
+            </ul>
+          </li> 
           <li> <b> cmake --build . --target MPL </b> <em> <- build the (static) Message Passing Library (MPL) </em> </li>
           <li> <b> cmake --build . --target PerfTestCombinedFixedSizeMsg </b> <em> <- builds the fixed size message performance test </em> </li>
           <li> <b> cmake --build . --target PerfTestCombinedVariableSizeMsg </b> <em> <- builds the variable size message performance test </em> </li>    
@@ -67,7 +74,7 @@ The current objective is to provide an efficient C++ network communication facil
     <li> 
      <b> Running the Targets </b>
         <ul>
-          <li> From a command terminal, type the name of target to run, followed by the Enter key:  e.g. <b> ./PerfTestCombinedFixedSizeMsg (Linux), PerfTestCombinedFixedSizeMsg.exe (Windows) </b> </li>    
+          <li> From a command terminal, type the name of target to run, followed by the Enter key:  e.g. <b> ./PerfTestCombinedFixedSizeMsg (Linux), cd Debug PerfTestCombinedFixedSizeMsg.exe (Windows) </b> </li>    
         </ul>
     </li>
  </ol>  
