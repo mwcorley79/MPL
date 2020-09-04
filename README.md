@@ -77,7 +77,7 @@ The current objective is to provide an efficient C++ network communication facil
 <ol> 
   <li> Download and install Visual Studio Code editor (VScode): <b> https://code.visualstudio.com/download </b>
      <ol>
-       <li> Start VScode and install "Microsoft C/C++ VScode extension (ms-vscode.cpptools) </li>
+       <li> Start VScode and install "Microsoft C/C++ VScode" extension (ms-vscode.cpptools) </li>
        <li> Install "CMake Tools: Extended CMake support in Visual Studion Code" extension (ms-vscode.cmake-tools) </li>
      </ol> 
   </li>
@@ -125,14 +125,7 @@ The current objective is to provide an efficient C++ network communication facil
 </ol>
 
 
-<b> Getting started on Linux and Windows with CMake only (if you prefer not to use VSCode) </b>
-<ul>
-  <li> NOTE:  you will need a compiler toolchain (i.e. Build Tools - Windows,  gcc/g++ - Linux) </li>
-  <li> cd MPL && mkdir build && cd build </li>
-  <li> cmake .. -DCMAKE_INSTALL_PREFIX=../install </li>
-  <li> make install </li>
-  <li> Also: (** Windows only) you can use the (full) Visual Studio 2019 IDE </li>
- </ul>
+
  <hr>
    <img src="./png/MPL.jpg"/> 
    MPL class diagram
