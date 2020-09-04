@@ -24,7 +24,7 @@ The current objective is to provide an efficient C++ network communication facil
        </li>
      </ol>
   </li>  
-  <li> Open a windows command prompt (cmd.exe) and type command: <b> git clone https://github.com/mwcorley79/MPL.git </b> </li>
+  <li>Open a windows command prompt (cmd.exe) and type command: <b> git clone https://github.com/mwcorley79/MPL.git </b> </li>
 </ol>
 
 <hr>
