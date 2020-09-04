@@ -52,7 +52,8 @@ The current objective is to provide an efficient C++ network communication facil
      </li>
    </li>
    <li> 
-     <b> Building CMake Project Targets </b>
+     <b> Building CMake Project Targets: (Note: *** on Windows only *** : If you wish to build in release mode, then you have to explicity specify the Release configuration for the target like this: <em> cmake --build . --target  ALL_BUILD --config Release </em>   
+    </b>
         <ul>
           <li> 
             <ul>
@@ -73,7 +74,9 @@ The current objective is to provide an efficient C++ network communication facil
     <li> 
      <b> Running the Targets </b>
         <ul>
-          <li> From a command terminal, type the name of target to run, followed by the Enter key:  e.g. <b> ./PerfTestCombinedFixedSizeMsg (Linux), cd Debug PerfTestCombinedFixedSizeMsg.exe (Windows) </b> </li>    
+          <li> From a command terminal, type the name of target to run, followed by the Enter key </li>
+          <li> e.g. On Windows:<b> cd Debug or cd Release (depends build configuration) and type PerfTestCombinedFixedSizeMsg.exe </b> </li>
+          <li> e.g. On Linux: <b> ./PerfTestCombinedFixedSizeMsg </b> </li>
         </ul>
     </li>
  </ol>  
