@@ -59,7 +59,7 @@ The current objective is to provide an efficient C++ network communication facil
            <b> *** Important notes for Building on Windows only *** </b>
            <ol>
               <li>If you have the full Visual Studio 2019 IDE installed, you many stop at this point and open the MPL.sln solution in the IDE </li>
-             <li> If you wish build from the command line in <b> <em> release mode </em> </b>, then you must explicity specify the Release configuration for the target like this: 
+             <li> If you wish build from the command line in <b> <em> release mode </em> </b>, then you must explicity specify the Release configuration for <em> each </em> target such as in this example: 
                 <b> <em> cmake --build . --target  ALL_BUILD --config Release </em> </b>
               </li>  
            </ol>
@@ -86,7 +86,7 @@ The current objective is to provide an efficient C++ network communication facil
  </ol>  
     
 
-<b> Option 2: Building the CMake targets with Visual Studio Code (these steps apply to both Windows and Linux) </b>
+<b> Option 2: Building the CMake targets using Visual Studio Code Editor: VScode (these steps apply to both Windows and Linux) </b>
 <ol> 
   <li> Download and install Visual Studio Code editor (VScode): <b> https://code.visualstudio.com/download </b>
      <ol>
