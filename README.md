@@ -84,7 +84,8 @@ The current objective is to provide an efficient C++ network communication facil
         </ul>
     </li>
  </ol>  
-    
+ 
+ <hr>
 
 <b> Option 2: Building the CMake targets using Visual Studio Code Editor: VScode (these steps apply to both Windows and Linux) </b>
 <ol> 
