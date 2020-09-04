@@ -3,7 +3,7 @@ This repository provides a reusable C++ message passing library (MPL) framework 
 One goal is to enable cross-platform portability (TCP socket level compatibility between Linux and Windows) by providing a TCPSocket class that encapsulates the (basic) differences between the low-level (C-based) Windows and Linux APIs. <br> <br>
 <b> See TCPSocket.h/.cpp for details of the TCP socket wrapper code. </b> <br><br>
 This project uses CMake to manage the build process for Linux and Windows.  <br> <br>
-The current objective is to provide an efficient C++ network communication facility for a joint experiment with Dr. James Fawcett (https://github.com/JimFawcett) to compare various (initially performance related) aspects of modern C++ and the Rust programming language. <hr>
+The current objective is to provide an efficient C++ network communication facility for a joint experiment with Dr. James Fawcett (https://github.com/JimFawcett) to compare various (initially performance related) aspects of modern C++ and the Rust programming language. 
 <b>Prerequisites for getting started on Linux:</b>
 <ol>
   <li> Download and install CMake (Debian-based distros): <b> sudo apt-get install cmake </b> </li>
@@ -14,7 +14,7 @@ The current objective is to provide an efficient C++ network communication facil
 <br>
 <b>Prerequisites for getting started on Windows:</b>
 <ol>
-  <li> Download and install CMake: https://cmake.org/download/</b> </li>
+  <li> Download and install CMake:<b> https://cmake.org/download/</b> </li>
   <li> Download and install git:   <b> https://git-scm.com/download/win </b> </li>
   <li> Note: If Visual Studio 2019 is not installed, then download and install Microsoft C++ Build Tools  (MSVC compiler tools): <b> https://visualstudio.microsoft.com/visual-cpp-build-tools/ </b> 
      <ol>
