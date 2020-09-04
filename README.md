@@ -28,49 +28,42 @@ The current objective is to provide an efficient C++ network communication facil
 </ol>
 
 <hr>
+
 <b>Option 1: Building the Cmake targets from the command line -- Debug and Release Mode  (these steps apply to both Windows and Linux) </b>
 <ol> 
-  <li> Open a command line terminal (i.e. bash in Linux) and (cmd.exe in Windows) </li>
-  <b> Building in Debug Mode </b> 
-  <ol>
-     <li> cd MPL </l>
-     <li> mkdir debug </li>
-     <li> cd debug </li>
-     <li> cmake .. -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=Debug </li>  
-   </ol>
-   
-   <b> Build All Targets </b>
-   <ul>
-     <li> cmake --build . --target all </li>
-   </ul>
-   
-   <b> Build the MPL: Message Passing (static) C++ Comm Library </b>
-   <ul>
-     <li> cmake --build . --target MPL  </li>
-   </ul>
-   
-   <b> Build the Performance Testing Targets (one at a time) Note: will build the MPL library target dependency </b>
-   <ul>
-      <li> cmake --build . --target PerfTestCombinedFixedSizeMsg  <em> -- builds the fixed size message performance test </em> </li>
-    
-       <li> cmake --build . --target PerfTestCombinedVariableSizeMsg 
-           <ul> <li> Build the variable size message performance Test  -- comparison with Dr. Fawcett's Rust Performance test </li> </ul>
-       </li>
-   </ul>
-   
-   <b> Build the Other Test Targets (one at a time) Note: will build the MPL library target dependency </b>
-   <ul>
-      <li> cmake --build . --target BQueueTest  -- buil</li>
-      <li> cmake --build . --target MessageTest </li>
-      <li> cmake --build . --target TCPSocketsTest </li>
-        <ul> <li> Build the fixed size message performance Test  -- comparison with Dr. Fawcett's Rust Performance test </li> </ul>
+  <li> Open a command line terminal (i.e. bash in Linux) and (cmd.exe in Windows)
+    <ul>
+      <li> 
+        <b> Building in Debug Mode </b> 
+        <ol>
+           <li> cd MPL </l>
+           <li> mkdir debug </li>
+           <li> cd debug </li>
+           <li> cmake .. -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=Debug </li>  
+        </ol>
       </li>
-       <li> cmake --build . --target PerfTestCombinedVariableSizeMsg --config Debug 
-           <ul> <li> Build the variable size message performance Test  -- comparison with Dr. Fawcett's Rust Performance test </li> </ul>
-       </li>
-   </ul>
-   
-   
+      <li>
+        <b> Building in Release Mode </b> 
+        <ol>
+           <li> cd MPL </l>
+           <li> mkdir release </li>
+           <li> cd release </li>
+           <li> cmake .. -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=Release </li>  
+        </ol>  
+     </li>
+   </li>
+   <li> 
+     <b> Building CMake Project Targets: </b>
+        <ul>
+          <li> <b> Build all targets: </b> cmake --build . --target all </li>
+          <li> <b> Build the (static) MPL Comm: </b> cmake --build . --target MPL  </li>
+          <li> cmake --build . --target PerfTestCombinedFixedSizeMsg  <em> -- builds the fixed size message performance test </em> </li>
+          <li> cmake --build . --target PerfTestCombinedVariableSizeMsg <em> -- builds the variable size message performance test </em> </li>    
+          <li> cmake --build . --target BQueueTest  -- buil </li>
+          <li> cmake --build . --target MessageTest </li>
+          <li> cmake --build . --target TCPSocketsTest </li>
+        </ul>
+    </li>
  </ol>  
     
 
