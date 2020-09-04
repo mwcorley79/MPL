@@ -57,8 +57,8 @@ The current objective is to provide an efficient C++ network communication facil
          <li> <b> *** Important notes for Building on Windows only *** </b>
            <ol>
               <li> If you have the Visual Studio 2019 IDE installed, wish may stop at this point and open the MPL.sln solution in the IDE </li>
-              <li> If you wish build from the command line in release mode, then you must explicity specify the Release configuration for the target like this: 
-                <ul> <li> <b> <em> cmake --build . --target  ALL_BUILD --config Release </em> </b> </li> </ul> 
+             <li> If you wish build from the command line in <b> <em> release mode </em> </b>, then you must explicity specify the Release configuration for the target like this: 
+                <b> <em> cmake --build . --target  ALL_BUILD --config Release </em> </b>
               </li>  
            </ol>
           </li>
