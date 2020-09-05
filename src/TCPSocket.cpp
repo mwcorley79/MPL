@@ -317,7 +317,7 @@ void ServiceProc(const EndPoint &service_ep)
 
   std::cout << "Server Received: " << block << " : " << rn << " bytes" << std::endl;
   std::cout << "Server Sent: " << sn << " bytes" << std::endl;
-
+  channel.Close();
   ret = sock.Close();
   if(ret != INVALID_SOCKET)
     std::cout << "server listening socket closed" << std::endl;
@@ -347,7 +347,7 @@ int main()
     int sn = client_sock.Send((char *)"cend test!", 10,0,1);
     char block[10];
     int sr = client_sock.Recv(block, 10, MSG_WAITALL, 1);
-    block[10] = '\0';
+    block[9] = '\0';
 
     int ret = client_sock.Close();
     if(ret != INVALID_SOCKET)

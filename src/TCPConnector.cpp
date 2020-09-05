@@ -45,28 +45,22 @@ namespace CSE384
     {
         try
         {
-            //IsSending(true);
-            while (IsSending())
-            {
-                // deque the next message
-                MessagePtr msgPtr = send_bq_.deQ();
+            IsSending(true);
 
-                // if this is the stop sending message, signal
-                // the send thread to shutdown
-                if (msgPtr->GetType() == STOP_SENDING)
-                {
-                    IsSending(false);
-                }
-                else
-                {
-                    // serialize the message into the socket
-                    SendSocketMessage(msgPtr);
-                }
+            MessagePtr msgPtr = send_bq_.deQ();
+            // if this is the stop sending message, signal
+            // the send thread to shutdown
+            while (msgPtr->GetType() != STOP_SENDING)
+            {
+                // serialize the message into the socket
+                SendSocketMessage(msgPtr);
+                // deque the next message
+                msgPtr = send_bq_.deQ();            
             }
         }
         catch (...)
         {
-            IsSending(false);
+            // IsSending(false);
         }
     }
 
@@ -118,21 +112,21 @@ namespace CSE384
     {
         try
         {
-            while (IsReceiving())
+            IsReceiving(true);
+            MessagePtr msg;
+            do
             {
-                MessagePtr msgPtr = RecvSocketMessage();
-                recv_queue_.enQ(msgPtr);
-                if (msgPtr->GetType() == MessageType::DISCONNECT)
-                {
-                    IsReceiving(false);
-                }
-            }
+                msg = RecvSocketMessage();
+                recv_queue_.enQ(msg);
+            } 
+            while (msg->GetType() != MessageType::DISCONNECT);
         }
-        catch (const std::exception &ex)
+        catch (const std::exception& ex)
         {
             std::cerr << ex.what() << std::endl;
-            IsReceiving(false);
+            // IsReceiving(false);
         }
+
     }
 
     // serialize the message header and message and write them into the socket
@@ -170,55 +164,64 @@ namespace CSE384
 
     void TCPConnector::StopSending()
     {
-        if (IsSending())
+        try
         {
-            //note: only gets deposited into queue if IsSending is true
-            MessagePtr StopMsgPtr(new Message(nullptr, 0, STOP_SENDING));
-            send_bq_.enQ(StopMsgPtr);
+            if (IsSending())
+            {
+                //note: only gets deposited into queue if IsSending is true
+                MessagePtr StopMsgPtr(new Message(nullptr, 0, STOP_SENDING));
+                this->PostMessage(StopMsgPtr);
+
+                if (send_thread_.joinable())
+                    send_thread_.join();
+
+                IsSending(false);
+            }
+        }
+        catch (...)
+        {
+            IsSending(false);
         }
     }
 
-    //void TCPConnector::Stop()
-    // {
-    //    StopSending();
-    // }
-
-    /*
+    
     void TCPConnector::StopReceiving()
     {
-       if(IsReceiving())
-       {
-         //note: only gets deposited into queue if IsSending is true
-         Message stopMsg(nullptr,0,STOP_RECEIVING);
-         recv_queue_.enQ(stopMsg);
-       }
-    }
-    */
+        try
+        {
+            if (IsReceiving())
+            {
+                if (recvThread.joinable())
+                    recvThread.join();
 
-    bool TCPConnector::Close()
+                IsReceiving(false);
+            }
+        }
+        catch (...)
+        {
+            IsReceiving(false);
+        }
+    }
+    
+
+    bool TCPConnector::Close(std::thread* listener)
     {
         bool ret = false;
         if (IsConnected())
         {
             if (UseSendQueue())
-            {
                 StopSending();
-
-                if (send_thread_.joinable())
-                    send_thread_.join();
-            }
-
             socket.ShutdownSend();
 
-            //if(ret)
-            // {
-            if (UseReceiveQueue())
-                if (recvThread.joinable())
-                    recvThread.join();
-            // }
+            if (listener)
+                if (listener->joinable())
+                    listener->join();
 
-             socket.ShutdownRecv();
-             ret = (socket.Close() == 0);
+            if (UseReceiveQueue())
+                StopReceiving();
+            socket.ShutdownRecv();
+
+            ret = (socket.Close() == 0);
         }
 
         return ret;
@@ -317,9 +320,6 @@ namespace CSE384
 #include <vector>
 #include <iostream>
 
-#ifdef LINK_MPL
-#include <mpl.h>
-#endif
 
 using namespace CSE384;
 
@@ -383,11 +383,11 @@ void TestSenderAsync(const std::string &name)
             // build an and print each string message
             std::string strMsg = name + " [ Message #: " + std::to_string(j + 1) + " ]";
             //MessagePtr msg(new Message(strMsg.c_str(), (int)strMsg.length(), MessageType::STRING));
-            MessagePtr msg = Message::CreateMessage(strMsg, MessageType::DEFAULT); 
-             
+            MessagePtr msg = Message::CreateMessage(strMsg, MessageType::DEFAULT);
+
             connector.SendMessage(msg);
-            std::cout << "Message is: " << *msg << std::endl;
-           
+            //std::cout << "Message is: " << *msg << std::endl;
+
             // post message into the send queue
             //connector.PostMessage(msg);
             //std::cout << sender.GetMessage() << std::endl;
@@ -396,8 +396,8 @@ void TestSenderAsync(const std::string &name)
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
 
-        connector.Close();
-        receiverProc.join();
+        connector.Close(&receiverProc);
+      
     }
     else
         std::cerr << " failed to connect in " << connect_attempts << " attempts " << std::endl;

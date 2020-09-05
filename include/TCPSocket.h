@@ -43,7 +43,6 @@ namespace CSE384
                          int ai_family, struct addrinfo **servinfo);
   private:
     SOCKET sock_fd;
-    int last_msg_size_;
   };
 
   class TCPClientSocket : public TCPSocket
@@ -104,16 +103,6 @@ namespace CSE384
   inline TCPSocket::operator SOCKET()
   {
     return sock_fd;
-  }
-
-  inline int TCPSocket::GetLastMsgSizeTransmitted() const
-  {
-     return last_msg_size_;
-  }
-  
-  inline void TCPSocket::SetLastMsgSizeTransmitted(int msg_size)
-  {
-    last_msg_size_ = msg_size;
   }
 
   inline bool TCPSocket::IsValid() const

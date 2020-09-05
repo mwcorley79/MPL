@@ -75,55 +75,50 @@ namespace CSE384
       }
    }
 
-   void TCPResponder::ServiceClient(ClientHandler *ch)
+   void TCPResponder::ServiceClient(ClientHandler* ch)
    {
-      // make sure the client handler resources are freed
-      if (ch != nullptr)
-      {
-         std::thread clientThread;
-         try
-         {
-            //start the client processing thread, if use specifies to 
-            if(UseClientReceiveQueue())
-               clientThread = std::thread(&ClientHandler::RecvProc, ch);
+       std::thread clientThread;
+       try
+       {
+           //start the client processing thread, if use specifies to 
+           if (UseClientReceiveQueue())
+               ch->StartReceiving();
 
-            // start the send thread
-            if(UseClientSendQueue())
-                ch->StartSending();
+           // start the send thread
+           if (UseClientSendQueue())
+               ch->StartSending();
 
-            // start the user defined AppProc() on a new thread
-            // std::thread app_thread_ = std::thread(&ClientHandler::AppProc, ch);
+           // start the user defined AppProc() on a new thread
+           // std::thread app_thread_ = std::thread(&ClientHandler::AppProc, ch);
 
-            // recycle this (current) thread to run the user define AppProc
-            ch->AppProc();
-         }
-         catch (std::exception &ex)
-         {
-            std::cerr << ex.what() << std::endl;
-         }
+           // recycle this (current) thread to run the user define AppProc
+           ch->AppProc();
+       }
+       catch (std::exception& ex)
+       {
+           std::cerr << ex.what() << std::endl;
+       }
 
-         try
-         {
-            if(UseClientReceiveQueue())
-              if(clientThread.joinable())
-                 clientThread.join();
+       try
+       {
+           //wait for the receive thread to shutdown
+           if (UseClientReceiveQueue())
+               ch->StopReceiving();
 
-            // stop the send thread
-            if(UseClientSendQueue())
+           // stop the send thread
+           if (UseClientSendQueue())
                ch->StopSending();
 
-            // signal client to shutdown
-            ch->Close();
-         }
-         catch (const std::exception &e)
-         {
-            std::cerr << e.what() << std::endl;
-         }
+           // signal client to shutdown
+           ch->Close();
+       }
+       catch (const std::exception& e)
+       {
+           std::cerr << e.what() << std::endl;
+       }
 
-         delete ch;
-      }
+       delete ch;
    }
-
    void TCPResponder::RegisterClientHandler(ClientHandler *ch)
    {
       ch_ = ch;
@@ -190,11 +185,12 @@ public:
       MessagePtr msg;
 
       // when UseReceiveQueue == false, then we must ReceiveMessage instead of GetMessage()
-      while ((msg = ReceiveMessage())->GetType() != MessageType::DISCONNECT)
+      while ((msg = GetMessage())->GetType() != MessageType::DISCONNECT)
+      //while ((msg = ReceiveMessage())->GetType() != MessageType::DISCONNECT)
       {
          std::cout << "Got a message:" << *msg << "from:" << RemoteEP() << std::endl;      
-         SendMessage(Message::CreateMessage(std::string("Reply from server: ") + GetServiceEndPoint().ToString(), MessageType::DEFAULT));
-         //PostMessage(MessagePtr(new Message(std::string("Reply from server: ") + GetServiceEndPoint().ToString())));
+         //SendMessage(Message::CreateMessage(std::string("Reply from server: ") + GetServiceEndPoint().ToString(), MessageType::DEFAULT));
+         PostMessage(Message::CreateMessage(std::string("Reply from server: ") + GetServiceEndPoint().ToString(), MessageType::DEFAULT));
       } 
 
      /* while ((msg = GetMessage())->GetType() != MessageType::DISCONNECT)
@@ -232,15 +228,15 @@ int main(int argc, char *argv[])
 
    // false: does not start the receive thread, and does not enQ  messages into the receive blocking Queue
    // note: when false, user must call ReceiveMessage() in the ClientHandler AppProc(), not GetMessage()
-   responder.UseClientReceiveQueue(false);
+   //responder.UseClientReceiveQueue(false);
    
    // false: does not start the send thread, and does not deQ messages and send via the send blocking Queue
    // note: when false, user must call SendMessage() in the ClientHandler AppProc(), not PostMessage() which enQ into the send blocking Queue
-   responder.UseClientSendQueue(false);
+   //responder.UseClientSendQueue(false);
    // responder.UseClientSendReceiveQueues(false);
 
    // shutdown the listener after one client connection
-   responder.NumClients(1);  
+   responder.NumClients(5);  
 
    // start the server listening thread
    responder.Start();

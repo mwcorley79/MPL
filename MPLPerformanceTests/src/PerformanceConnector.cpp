@@ -78,12 +78,10 @@ int main()
       }
       high_resolution_clock::time_point t2 = high_resolution_clock::now();
       duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
-      perfConnector.Close();
+      perfConnector.Close(&receiverProc);
       SyncPrint("Finished Sending     : " + std::to_string(num_messages)  + " of size " + std::to_string(MSG_SIZE)); 
       SyncPrint("Send Processing time : " + std::to_string(time_span.count()) +  " seconds.");
       SyncPrint("Send Thoughput       : " + std::to_string(((unsigned long long) num_messages * (MSG_SIZE * 8)) / time_span.count()) +  " bits/sec");
-
-      receiverProc.join();
    }
    else
       std::cerr << " failed to connect in " << connect_attempts << " attempts " << std::endl;

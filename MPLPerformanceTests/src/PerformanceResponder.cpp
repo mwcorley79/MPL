@@ -50,7 +50,7 @@ public:
    virtual void AppProc()
    {
       // handle messages sent to TCPConnector (client) in separate thread
-      std::thread senderProc(SendProc, this);
+      std::thread senderProc(::SendProc, this);
 
       // while there are messages in the blocking queue, and you have seen the disconnect
       // message, pull messages out and dispaly them.

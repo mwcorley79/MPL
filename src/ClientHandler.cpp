@@ -5,32 +5,58 @@
 
 namespace CSE384
 {
-   // RecvProc is a dedicated thread for servicing the socket
-   // by pulling out messages and enQing in the recv blocking queue
-   void ClientHandler::RecvProc()
-   {
-      try
-      {
-         IsReceiving(true);
 
-         while (IsReceiving())
-         {
-            MessagePtr msg = RecvSocketMessage();
-            recv_queue_.enQ(msg);
-            if (msg->GetType() == MessageType::DISCONNECT)
+    void ClientHandler::StartReceiving()
+    {
+        if (!IsReceiving())
+        {
+            //start the send the send thread
+            IsReceiving(true);
+            
+            // RecvProc is a dedicated thread for servicing the socket
+            // by pulling out messages and enQing in the recv blocking queue
+            recvThread = std::thread(&ClientHandler::RecvProc, this);
+        }
+    }
+
+    void ClientHandler::StopReceiving()
+    {
+        try
+        {
+            if (IsReceiving())
             {
-               IsReceiving(false);
+                if (recvThread.joinable())
+                    recvThread.join();
+                IsReceiving(false);
             }
-         }
-      }
-      catch (const std::exception &ex)
-      {
-         std::cerr << ex.what() << std::endl;
-         IsReceiving(false);
-      }
+        }
+        catch (...)
+        {
+            IsReceiving(false);
+        }
 
-      // std::cout << "recv thread shutdown" << std::endl;
-   }
+        data_socket.ShutdownRecv();
+    }
+
+    void ClientHandler::RecvProc()
+    {     
+        try
+        {
+            IsReceiving(true);
+            MessagePtr msg;
+            do
+            {
+                msg = RecvSocketMessage();
+                recv_queue_.enQ(msg);
+            } 
+            while (msg->GetType() != MessageType::DISCONNECT);
+        }
+        catch (const std::exception& ex)
+        {
+            std::cerr << ex.what() << std::endl;
+            // IsReceiving(false);
+        }
+    }
 
    // serialize the message header and message and write them into the socket
    MessagePtr ClientHandler::RecvSocketMessage()
@@ -96,60 +122,68 @@ namespace CSE384
            throw SenderTransmitMessageDataException(getlasterror_portable());
    }
 
+  
    void ClientHandler::StartSending()
    {
-      if (!IsSending())
-      {
-         //start the send the send thread
-         IsSending(true);
-         sendThread = std::thread(&ClientHandler::sendProc, this);
-      }
+       if (!IsSending())
+       {
+           //start the send the send thread
+          
+           IsSending(true);
+           
+           // dedicated thread function that deques messages
+           // from the blocking queue and writes them into the socket
+           sendThread = std::thread(&ClientHandler::SendProc, this);
+       }
    }
 
+   void ClientHandler::SendProc()
+   {  
+       try
+       {
+           IsSending(true);
+           MessagePtr msg = send_bq_.deQ();
+          
+           // if this is the stop sending message, signal
+           // the send thread to shutdown
+           while (msg->GetType() != STOP_SENDING)
+           {
+               // deque the next message
+               SendSocketMessage(msg);
+               msg = send_bq_.deQ();        
+           }
+       }
+       catch (...)
+       {
+          // IsSending(false);
+       }
+   }
+
+   
    void ClientHandler::StopSending()
    {
-      if (IsSending())
-      {
-         //note: only gets deposited into queue if IsSending is true
-         MessagePtr stopMsg(new Message(nullptr, 0, STOP_SENDING));
-         send_bq_.enQ(stopMsg);
+       
+       try
+       {
+           if (IsSending())
+           {
+               //note: only gets deposited into queue if IsSending is true
+               MessagePtr stopMsg(new Message(nullptr, 0, STOP_SENDING));
+               send_bq_.enQ(stopMsg);
 
-         // make the calling thread wait for the send thread to finish
-         if (sendThread.joinable())
-            sendThread.join();
-      }
-   }
+               // make the calling thread wait for the send thread to finish
+               if (sendThread.joinable())
+                   sendThread.join();
 
-   // dedicated thread function that deques messages
-   // from the blocking queue and writes them into the socket
-   void ClientHandler::sendProc()
-   {
-      try
-      {
-         while (IsSending())
-         {
-            // deque the next message
-            MessagePtr msg = send_bq_.deQ();
-
-            // if this is the stop sending message, signal
-            // the send thread to shutdown
-            if (msg->GetType() == STOP_SENDING)
-            {
                IsSending(false);
-            }
-            else
-            {
-               // serialize the message into the socket
-               SendSocketMessage(msg);
-            }
-         }
+           }
+       }
+       catch (...)
+       {
+           IsSending(false);
+       }
 
-         //std::cout << "send thread shutdown" << std::endl;
-      }
-      catch (...)
-      {
-         IsSending(false);
-      }
+       data_socket.ShutdownSend();
    }
 
    FixedSizeMsgClientHander::FixedSizeMsgClientHander(int msg_size) : msg_size_(msg_size)

@@ -56,7 +56,7 @@ namespace CSE384
         virtual ~TCPConnector();
 
         // void Stop();
-        bool Close();
+        bool Close(std::thread* listener=nullptr);
         bool IsConnected() const;
         bool IsSending() const;
         bool IsReceiving() const;
@@ -105,8 +105,7 @@ namespace CSE384
         std::thread recvThread;
 
         void StartReceiving();
-
-        // void StopReceiving();
+        void StopReceiving();
         void IsReceiving(bool receiving);
 
         bool Start();

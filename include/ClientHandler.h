@@ -71,11 +71,14 @@ namespace CSE384
         
        private:
          void StartSending();
+         void StartReceiving();
+
          void StopSending();
+         void StopReceiving();
 
          // can redefine socket level processing (if you wish)
          virtual void RecvProc();
-         virtual void sendProc();  
+         virtual void SendProc();  
          virtual MessagePtr RecvSocketMessage();
          virtual void SendSocketMessage(const MessagePtr& msg);
         
@@ -103,8 +106,8 @@ namespace CSE384
 
     inline int ClientHandler::Close()
     {   
-       data_socket.ShutdownSend();
-       data_socket.ShutdownRecv();
+       //data_socket.ShutdownSend();
+       //data_socket.ShutdownRecv();
        return data_socket.Close();
     }
 
