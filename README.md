@@ -62,14 +62,15 @@ The current objective is to provide an efficient C++ network communication facil
            <b> *** Important notes for Building on Windows only *** </b>
            <ol>
               <li>If you have Visual Studio 2019 IDE installed, you may opt to stop at this point and open the MPL.sln solution in the IDE (located in the Debug or Release subfolder corresponding with the chosen build configuration) </li>
-             <li> If you wish build from the command line in <b> <em> release mode </em> </b>, then you must explicity specify the Release configuration for <em> each </em> target such as in this example: 
+             <li> If you wish build from the command line (with cmake) in <b> <em> release mode </em> </b>, then you must explicity specify the Release configuration for <em> each </em> target such as in this example: 
                 <b> <em> cmake --build . --target  ALL_BUILD --config Release </em> </b>
               </li>  
            </ol>
              </li> </ul>
           </li>
-          <li> (Linux)  : <b> cmake --build . --target all </b> <em> <- build all project targets on Linux </em> </li>
+          <li> <b> Note: You can append <em> --config Release </em> or  <em> --config Debug </em> to each target build command (below) to ensure the intended build mode </b>  
           <li> (Windows): <b> cmake --build . --target  ALL_BUILD </b> <em> <- build all project targets on Windows </em> </li> 
+          <li> (Linux)  : <b> cmake --build . --target all </b> <em> <- build all project targets on Linux </em> </li>
           <li> <b> cmake --build . --target MPL </b> <em> <- build the (static) Message Passing Library (MPL) </em> </li>
           <li> <b> cmake --build . --target PerfTestCombinedFixedSizeMsg </b> <em> <- builds the fixed size message performance test </em> </li>
           <li> <b> cmake --build . --target PerfTestCombinedVariableSizeMsg </b> <em> <- builds the variable size message performance test </em> </li>    
