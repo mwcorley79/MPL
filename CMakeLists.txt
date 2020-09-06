@@ -88,7 +88,7 @@ target_compile_definitions(TCPResponderTest PUBLIC TEST_RESPONDER)
 
 #  6. Performance Test Targets
 # ******************************************************************
-link_directories( ./debug ./release ./install)
+link_directories( ./debug ./release ./Debug ./Release ./install)
 
 # generate the TCPResponderPerfTest test stub target (executable test) from the SOURCES
 add_executable(TCPResponderPerfTest ./MPLPerformanceTests/src/PerformanceResponder.cpp)
