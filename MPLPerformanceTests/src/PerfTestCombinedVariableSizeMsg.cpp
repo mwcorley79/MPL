@@ -4,7 +4,6 @@
 // Mike Corley, https://github.com/mwcorley79, 22 Aug 2020  //
 //////////////////////////////////////////////////////////////
 
-// ** email to Doc: write message in one write sys call ***
 /*
    Demo:
    Test message rate and throughput
@@ -35,7 +34,7 @@ static std::mutex ioLock;
 */
 void display_test_data(int64_t et, unsigned num_msgs, unsigned msg_size)
 {
-   double elapsed_time_sec = 1.0e-6 * et;
+  /*  double elapsed_time_sec = 1.0e-6 * et;
    double num_msgs_f64 = num_msgs;
    double size_mb = 1.0e-6 * (msg_size + 4);
    double msg_rate = num_msgs_f64 / elapsed_time_sec;
@@ -44,6 +43,7 @@ void display_test_data(int64_t et, unsigned num_msgs, unsigned msg_size)
    std::cout << "\n   elapsed microsec " << et;
    std::cout << "\n   messages/second  " << msg_rate;
    std::cout << "\n   thruput - MB/s   " << byte_rate_mbpsec;
+   */
 }
 
 
@@ -128,10 +128,8 @@ void client_no_wait_for_reply(const EndPoint &addr,    // endpoint (address, por
           conn.PostMessage(msg);
       }
       
-      conn.Close();
+      conn.Close(&handle);
 
-      if(handle.joinable())
-         handle.join();
    }
 }
 
@@ -165,8 +163,8 @@ void multiple_clients(int nc,
    tmr.stop();
 
    auto et = tmr.elapsed_micros();
-   auto nm = (u_int)nc * num_msgs;
-   auto tp = ((u_int)(nm * sz_bytes)) / et;
+   uint64_t nm = nc * num_msgs;
+   uint64_t tp = (nm * sz_bytes) / et;
 
    std::cout << "\n elapsed microseconds: " << et;
    std::cout << "\n number messages: " << nm;
@@ -229,7 +227,7 @@ int main(int argc, char* argv[])
    const int NUM_THREAD_POOL_THREADS = 8;
    const std::string TEST_NAME = "test4";
    
-   EndPoint addr("127.0.0.1", 8080);
+  EndPoint addr("127.0.0.1", 8080);
    PerfClientHandler ph(MSG_SIZE);
 
    // set TCP socket options
@@ -259,13 +257,14 @@ int main(int argc, char* argv[])
    std::cout << "\n  -- test4 (variable size message): c++_comm --\n";
    int nt = 8;
    std::cout << "\n  num thrdpool thrds: " << nt;
+   
 
    multiple_clients(NUM_CLIENTS, addr, TEST_NAME, NUM_MSGS, MSG_SIZE);
 
   // std::cin.get();
 
    // stop the listener and quit
-   responder.Stop();
+  responder.Stop();
 
    return 0;
 }

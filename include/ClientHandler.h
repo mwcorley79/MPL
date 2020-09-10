@@ -84,6 +84,10 @@ namespace CSE384
         
          void IsReceiving(bool receiving);  
          void IsSending(bool issending);
+
+         void ShutdownRecv();
+         void ShutdownSend();
+        
        
          void SetServiceEndPoint(const EndPoint& ep);
 

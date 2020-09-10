@@ -81,7 +81,6 @@ namespace CSE384
         std::atomic<bool> islistening_;
         std::thread listenThread_;
 
-        ThreadPool<8> threadPool_;
         std::atomic<bool> useClientRecvQueue_;
         std::atomic<bool> useClientSendQueue_;
         std::atomic<int>  num_clients_;

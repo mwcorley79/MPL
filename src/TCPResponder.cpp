@@ -31,43 +31,62 @@ namespace CSE384
          // set socket listening
          listenSocket_.Listen(backlog);
          IsListening(true);
+
+         // std::vector<std::thread> serviceQ_;
+         
+         //Dr. Fawcett's thread pool hard wired to 8 threads (I think?)
+         ThreadPool<8> threadPool_;
+
          // loop around accepting)
-         while(IsListening() &&  (client_count++ < NumClients() || NumClients() == -1))
+         while (IsListening() && (client_count++ < NumClients() || NumClients() == -1))
          {
-            // ---accept a connection (creating a data pipe)---
-            TCPSocket client_socket = listenSocket_.Accept();
+             // ---accept a connection (creating a data pipe)---
+             TCPSocket client_socket = listenSocket_.Accept();
 
-            if (client_socket.IsValid())
-            {
-               if (ch_ != nullptr)
-               {
-                 // clone the registered client hander, and hand the socket to the client handler
-                 ClientHandler *ch = ch_->Clone();
-
-                 // give service end point the client handler instance
-                 ch->SetServiceEndPoint(ServiceEP);
-
-                 // give the TCPSocket to the client handler instance
-                 ch->SetSocket(client_socket);
-
-                 // service the current client request using a threadPool thread
-                 ThreadPool<8>::CallObj service_client = [this, ch]() -> bool 
+             if (client_socket.IsValid())
+             {
+                 if (ch_ != nullptr)
                  {
-                    ServiceClient(ch);
-                    return true;
-                 };
-                 threadPool_.workItem(service_client);
-                 
-                 // spawn a thread to service the current client request
-                 // std::thread clientThread = std::thread(&TCPResponder::ServiceClient, this, ch);
-                 // clientThread.detach();
-               }
-               else 
-               {
-                  throw ReceiverNoRegisteredClientHandlerException();
-               }
-            }
+                     // clone the registered client hander, and hand the socket to the client handler
+                     ClientHandler* ch = ch_->Clone();
+
+                     // give service end point the client handler instance
+                     ch->SetServiceEndPoint(ServiceEP);
+
+                     // give the TCPSocket to the client handler instance
+                     ch->SetSocket(client_socket);
+
+                     // service the current client request using a threadPool thread
+                     ThreadPool<8>::CallObj service_client = [this, ch]() -> bool
+                     {
+                         ServiceClient(ch);
+                         return true;
+                     };
+                     threadPool_.workItem(service_client);
+                    
+
+
+                     // spawn a thread to service the current client request
+                     // serviceQ_.push_back(std::thread(&TCPResponder::ServiceClient, this, ch));
+                 }
+                 else
+                 {
+                     throw ReceiverNoRegisteredClientHandlerException();
+                 }
+             }
          }
+
+         /* for(int i = 0; i < serviceQ_.size(); ++i)
+         {
+             if (serviceQ_[i].joinable())
+                 serviceQ_[i].join();
+         }
+         */
+
+          ThreadPool<8>::CallObj exit = []() ->bool { return false; };
+          threadPool_.workItem(exit);
+          threadPool_.wait();
+         
       }
       catch (const std::exception)
       {
@@ -104,10 +123,12 @@ namespace CSE384
            //wait for the receive thread to shutdown
            if (UseClientReceiveQueue())
                ch->StopReceiving();
+           ch->ShutdownRecv();
 
            // stop the send thread
            if (UseClientSendQueue())
                ch->StopSending();
+           ch->ShutdownSend();
 
            // signal client to shutdown
            ch->Close();
@@ -137,12 +158,6 @@ namespace CSE384
 
             listenSocket_.Close(); 
             IsListening(false);
-
-            ThreadPool<8>::CallObj exit = []() ->bool { return false; };
-            threadPool_.workItem(exit);
-            threadPool_.wait();
-
-            //listenThread_.detach();
          }
          catch(...)
          {

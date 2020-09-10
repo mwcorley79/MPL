@@ -35,8 +35,14 @@ namespace CSE384
             IsReceiving(false);
         }
 
+       // data_socket.ShutdownRecv();
+    }
+
+    void ClientHandler::ShutdownRecv()
+    {
         data_socket.ShutdownRecv();
     }
+
 
     void ClientHandler::RecvProc()
     {     
@@ -183,6 +189,11 @@ namespace CSE384
            IsSending(false);
        }
 
+      // data_socket.ShutdownSend();
+   }
+
+   void ClientHandler::ShutdownSend()
+   {
        data_socket.ShutdownSend();
    }
 
