@@ -1,0 +1,19 @@
+language: cpp
+
+os:
+  - linux
+
+compiler:
+  - gcc
+
+addons:
+  apt:
+    packages:
+      - cmake
+      - g++
+
+script:
+  - cd MPL
+  - mkdir release
+  - cd release
+  - cmake .. -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=Release
