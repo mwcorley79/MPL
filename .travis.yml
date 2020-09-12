@@ -13,7 +13,8 @@ addons:
       - g++
 
 script:
-  - cd MPL
   - mkdir release
   - cd release
   - cmake .. -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=Release
+  - cmake --build . --target all
+  - ./PerfTestCombinedFixedSizeMsg 
