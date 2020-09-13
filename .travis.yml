@@ -11,11 +11,11 @@ addons:
       - cmake
       - g++
 script:
-  - mkdir debug
-  - cd debug
-  - cmake .. -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=Debug
+  - mkdir release
+  - cd release
+  - cmake .. -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=Release
   - cmake --build . --target all
   - ./PerfTestCombinedFixedSizeMsg
+  - cd .. && rm -r release/
 after_success:
-  - cd ..
   - sh .travis/deploy_dockerhub.sh
