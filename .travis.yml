@@ -11,9 +11,9 @@ addons:
       - cmake
       - g++
 script:
-  - mkdir test
-  - cd test
-  - cmake .. -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=Release
+  - mkdir debug
+  - cd debug
+  - cmake .. -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=Debug
   - cmake --build . --target all
   - ./PerfTestCombinedFixedSizeMsg
 after_success:
