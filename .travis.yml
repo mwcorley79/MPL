@@ -1,20 +1,15 @@
 services:
    - docker
-
 language: cpp
-
 os:
   - linux
-
 compiler:
   - gcc
-
 addons:
   apt:
     packages:
       - cmake
       - g++
-
 script:
   - mkdir release
   - cd release
@@ -23,7 +18,5 @@ script:
   - echo "*** Note: Build the CPP test targets here: Perhaps Dr. Fawcett's C++ Test Harness ***"
   - echo " * Running the Fixed Size Message Perf Test (for fun) *"
   - ./PerfTestCombinedFixedSizeMsg
-
 after_success:
- - sh .travis/deploy_dockerhub.sh
-
+  - sh .travis/deploy_dockerhub.sh
