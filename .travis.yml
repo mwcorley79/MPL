@@ -17,4 +17,5 @@ script:
   - cmake --build . --target all
   - ./PerfTestCombinedFixedSizeMsg
 after_success:
+  - cd ..
   - sh .travis/deploy_dockerhub.sh
