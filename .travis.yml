@@ -17,4 +17,10 @@ script:
   - cd release
   - cmake .. -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=Release
   - cmake --build . --target all
-  - ./PerfTestCombinedFixedSizeMsg 
+  - echo "*** Note: Build the CPP test targets here: Perhaps Dr. Fawcett's C++ Test Harness ***"
+    echo " * Running the Fixed Size Message Perf Test (for fun) *"
+  - ./PerfTestCombinedFixedSizeMsg
+
+after_success:
+ - sh .travis/deploy_dockerhub.sh
+
