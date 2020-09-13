@@ -18,4 +18,5 @@ script:
   - ./PerfTestCombinedFixedSizeMsg
 after_success:
   - cd ..
+    rm -r release/
   - sh .travis/deploy_dockerhub.sh
