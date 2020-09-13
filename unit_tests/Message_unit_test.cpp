@@ -15,7 +15,7 @@ void test()
      
      assert(("Test GetData()",   std::string(non_const_msg->GetData()) == std::string("message test")));
      
-     assert(("Test Length() accessor: ", non_const_msg->Length() == 12));
+     assert(("Test Length() accessor: ", non_const_msg->Length() == 13));
 
      assert(("Test GetType", non_const_msg->GetType() == MessageType::DEFAULT ));
      
