@@ -4,7 +4,6 @@
 // Mike Corley, https://github.com/mwcorley79, 22 Aug 2020  //
 //////////////////////////////////////////////////////////////
 
-// ** email to Doc: write message in one write sys call ***
 /*
    Demo:
    Test message rate and throughput
