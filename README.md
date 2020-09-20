@@ -56,18 +56,18 @@ The current objective is to provide an efficient C++ network communication facil
    </li>
    
    <li> 
-     <b> Building CMake Project Targets </b>
-         <li> 
-           <ul> <li>
-           <b> *** Important notes for Building on Windows only *** </b>
-           <ol>
-              <li>If you have Visual Studio 2019 IDE installed, you may opt to stop at this point and open the MPL.sln solution in the IDE (located in the Debug or Release subfolder corresponding with the chosen build configuration) </li>
-           </ol>
-             </li> </ul>
-          </li>
-          <li> <b> Note: You can append <em> --config Release </em> or  <em> --config Debug </em> to each target build command (below) to ensure the intended build mode </b> </li> 
-         
-          <li>  <b> cmake --build . --config Release </b> <em> <- build all project targets on Linux </em> </li>
+     <b> Building CMake Project Targets </b> 
+           <ul> 
+             <li>
+               <b> *** Important notes for Building on Windows only *** </b>
+                <ol>
+                  <li>If you have Visual Studio 2019 IDE installed, you may opt to stop at this point and open the MPL.sln solution in the IDE (located in the Debug or Release subfolder corresponding with the chosen build configuration) </li>
+                 </ol>
+               </li> 
+            </ul>
+    </li>
+          <li> <b> Note: You can append <em> --config Release </em> or  <em> --config Debug </em> to each target build command (below) to ensure the intended build mode </b>  
+          <li> <b> cmake --build . --config Release </b> <em> <- build all project targets on Linux </em> </li>
           <li> <b> cmake --build . --target MPL </b> <em> <- build the (static) Message Passing Library (MPL) </em> </li>
           <li> <b> cmake --build . --target PerfTestCombinedFixedSizeMsg </b> <em> <- builds the fixed size message performance test </em> </li>
           <li> <b> cmake --build . --target PerfTestCombinedVariableSizeMsg </b> <em> <- builds the variable size message performance test </em> </li>    
