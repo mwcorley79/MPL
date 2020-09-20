@@ -65,7 +65,7 @@ The current objective is to provide an efficient C++ network communication facil
            </ol>
              </li> </ul>
           </li>
-          <li> <b> Note: You can append <em> --config Release </em> or  <em> --config Debug </em> to each target build command (below) to ensure the intended build mode </b>  
+          <li> <b> Note: You can append <em> --config Release </em> or  <em> --config Debug </em> to each target build command (below) to ensure the intended build mode </b> </li> 
          
           <li>  <b> cmake --build . --config Release </b> <em> <- build all project targets on Linux </em> </li>
           <li> <b> cmake --build . --target MPL </b> <em> <- build the (static) Message Passing Library (MPL) </em> </li>
