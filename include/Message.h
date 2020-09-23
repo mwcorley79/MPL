@@ -89,6 +89,8 @@ namespace CSE384
     static MessagePtr CreateFixedSizeMessage(size_t msg_size, const char *data, size_t length, int type);
     static MessagePtr CreateFixedSizeMessage(size_t msg_size, const std::string &str, int type);
     static MessagePtr CreateEmptyFixedSizeMessage(size_t msg_size);
+    
+    MessagePtr Clone();
 
     char& operator[](int index);
     const char& operator[](int index) const;
@@ -112,6 +114,12 @@ namespace CSE384
     char *raw_msg_; 
     MSGHEADER shadow_hdr;
   };
+
+
+   inline MessagePtr Message::Clone()
+   {
+      return MessagePtr(new Message(*this));
+   }
 
   inline MessagePtr Message::CreateFixedSizeMessage(size_t msg_size, const char *data, size_t length, int type)
   {

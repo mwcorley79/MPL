@@ -31,6 +31,7 @@ namespace CSE384
     return *this;
   }
 
+
   std::string Message::ToString() const
   {
     return std::string(GetData(), Length());
