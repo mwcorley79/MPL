@@ -70,9 +70,11 @@ namespace CSE384
   class Message
   {
   public:
+    Message();
     Message(const std::string &str, int type);  
     Message(const char *data, size_t length, int type);
     Message(const MSGHEADER &mhdr);
+    Message(size_t fixed_size, const std::string& str, int type);
     Message(size_t fixed_size, const char* data, size_t length, int type);
     Message(size_t fixed_size, size_t length, int type);
     Message &operator=(const Message &msg); 
@@ -104,7 +106,7 @@ namespace CSE384
     int Length() const;
     MessageType GetType() const;
     char *GetData() const;
-    MSGHEADER *GetHeader();
+    MSGHEADER *GetHeader() const;
 
     size_t RawMsgLength() const;
     char* GetRawMsg() const;
@@ -170,6 +172,9 @@ namespace CSE384
     std::memcpy((raw_msg_ + sizeof(MSGHEADER)), data, length);
   }
 
+  inline Message::Message(size_t fixed_size, const std::string& str, int type): Message(fixed_size, str.c_str(), str.length(), type)
+  {}
+ 
   inline Message::Message(const char *data, size_t length, int type) : raw_len_(sizeof(MSGHEADER) + (int) length),
                                                                              raw_msg_(new char[raw_len_])
   {
@@ -180,6 +185,11 @@ namespace CSE384
     // copy the message into the data portion of the raw message
     std::memcpy((raw_msg_ + sizeof(MSGHEADER)), data, length);
   }
+
+  inline Message::Message(): raw_len_(0), 
+                             raw_msg_(nullptr),
+                             shadow_hdr(0,0)
+                             {}
 
   inline Message::Message(const std::string &str, int type) : Message(str.c_str(), str.length(), type)
   {
@@ -216,7 +226,7 @@ namespace CSE384
    // return ((MSGHEADER *)raw_msg_)->len();
   }
 
-  inline MSGHEADER *Message::GetHeader()
+  inline MSGHEADER *Message::GetHeader() const
   {
     // must return the actual message hdr (not shadow hdr) because socket Send/Receive will perform endianess conversions
     return ((MSGHEADER *)raw_msg_);

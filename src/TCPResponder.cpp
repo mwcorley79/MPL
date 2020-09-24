@@ -197,15 +197,14 @@ public:
       // while there are messages in the blocking queue, and you have seen the disconnect
       // message, pull messages out and dispaly them.
 
-      MessagePtr msg;
-
+      Message msg;
       // when UseReceiveQueue == false, then we must ReceiveMessage instead of GetMessage()
-      while ((msg = GetMessage())->GetType() != MessageType::DISCONNECT)
+      while ((msg = GetMessage()).GetType() != MessageType::DISCONNECT)
       //while ((msg = ReceiveMessage())->GetType() != MessageType::DISCONNECT)
       {
-         std::cout << "Got a message:" << *msg << "from:" << RemoteEP() << std::endl;      
+         std::cout << "Got a message:" << msg << "from:" << RemoteEP() << std::endl;      
          //SendMessage(Message::CreateMessage(std::string("Reply from server: ") + GetServiceEndPoint().ToString(), MessageType::DEFAULT));
-         PostMessage(Message::CreateMessage(std::string("Reply from server: ") + GetServiceEndPoint().ToString(), MessageType::DEFAULT));
+         PostMessage(Message(std::string("Reply from server: ") + GetServiceEndPoint().ToString(), MessageType::DEFAULT));
       } 
 
      /* while ((msg = GetMessage())->GetType() != MessageType::DISCONNECT)

@@ -21,9 +21,9 @@ void ReceiverProc(TCPConnector *connector)
 {
    SyncPrint("Begin Receiving messages of size " + std::to_string(MSG_SIZE)); 
    high_resolution_clock::time_point t1 = high_resolution_clock::now();
-   MessagePtr msg;
+   Message msg;
    int count = 0;
-   while ((msg = connector->ReceiveMessage())->GetType() != MessageType::DISCONNECT)
+   while ((msg = connector->ReceiveMessage()).GetType() != MessageType::DISCONNECT)
    //while ((msg = connector->GetMessage())->GetType() != MessageType::DISCONNECT)
    {
      ++count; // std::cout << msg->ToString() << std::endl;
@@ -62,8 +62,8 @@ int main()
       high_resolution_clock::time_point t1 = high_resolution_clock::now();
       // loop to send messages
       for (int j = 0; j < num_messages; j++)
-      {
-         MessagePtr msg = Message::CreateFixedSizeMessage(MSG_SIZE, "[ Message #: " + std::to_string(j + 1) + " ]", MessageType::DEFAULT );
+      {  
+         Message msg(MSG_SIZE, "[ Message #: " + std::to_string(j + 1) + " ]",  MessageType::DEFAULT );
          // std::cout << "Message is: " << *msg << std::endl;
 
          // post message into the send queue

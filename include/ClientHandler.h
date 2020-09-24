@@ -50,10 +50,10 @@ namespace CSE384
          bool IsReceiving() const;
          bool IsSending() const;
          TCPSocket&  GetDataSocket(); 
-         MessagePtr GetMessage();
-         MessagePtr ReceiveMessage();
-         void PostMessage(const MessagePtr& m);
-         void SendMessage(const MessagePtr& m);
+         Message GetMessage();
+         Message ReceiveMessage();
+         void PostMessage(const Message& m);
+         void SendMessage(const Message& m);
 
          EndPoint& GetServiceEndPoint();
 
@@ -79,8 +79,8 @@ namespace CSE384
          // can redefine socket level processing (if you wish)
          virtual void RecvProc();
          virtual void SendProc();  
-         virtual MessagePtr RecvSocketMessage();
-         virtual void SendSocketMessage(const MessagePtr& msg);
+         virtual Message RecvSocketMessage();
+         virtual void SendSocketMessage(const Message& msg);
         
          void IsReceiving(bool receiving);  
          void IsSending(bool issending);
@@ -88,7 +88,6 @@ namespace CSE384
          void ShutdownRecv();
          void ShutdownSend();
         
-       
          void SetServiceEndPoint(const EndPoint& ep);
 
          std::thread recvThread;
@@ -98,8 +97,8 @@ namespace CSE384
          std::atomic<bool> isReceiving_;
          std::atomic<bool> isSending_;
          
-         BlockingQueue<MessagePtr> recv_queue_;
-         BlockingQueue<MessagePtr> send_bq_;
+         BlockingQueue<Message> recv_queue_;
+         BlockingQueue<Message> send_bq_;
          EndPoint ServiceEP;
     };
     
@@ -147,22 +146,22 @@ namespace CSE384
        }
     }
 
-    inline MessagePtr ClientHandler::GetMessage()
+    inline Message ClientHandler::GetMessage()
     {
        return recv_queue_.deQ();
     }
 
-    inline MessagePtr ClientHandler::ReceiveMessage()
+    inline Message ClientHandler::ReceiveMessage()
     {
        return RecvSocketMessage();
     }
 
-    inline void ClientHandler::PostMessage(const MessagePtr& msg)
+    inline void ClientHandler::PostMessage(const Message& msg)
     {
        return send_bq_.enQ(msg);
     }
 
-    inline void ClientHandler::SendMessage(const MessagePtr& msg)
+    inline void ClientHandler::SendMessage(const Message& msg)
     {
        SendSocketMessage(msg);
     }
@@ -204,8 +203,8 @@ namespace CSE384
           int msg_size_;
           // redefine socket level processing for fixed message handling 
           // only one send and recv system call
-          virtual MessagePtr RecvSocketMessage();
-          virtual void SendSocketMessage(const MessagePtr& msg);
+          virtual Message RecvSocketMessage();
+          virtual void SendSocketMessage(const Message& msg);
     };
 
     inline int FixedSizeMsgClientHander::GetMessageSize() const

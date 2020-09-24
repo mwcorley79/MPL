@@ -64,7 +64,7 @@ void client_wait_for_reply(const EndPoint &addr,    // endpoint (address, port)
    // construct message of sz_bytes (pertains to message body, not including header)
    char* body = new char[sz_bytes];
    std::memset(body, '\0', sz_bytes);
-   MessagePtr msg = Message::CreateFixedSizeMessage(sz_bytes, body, sz_bytes, MessageType::DEFAULT);
+   Message msg(sz_bytes, body, sz_bytes, MessageType::DEFAULT);
    delete[] body;
    
    StopWatch tmr;
@@ -108,8 +108,8 @@ void client_no_wait_for_reply(const EndPoint &addr,    // endpoint (address, por
    if (conn.IsConnected())
    {
       std::thread handle = std::thread([&]() {
-         MessagePtr msg;
-         while ((msg = conn.GetMessage())->GetType() != MessageType::DISCONNECT)
+         Message msg;
+         while ((msg = conn.GetMessage()).GetType() != MessageType::DISCONNECT)
          {
             // std::cout << "\n received msg: " << msg->Length();
          }
@@ -118,7 +118,7 @@ void client_no_wait_for_reply(const EndPoint &addr,    // endpoint (address, por
       // construct message of sz_bytes (pertains to message body, not including header)
       char* body = new char[sz_bytes];
       std::memset(body, '0', sz_bytes);
-      MessagePtr msg = Message::CreateFixedSizeMessage(sz_bytes, body, sz_bytes, MessageType::DEFAULT);
+      Message msg(sz_bytes, body, sz_bytes, MessageType::DEFAULT);
       delete [] body;
      
       for (unsigned _i = 0; _i < num_msgs; ++_i)
@@ -194,15 +194,15 @@ public:
       int sz_bytes = GetMessageSize();
       char* body = new char[sz_bytes];
       std::memset(body, '\0', sz_bytes);
-      MessagePtr msgSend = Message::CreateFixedSizeMessage(sz_bytes, body, sz_bytes, MessageType::DEFAULT);
+      Message msgSend(sz_bytes, body, sz_bytes, MessageType::DEFAULT);
       delete [] body;
 
-      MessagePtr msg;
+      Message msg;
       // use of Queue
       // while ((msg = GetMessage())->GetType() != MessageType::DISCONNECT)
       
       //no use of queue
-      while ((msg = ReceiveMessage())->GetType() != MessageType::DISCONNECT)
+      while ((msg = ReceiveMessage()).GetType() != MessageType::DISCONNECT)
       {
          // PostMessage(msg); // post to send queue
          SendMessage(msgSend); //direct send 

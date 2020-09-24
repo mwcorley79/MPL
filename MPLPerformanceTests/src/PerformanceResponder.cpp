@@ -23,7 +23,7 @@ void SendProc(FixedSizeMsgClientHander *handler)
    // loop to send messages
    for (int j = 0; j < num_messages; j++)
    {
-      handler->SendMessage(Message::CreateFixedSizeMessage(MSG_SIZE, "[ Message #: " + std::to_string(j + 1) + " ]", MessageType::DEFAULT));
+      handler->SendMessage(Message(MSG_SIZE, "[ Message #: " + std::to_string(j + 1) + " ]", MessageType::DEFAULT));
    }
    high_resolution_clock::time_point t2 = high_resolution_clock::now();
    duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
@@ -58,14 +58,13 @@ public:
       high_resolution_clock::time_point t1 = high_resolution_clock::now();
 
 
-      MessagePtr msg;
-      while ((msg = ReceiveMessage())->GetType() != MessageType::DISCONNECT)
+      Message msg;
+      while ((msg = ReceiveMessage()).GetType() != MessageType::DISCONNECT)
       //while ((msg = GetMessage())->GetType() != MessageType::DISCONNECT)
       {
          // std::cout << "Got a message:" << *msg << "from: " << RemoteEP() << std::endl;
          ++count;
-         MessagePtr msgPtr = Message::CreateFixedSizeMessage(GetMessageSize(),
-                                                             std::string("Reply from server: ") + GetServiceEndPoint().ToString(), MessageType::DEFAULT);
+         Message msg(GetMessageSize(), std::string("Reply from server: ") + GetServiceEndPoint().ToString(), MessageType::DEFAULT);
 
          // queue reply message
          // PostMessage(msgPtr);

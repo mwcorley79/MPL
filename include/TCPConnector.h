@@ -65,10 +65,10 @@ namespace CSE384
         bool UseSendQueue();
         void UseReceiveQueue(bool use_q);
         bool UseReceiveQueue();
-        void PostMessage(const MessagePtr &m);
-        void SendMessage(const MessagePtr &m);
-        MessagePtr GetMessage();
-        MessagePtr ReceiveMessage();
+        void PostMessage(const Message &m);
+        void SendMessage(const Message &m);
+        Message GetMessage();
+        Message ReceiveMessage();
 
         TCPClientSocket &GetClientSocket();
 
@@ -87,8 +87,8 @@ namespace CSE384
         TCPSocketOptions *sc_;
 
         // can redefine socket level processing (if you wish)
-        virtual void SendSocketMessage(const MessagePtr &msg);
-        virtual MessagePtr RecvSocketMessage();
+        virtual void SendSocketMessage(const Message &msg);
+        virtual Message RecvSocketMessage();
 
         virtual void sendProc();
         virtual void RecvProc();
@@ -99,8 +99,8 @@ namespace CSE384
         std::atomic<bool> useSendQueue_;
         std::atomic<bool> useRecvQueue_;
 
-        BlockingQueue<MessagePtr> recv_queue_;
-        BlockingQueue<MessagePtr> send_bq_;
+        BlockingQueue<Message> recv_queue_;
+        BlockingQueue<Message> send_bq_;
         std::thread send_thread_;
         std::thread recvThread;
 
@@ -120,12 +120,12 @@ namespace CSE384
         #endif
     };
 
-    inline void TCPConnector::PostMessage(const MessagePtr &m)
+    inline void TCPConnector::PostMessage(const Message &m)
     {
         send_bq_.enQ(m);
     }
 
-    inline void TCPConnector::SendMessage(const MessagePtr &m)
+    inline void TCPConnector::SendMessage(const Message &m)
     {
         SendSocketMessage(m);
     }
@@ -135,12 +135,12 @@ namespace CSE384
         isSending_.store(issending);
     }
 
-    inline MessagePtr TCPConnector::GetMessage()
+    inline Message TCPConnector::GetMessage()
     {
         return recv_queue_.deQ();
     }
 
-    inline MessagePtr TCPConnector::ReceiveMessage()
+    inline Message TCPConnector::ReceiveMessage()
     {
         return RecvSocketMessage();
     }
@@ -207,8 +207,8 @@ namespace CSE384
     private:
         // redefine socket level processing for fixed message handling 
         // only one send and recv system call
-        virtual void SendSocketMessage(const MessagePtr &msg);
-        virtual MessagePtr RecvSocketMessage();
+        virtual void SendSocketMessage(const Message &msg);
+        virtual Message RecvSocketMessage();
         int msg_size_;
     };
 
