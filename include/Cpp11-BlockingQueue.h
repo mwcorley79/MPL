@@ -2,7 +2,7 @@
 #define CPP11_BLOCKINGQUEUE_H
 ///////////////////////////////////////////////////////////////
 // Cpp11-BlockingQueue.h - Thread-safe Blocking Queue        //
-// ver 1.3                                                   //
+// ver 1.4 - 23 Sep 2020                                     //
 // Jim Fawcett, CSE687 - Object Oriented Design, Spring 2015 //
 ///////////////////////////////////////////////////////////////
 /*
@@ -13,26 +13,31 @@
  * It is implemented using C++11 threading constructs including 
  * std::condition_variable and std::mutex.  The underlying storage
  * is provided by the non-thread-safe std::queue<T>.
+ * 
+ * Note: 
+ * The enQ(T t) accepts its argument by value.  If you pass
+ * a reference a second enQ could change the contents of the
+ * enqueued first message.  Whether that happens is time
+ * dependent, e.g., a data race.  So we avoid that at the
+ * expense of a message copy.
+ * 
+ * It is desireable to provide move semantics for the type
+ * stored in this queue.  That avoids multiple copies.
+ * A single enQ and deQ results in one copy and three moves.
  *
+ * You can see where those occur by looking at the enQ and
+ * deQ implementations, below.
+ * 
  * Required Files:
  * ---------------
  * Cpp11-BlockingQueue.h
  *
- * 
  * Build Process:
  * --------------
- * Windows (Visual Studio): devenv Cpp11-BlockingQueue.sln /rebuild debug
- * Linux (gnu C++): g++ -o BlockingQueueTest -DTEST_BLOCKING_QUEUE Cpp11-BlockingQueue.cpp -lpthread
- *
- * Run Command:
- * -----------
- * Linux ./BlockingQueueTest
- *  
+ * devenv Cpp11-BlockingQueue.sln /rebuild debug
  *
  * Maintenance History:
  * --------------------
- * ver 1.4:  04 Jul 2020
- * - removed unnecessary includes and tested on Linux (Mike C.)
  * ver 1.3 : 04 Mar 2016
  * - changed behavior of front() to throw exception
  *   on empty queue.
@@ -50,19 +55,22 @@
 
 #include <condition_variable>
 #include <mutex>
+#include <thread>
 #include <queue>
-#include <exception>
+#include <string>
+#include <iostream>
+#include <sstream>
 
 template <typename T>
 class BlockingQueue {
 public:
   BlockingQueue() {}
-  BlockingQueue(BlockingQueue<T>&& bq);
-  BlockingQueue<T>& operator=(BlockingQueue<T>&& bq);
+  BlockingQueue(BlockingQueue<T>&& bq) noexcept;
+  BlockingQueue<T>& operator=(BlockingQueue<T>&& bq) noexcept;
   BlockingQueue(const BlockingQueue<T>&) = delete;
   BlockingQueue<T>& operator=(const BlockingQueue<T>&) = delete;
   T deQ();
-  void enQ(const T& t);
+  void enQ(T t);
   T& front();
   void clear();
   size_t size();
@@ -74,7 +82,8 @@ private:
 //----< move constructor >---------------------------------------------
 
 template<typename T>
-BlockingQueue<T>::BlockingQueue(BlockingQueue<T>&& bq) // need to lock so can't initialize
+BlockingQueue<T>::BlockingQueue(BlockingQueue<T>&& bq) noexcept
+// need to lock so can't initialize
 {
   std::lock_guard<std::mutex> l(mtx_);
   q_ = bq.q_;
@@ -85,7 +94,7 @@ BlockingQueue<T>::BlockingQueue(BlockingQueue<T>&& bq) // need to lock so can't 
 //----< move assignment >----------------------------------------------
 
 template<typename T>
-BlockingQueue<T>& BlockingQueue<T>::operator=(BlockingQueue<T>&& bq)
+BlockingQueue<T>& BlockingQueue<T>::operator=(BlockingQueue<T>&& bq) noexcept
 {
   if (this == &bq) return *this;
   std::lock_guard<std::mutex> l(mtx_);
@@ -113,15 +122,14 @@ T BlockingQueue<T>::deQ()
    */
   if(q_.size() > 0)
   {
-    T temp = q_.front();
+    T temp = std::move(q_.front());  // move avoids copy into temp
     q_.pop();
     return temp;
   }
-  
   // may have spurious returns so loop on !condition
+
   while (q_.size() == 0)
     cv_.wait(l, [this] () { return q_.size() > 0; });
-  
   T temp = q_.front();
   q_.pop();
   return temp;
@@ -129,11 +137,11 @@ T BlockingQueue<T>::deQ()
 //----< push element onto back of queue >------------------------------
 
 template<typename T>
-void BlockingQueue<T>::enQ(const T& t)
+void BlockingQueue<T>::enQ(T t)
 {
   {
     std::unique_lock<std::mutex> l(mtx_);
-    q_.push(t);
+    q_.push(std::move(t));  // moves copy made on entry
   }
   cv_.notify_one();
 }
@@ -145,7 +153,7 @@ T& BlockingQueue<T>::front()
   std::lock_guard<std::mutex> l(mtx_);
   if(q_.size() > 0)
     return q_.front();
-  throw std::exception();
+  throw std::exception(); // "attempt to deQue empty queue");
 }
 //----< remove all elements from queue >-------------------------------
 

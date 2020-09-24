@@ -1,7 +1,8 @@
-#include "Cpp11-BlockingQueue.h"
-
-
-#ifdef TEST_BLOCKING_QUEUE
+///////////////////////////////////////////////////////////////
+// Cpp11-BlockingQueue.cpp - Thread-safe Blocking Queue      //
+// ver 1.4                                                   //
+// Jim Fawcett, CSE687 - Object Oriented Design, Spring 2013 //
+///////////////////////////////////////////////////////////////
 
 #include <condition_variable>
 #include <mutex>
@@ -10,7 +11,9 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include "Cpp11-BlockingQueue.h"
 
+#ifdef TEST_BLOCKING_QUEUE
 
 std::mutex ioLock;
 
@@ -28,11 +31,37 @@ void test(BlockingQueue<std::string>* pQ)
   } while(msg != "quit");
 }
 
+class Msg {
+public:
+  Msg(const std::string& cnts = "") : contents(cnts) {
+
+  }
+  Msg(const Msg& msg) : contents(msg.contents) {
+    std::cout << "\n  copied Msg";
+  }
+  Msg(Msg&& msg) : contents(std::move(msg.contents)) {
+    std::cout << "\n  moved Msg";
+  }
+  std::string& msg_contents() { return contents; }
+private:
+  std::string contents;
+};
+
 int main()
 {
   std::cout << "\n  Demonstrating C++11 Blocking Queue";
-  std::cout << "\n ====================================";
+  std::cout << "\n ====================================\n";
 
+  std::cout << "\n  -- test enQ and deQ operations --";
+
+  BlockingQueue<Msg> mQ;
+  Msg tmsg("a message");
+  std::cout << "\n  enqueuing " << "\"" << tmsg.msg_contents() << "\"";
+  mQ.enQ(tmsg);
+  auto dm = mQ.deQ();
+  std::cout << "\n  dequeued " << "\"" << dm.msg_contents() << "\"\n";
+
+  std::cout << "\n  -- test inter-thread messaging --";
   BlockingQueue<std::string> q;
   std::thread t(test, &q);
 
@@ -52,8 +81,8 @@ int main()
   t.join();
 
   std::cout << "\n";
-  std::cout << "\n  Making move copy of BlockingQueue";
-  std::cout << "\n -----------------------------------";
+  std::cout << "\n  Move construction of BlockingQueue";
+  std::cout << "\n ------------------------------------";
 
   std::string msg = "test";
   q.enQ(msg);
