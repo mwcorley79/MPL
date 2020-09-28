@@ -20,6 +20,7 @@ const int PORTABLE_SOCK_ERR_BUF_SIZE = 512;
   #include <features.h>
   #include <strings.h>
   #include <locale.h>
+  #include <endian.h>
 
   // for strerror_s on Linux: source: https://en.cppreference.com/w/c/string/byte/strerror
   // #ifndef __STDC_WANT_LIB_EXT1__
@@ -53,6 +54,17 @@ const int PORTABLE_SOCK_ERR_BUF_SIZE = 512;
 	 return close(s);
   }   
 
+  // helper function for endianness conversions
+  inline uint64_t hton64_portable(uint64_t val)
+  {
+    return htobe64(val);
+  }
+
+  inline uint64_t ntoh64_portable(uint64_t val)
+  {
+    return be64toh(val);
+  }
+  
 #else 
   #ifndef WIN32_LEAN_AND_MEAN  // prevents duplicate includes of core parts of windows.h in winsock2.h 
      #define WIN32_LEAN_AND_MEAN
@@ -65,15 +77,34 @@ const int PORTABLE_SOCK_ERR_BUF_SIZE = 512;
   #include <IPHlpApi.h>     // ip helpers
 
   #include<atomic>
+  #include<intrin.h>
 
   #pragma warning(disable:4522)
   #pragma comment(lib, "Ws2_32.lib")
 
   // helper function to make error handling portable:  on Windows return WSAGetLastError()
   inline int getlasterror_portable() { return  WSAGetLastError(); }
-
+  
   // helper function to get socket errors in a portable way (windows and linux)
   const char* strerror_portable(const char* errbuf, int buflen, int error);
+
+  // helper function for endianness conversions
+  inline uint64_t hton64_portable(uint64_t val)
+  {
+    // https://www.geeksforgeeks.org/little-and-big-endian-mystery/
+    unsigned int i = 1;
+    if (*((char *)&i)) // a quick way to check if architecture is little endian
+      return byteswap_uint64(val);
+    else
+    {
+      return val; // host is a big endian so nothing to do
+    }
+  }
+
+  inline uint64_t ntoh64_portable(uint64_t val)
+  {
+    return hton64_portable(val);
+  }
 
   /////////////////////////////////////////////////////////////////////////////
   // SocketSystem class - manages loading and unloading Winsock library

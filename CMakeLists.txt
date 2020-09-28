@@ -3,8 +3,8 @@ project(MPL)
  
 ####################### Build MPL library targets ################################
 
-# set to c++ 17 (standard) 
-set(CMAKE_CXX_STANDARD 17)
+# set to c++ 20 (standard) 
+set(CMAKE_CXX_STANDARD 20)
 
 # include all the headers from the MPL include folder, and Performance test folder
 include_directories(./include ./MPLPerformanceTests/include)
