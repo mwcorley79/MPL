@@ -5,22 +5,6 @@
 #include <string>
 using namespace CSE384;
 
-void printBytes(const u8 buff[], size_t len)
-{
-   int i;
-    std::cout << "[";
-    if(len > 0)
-    {
-    for(i = 0; i < len-1; ++i)
-       std::cout << (int) buff[i] << ", " << buff[i];
-    std::cout << (int) buff[i] << "]";
-    }
-    else
-    {
-        std::cout << "]";
-    }
-}
-
 int main()
 {
     const usize MESS_SIZE = 32;
@@ -53,19 +37,18 @@ int main()
     msg.init();
     const u8 bytes[] = {1,2,3,4};
     msg.set_content_bytes(bytes, 4);
-    std::cout << "\n  bytes: " << bytes; printBytes(bytes, 4);
+    std::cout << "\n  bytes: " << VecSlice(bytes,4);
     msg.show_message(8);
     sz = msg.get_content_size();
     std::cout << "\n  content size: " << sz;
-    auto [bytes1, len1] = msg.get_content_bytes();
-    std::cout << "\n  bytes: "; printBytes(bytes1, len1); 
+    std::cout << "\n  bytes: " << msg.get_content_bytes();  // returns a stuctured binding and print with <<
     std::cout << std::endl;
 
     std::cout << "\n  -- demo setting MessageType --\n";
     msg.set_type(MessageType::TEXT);
     msg.show_message(8);
     auto mt = msg.get_type();
-    std::cout << "\n  mt: " << mt <<  "MessageType: " << msg.type_display();
+    std::cout << "\n  mt: " << (int) mt << " MessageType: " << msg.type_display();
     std::cout << std::endl; 
 
     std::cout << "\n  -- demo messages fitted to content --\n";
@@ -76,15 +59,13 @@ int main()
 
     msg = Message::create_msg_bytes_fit(bytes, 4);
     msg.show_message(8);
-    auto [cbytes, clen] = msg.get_content_bytes();
-    std::cout << "\n\n  content: "; printBytes(bytes, clen);
+    std::cout << "\n\n  content: " <<  msg.get_content_bytes();
     std::cout << std::endl;
 
     const u8* zerobuffer = nullptr; 
     msg = Message::create_msg_bytes_fit(zerobuffer,0);  // intentionally 0 length
     msg.show_message(8);
-    auto [zbytes, zlen] = msg.get_content_bytes();
-    std::cout << "\n\n  content: "; printBytes(zerobuffer,zlen); 
+    std::cout << "\n\n  content: " << msg.get_content_bytes();
     sz = msg.get_content_size();
     std::cout << "\n\n  msg content size: " << sz;
     std::cout << std::endl;

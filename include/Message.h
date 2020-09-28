@@ -46,27 +46,28 @@ namespace CSE384
   // setup for structured binding to define "slices" of vector in terms
   // of buffer (pointer), and length of the slice to avoid explict copy overhead
   // intent is efficient approximated for Rust's borrowed slices (without using C++ 20 ranges yet)
-  using VecSlice = std::tuple<const u8 * const, size_t>;
+  using VecSlice = std::tuple<const u8 *const, size_t>;
 
-  // Save for ref: *(immutability C++) 
+  // Save for ref: (immutability C++)
   // https://www.modernescpp.com/index.php/c-core-guidelines-rules-for-constants-and-immutability
 
   const int TYPE_SIZE = 1;
   const int CONTENT_SIZE = sizeof(usize);
   const int HEADER_SIZE = TYPE_SIZE + CONTENT_SIZE;
 
-  inline const u8 *to_be_bytes(const usize& sz, usize &result)
+  // help method to approximate Rust's "to_be_bytes" method for usize type
+  inline const u8 *to_be_bytes(const usize &sz, usize &result)
   {
     result = hton64_portable(sz);
     return (const u8 *)&result;
   }
 
+  // help method to approximate Rust's "from_be_bytes" method for usize type
   inline usize from_be_bytes(const u8 bytes[], size_t len)
   {
     return ntoh64_portable(*((usize *)bytes));
   }
 
-  
   class Message
   {
   public:
@@ -167,7 +168,7 @@ namespace CSE384
       auto start_it = br.begin() + HEADER_SIZE;
       auto end_it = start_it + sz;
 
-      // 1. -- reference: C++ / Rust string differences: 
+      // 1. -- reference: C++ / Rust string differences:
       // https://hermanradtke.com/2015/05/03/string-vs-str-in-rust-functions.html
       return std::string(start_it, end_it);
     }
@@ -217,41 +218,41 @@ namespace CSE384
     void show_message(usize fold)
     {
       auto foldpoint = 0;
-      while(true)
+      while (true)
       {
         std::cout << "\n ";
-        for(int i = 0; i < fold; ++i)
+        for (int i = 0; i < fold; ++i)
         {
-           if(i + foldpoint < this->br.size())
-           {
-              std::cout << std::setw(4) << (int) this->br[i + foldpoint];
-           }
-           else
-           {
-              return;
-           }  
+          if (i + foldpoint < this->br.size())
+          {
+            std::cout << std::setw(4) << (int)this->br[i + foldpoint];
+          }
+          else
+          {
+            return;
+          }
         }
         foldpoint += fold;
       }
     }
 
-    std::string type_display() 
+    std::string type_display()
     {
-        std::string rtn = std::string("UNKNOWN");
-        if (br[0] == MessageType::DEFAULT) 
-            rtn = std::string("DEFAULT");
-        else if(br[0] == MessageType::END)
-            rtn = std::string("END");
-        else if(br[0] == MessageType::QUIT)
-            rtn = std::string("QUIT");
-        else if(br[0] == MessageType::REPLY)
-            rtn = std::string("REPLY");
-        else if(br[0] == MessageType::TEXT)
-            rtn = std::string("TEXT");
-        else if(br[0] == MessageType::FLUSH)
-            rtn = std::string("FLUSH");
-        
-        return rtn;
+      std::string rtn = std::string("UNKNOWN");
+      if (br[0] == MessageType::DEFAULT)
+        rtn = std::string("DEFAULT");
+      else if (br[0] == MessageType::END)
+        rtn = std::string("END");
+      else if (br[0] == MessageType::QUIT)
+        rtn = std::string("QUIT");
+      else if (br[0] == MessageType::REPLY)
+        rtn = std::string("REPLY");
+      else if (br[0] == MessageType::TEXT)
+        rtn = std::string("TEXT");
+      else if (br[0] == MessageType::FLUSH)
+        rtn = std::string("FLUSH");
+
+      return rtn;
     }
 
     static Message create_msg_str_fit(const std::string &content)
@@ -304,6 +305,17 @@ namespace CSE384
       return {&br[offset], size};
     }
 
+    void set_str(usize offset, const std::string &s)
+    {
+      auto [buff, len] = str_to_bytes(s);
+      set_field(offset, buff, len);
+    }
+
+    std::string get_str(usize offset, usize size)
+    {
+      return str_from_bytes(&br[offset], size);
+    }
+
     //  use stuctured to produce the desire effect: reference to the buffer
     // pointer and the length as a tuple
     VecSlice str_to_bytes(const std::string &str)
@@ -332,6 +344,26 @@ namespace CSE384
     return (outs << const_cast<Message &>(msg));
   }
 
+  // prints a structured binding:  my approximation of slices
+  inline std::ostream &operator<<(std::ostream &outs, const VecSlice &slice)
+  {
+    auto [buff, len] = slice;
+
+    int i;
+    outs << "[";
+    if (len > 0)
+    {
+      for (i = 0; i < len - 1; ++i)
+        outs << (int)buff[i] << ", " << buff[i];
+      outs << (int)buff[i] << "]";
+    }
+    else
+    {
+      outs << "]";
+    }
+    
+    return outs;
+  }
 
 } // namespace CSE384
 #endif
