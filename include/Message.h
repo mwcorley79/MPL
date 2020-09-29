@@ -217,7 +217,7 @@ namespace CSE384
     */
     void show_message(usize fold)
     {
-      auto foldpoint = 0;
+      usize foldpoint = 0;
       while (true)
       {
         std::cout << "\n ";
@@ -286,8 +286,8 @@ namespace CSE384
 
     void set_field(size_t offset, const u8 buff[], size_t len)
     {
-      int item_index;
-      for (int i = 0; i < len; ++i)
+      size_t item_index;
+      for (size_t i = 0; i < len; ++i)
       {
         if ((item_index = i + offset) < br.size())
           br[item_index] = buff[i];
@@ -302,7 +302,9 @@ namespace CSE384
     // (buffer pointer and len as a tuple)
     VecSlice get_field(size_t offset, size_t size)
     {
-      return {&br[offset], size};
+      if(size)
+        return {&br[offset], size};
+      return {nullptr, 0};
     }
 
     void set_str(usize offset, const std::string &s)
@@ -354,8 +356,8 @@ namespace CSE384
     if (len > 0)
     {
       for (i = 0; i < len - 1; ++i)
-        outs << (int)buff[i] << ", " << buff[i];
-      outs << (int)buff[i] << "]";
+        outs << (unsigned)buff[i] << ", " << buff[i];
+      outs << (unsigned)buff[i] << "]";
     }
     else
     {

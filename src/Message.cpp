@@ -70,7 +70,6 @@ int main()
     std::cout << "\n\n  msg content size: " << sz;
     std::cout << std::endl;
 
-    
     std::cout << "\n  -- demo header only message --\n";
     msg = Message::create_msg_header_only();
     sz = msg.get_content_size();

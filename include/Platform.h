@@ -77,7 +77,7 @@ const int PORTABLE_SOCK_ERR_BUF_SIZE = 512;
   #include <IPHlpApi.h>     // ip helpers
 
   #include<atomic>
-  #include<intrin.h>
+  #include<cstdlib>
 
   #pragma warning(disable:4522)
   #pragma comment(lib, "Ws2_32.lib")
@@ -94,7 +94,8 @@ const int PORTABLE_SOCK_ERR_BUF_SIZE = 512;
     // https://www.geeksforgeeks.org/little-and-big-endian-mystery/
     unsigned int i = 1;
     if (*((char *)&i)) // a quick way to check if architecture is little endian
-      return byteswap_uint64(val);
+      //return _int64 _byteswap_uint64(val);
+      return (uint64_t) _byteswap_uint64(val);
     else
     {
       return val; // host is a big endian so nothing to do
