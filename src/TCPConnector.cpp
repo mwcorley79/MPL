@@ -50,7 +50,7 @@ namespace CSE384
             Message msg = send_bq_.deQ();
             // if this is the stop sending message, signal
             // the send thread to shutdown
-            while (msg.GetType() != STOP_SENDING)
+            while (msg.get_type() != STOP_SENDING)
             {
                 // serialize the message into the socket
                 SendSocketMessage(msg);
@@ -80,19 +80,19 @@ namespace CSE384
         */
 
         // convert the wire protocol (message header) to big endian (network byte order)
-        msg.GetHeader()->ToNetorkByteOrder();  
+        //msg.GetHeader()->ToNetorkByteOrder();  
 
         // send message header
-        if(socket.Send( (const char*) msg.GetHeader(), sizeof(struct MSGHEADER), 0,1) == -1)
+        if(socket.Send( (const char*) msg.get_ref(), msg.len(), 0,1) == -1)
         {
-           msg.GetHeader()->ToHostByteOrder();
+           // msg.GetHeader()->ToHostByteOrder();
            throw SenderTransmitMessageHeaderException(getlasterror_portable());
         }
-        msg.GetHeader()->ToHostByteOrder();
+       // msg.GetHeader()->ToHostByteOrder();
 
         // send message data
-        if(socket.Send(msg.GetData(), msg.Length(),0,1) == -1)
-           throw SenderTransmitMessageDataException(getlasterror_portable());
+       // if(socket.Send(msg.GetData(), msg.Length(),0,1) == -1)
+       //   throw SenderTransmitMessageDataException(getlasterror_portable());
     }
 
 
@@ -113,7 +113,7 @@ namespace CSE384
         try
         {
             IsReceiving(true);
-            Message msg;
+            Message msg();
             do
             {
                 msg = RecvSocketMessage();

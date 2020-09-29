@@ -12,9 +12,11 @@ int main()
    
     std::cout << "\n  -- demo writing directly to msg buffer --\n";
     Message msg(MESS_SIZE);
-    std::cout << "\n msg len: " << msg.get_ref().size(); 
-    for(auto i = TYPE_SIZE + CONTENT_SIZE; i < MESS_SIZE; ++i) {
-       msg.get_mut_ref()[i] = u8 (i);
+    std::cout << "\n msg len: " << msg.len();
+    for(auto i = TYPE_SIZE + CONTENT_SIZE; i < MESS_SIZE; ++i) 
+    {
+       msg[i] = u8 (i);
+       //msg.get_mut_ref()[i] = u8 (i);
     }
     msg.set_content_size(MESS_SIZE);
     msg.show_message(8);
