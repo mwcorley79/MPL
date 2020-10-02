@@ -61,12 +61,9 @@ void client_wait_for_reply(const EndPoint &addr,    // endpoint (address, port)
    FixedSizeMsgConnector conn(sz_bytes);
    conn.Connect(addr);
 
-   // construct message of sz_bytes (pertains to message body, not including header)
-   char* body = new char[sz_bytes];
-   std::memset(body, '\0', sz_bytes);
-   Message msg(sz_bytes, body, sz_bytes, MessageType::DEFAULT);
-   delete[] body;
-   
+   Message msg(sz_bytes);
+   msg.init_content();
+
    StopWatch tmr;
 
    //std::thread handle = std::thread( [&]() {
@@ -100,7 +97,7 @@ void client_no_wait_for_reply(const EndPoint &addr,    // endpoint (address, por
 {
    {
      std::lock_guard<std::mutex> l(ioLock);
-     std::cout <<"\n -- " << name << ": " << num_msgs << " msgs," << sz_bytes + MSGHEADER::SIZE()  << " bytes per msg";
+     std::cout <<"\n -- " << name << ": " << num_msgs << " msgs," << sz_bytes + HEADER_SIZE  << " bytes per msg";
    }
 
    FixedSizeMsgConnector conn(sz_bytes);
@@ -109,28 +106,25 @@ void client_no_wait_for_reply(const EndPoint &addr,    // endpoint (address, por
    {
       std::thread handle = std::thread([&]() {
          Message msg;
-         while ((msg = conn.GetMessage()).GetType() != MessageType::DISCONNECT)
+         while ((msg = conn.GetMessage()).get_type() != MessageType::DISCONNECT)
          {
             // std::cout << "\n received msg: " << msg->Length();
          }
       });
 
-      // construct message of sz_bytes (pertains to message body, not including header)
-      char* body = new char[sz_bytes];
-      std::memset(body, '0', sz_bytes);
-      Message msg(sz_bytes, body, sz_bytes, MessageType::DEFAULT);
-      delete [] body;
-     
-      for (unsigned _i = 0; _i < num_msgs; ++_i)
+      Message msg(sz_bytes);
+      msg.init_content();
+
+      for(unsigned _i = 0; _i < num_msgs; ++_i)
       {
          //std::cout << "\n posting msg " << name << " of size " << sz_bytes;
           conn.PostMessage(msg);
       }
       
-      conn.Close();
+      conn.Close(&handle);
 
-      if(handle.joinable())
-         handle.join();
+      //if(handle.joinable())
+      //   handle.join();
    }
 }
 
@@ -192,17 +186,19 @@ public:
    {
       // construct message of sz_bytes (pertains to message body, not including header)
       int sz_bytes = GetMessageSize();
-      char* body = new char[sz_bytes];
-      std::memset(body, '\0', sz_bytes);
-      Message msgSend(sz_bytes, body, sz_bytes, MessageType::DEFAULT);
-      delete [] body;
+      //char* body = new char[sz_bytes];
+      //std::memset(body, '\0', sz_bytes);
+      //Message msgSend(sz_bytes, body, sz_bytes, MessageType::DEFAULT);
+      //delete [] body;
+      Message msgSend(sz_bytes);
+      msgSend.init_content();
 
       Message msg;
       // use of Queue
       // while ((msg = GetMessage())->GetType() != MessageType::DISCONNECT)
       
       //no use of queue
-      while ((msg = ReceiveMessage()).GetType() != MessageType::DISCONNECT)
+      while ((msg = ReceiveMessage()).get_type() != MessageType::DISCONNECT)
       {
          // PostMessage(msg); // post to send queue
          SendMessage(msgSend); //direct send 
@@ -236,10 +232,10 @@ int main(int argc, char* argv[])
    // define instance of the TCPResponder (server host)
    TCPResponder responder(addr, &sock_opts);
 
-    // set number of clients for the server process to service before exiting (-1 runs indefinitely)
+   // set number of clients for the server process to service before exiting (-1 runs indefinitely)
    responder.NumClients(NUM_CLIENTS);
 
-   responder.UseClientSendReceiveQueues(false);  // uncomment if you use SendMessage/ReceiveMessage
+   //responder.UseClientSendReceiveQueues(false);  // uncomment if you use SendMessage/ReceiveMessage
 
    // register the custom client handler with TCPResponder instance
    responder.RegisterClientHandler(&ph);

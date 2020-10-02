@@ -67,34 +67,15 @@ namespace CSE384
     // serialize the message header and message and write them into the socket
     void TCPConnector::SendSocketMessage(const Message &msg)
     {
-        // Note: could do the send in one call (same as for the Fixed message), but choosing 
-        // not to here. instead send the fixed size header, followed by the variable length data
-        /* 
-        msgPtr->GetHeader()->ToNetorkByteOrder();
-        if (socket.Send(msgPtr->GetRawMsg(), msgPtr->RawMsgLength(),0,1) == -1)
-        {
-            msgPtr->GetHeader()->ToHostByteOrder();
-            throw SenderTransmitMessageDataException(getlasterror_portable());
-        }
-        msgPtr->GetHeader()->ToHostByteOrder();
-        */
-
-        // convert the wire protocol (message header) to big endian (network byte order)
-        //msg.GetHeader()->ToNetorkByteOrder();  
-
         // send message header
-        if(socket.Send( (const char*) msg.get_ref(), msg.len(), 0,1) == -1)
+        if(socket.Send( (const char*) msg.get_raw_ref(), HEADER_SIZE, 0,1) == -1)
         {
-           // msg.GetHeader()->ToHostByteOrder();
            throw SenderTransmitMessageHeaderException(getlasterror_portable());
         }
-       // msg.GetHeader()->ToHostByteOrder();
-
-        // send message data
-       // if(socket.Send(msg.GetData(), msg.Length(),0,1) == -1)
-       //   throw SenderTransmitMessageDataException(getlasterror_portable());
+    
+        if(socket.Send( (const char*) msg.get_content_bytes(), msg.get_content_len() ,0,1) == -1)
+            throw SenderTransmitMessageDataException(getlasterror_portable());
     }
-
 
     void TCPConnector::StartReceiving()
     {
@@ -112,41 +93,39 @@ namespace CSE384
     {
         try
         {
+            Message msg;
             IsReceiving(true);
-            Message msg();
             do
             {
                 msg = RecvSocketMessage();
                 recv_queue_.enQ(msg);
             } 
-            while (msg.GetType() != MessageType::DISCONNECT);
+            while(msg.get_type() != MessageType::DISCONNECT);
         }
         catch (const std::exception& ex)
         {
             std::cerr << ex.what() << std::endl;
             // IsReceiving(false);
         }
-
     }
+
 
     // serialize the message header and message and write them into the socket
     Message TCPConnector::RecvSocketMessage()
     {
-        struct MSGHEADER mhdr;
         int recv_bytes;
+        //char header_buf[HEADER_SIZE];
+
+        Message msg;
 
         // receive fixed size message header (see wire protocol in Message.h)
-        if ((recv_bytes = socket.Recv((const char *)&mhdr, sizeof(MSGHEADER), MSG_WAITALL, 1)) == sizeof(MSGHEADER))
+        if ((recv_bytes = socket.Recv( (const char*) msg.get_raw_ref(), HEADER_SIZE, MSG_WAITALL, 1)) == HEADER_SIZE)
         {
-            // *** MUST convert message header to host byte order (e.g. Intel CPU == little endian)
-            mhdr.ToHostByteOrder();
-
-            // construct a Message using the Message header read from the socket channel
-            // *** critical that mhdr is host byte order ****
-            Message msg(mhdr);
-
-            // send message data
-            if (socket.Recv(msg.GetData(), msg.Length(), MSG_WAITALL, 1) == -1)
+            // build message directly from the header
+            // Message msg( (u8*) header_buf);
+         
+            // receive the message data
+            if (socket.Recv( (const char *) msg.get_content_bytes(), msg.get_content_len(), MSG_WAITALL, 1) == -1)
                 throw ReceiverReceiveMessageDataException(getlasterror_portable());
 
             return msg;
@@ -155,7 +134,7 @@ namespace CSE384
         // if read zero bytes, then this is the zero length message signaling client shutdown
         if (recv_bytes == 0)
         {
-            return Message(nullptr, 0, DISCONNECT);
+            return Message(DISCONNECT);
         }
         else
         {
@@ -170,8 +149,9 @@ namespace CSE384
             if (IsSending())
             {
                 //note: only gets deposited into queue if IsSending is true
-                Message StopMsgPtr(nullptr, 0, STOP_SENDING);
-                PostMessage(StopMsgPtr);
+                Message StopMsg;
+                StopMsg.set_type(STOP_SENDING);
+                PostMessage(StopMsg);
 
                 if (send_thread_.joinable())
                     send_thread_.join();
@@ -185,7 +165,6 @@ namespace CSE384
         }
     }
 
-    
     void TCPConnector::StopReceiving()
     {
         try
@@ -276,35 +255,28 @@ namespace CSE384
     {
     }
 
-
     void FixedSizeMsgConnector::SendSocketMessage(const Message &msg)
     {   
-        msg.GetHeader()->ToNetorkByteOrder();
-        if (socket.Send(msg.GetRawMsg(), msg.RawMsgLength(),0,1) == -1)
+        if (socket.Send( (const char*) msg.get_raw_ref(), msg_size_ ,0,1) == -1)
         {
-            msg.GetHeader()->ToHostByteOrder();
             throw SenderTransmitMessageDataException(getlasterror_portable());
         }
-        msg.GetHeader()->ToHostByteOrder();
     }
     
-
     Message FixedSizeMsgConnector::RecvSocketMessage()
     {
-        Message msg(msg_size_, msg_size_, MessageType::DEFAULT); 
+        Message msg(msg_size_);
         int recv_bytes;
 
-        if ((recv_bytes = socket.Recv(msg.GetRawMsg(), msg.RawMsgLength(),MSG_WAITALL,1 )) == msg.RawMsgLength())
+        if((recv_bytes = socket.Recv( (const char*) msg.get_raw_ref(), msg_size_, MSG_WAITALL,1 )) == msg_size_)
         {
-            // *** MUST convert message header to host byte order (e.g. Intel CPU == little endian)
-            msg.GetHeader()->ToHostByteOrder();
-            return msg;
+           return msg;
         }
-
+        
         // if read zero bytes, then this is the zero length message signaling client shutdown
         if (recv_bytes == 0)
         {
-            return Message(nullptr, 0, DISCONNECT);
+            return Message(DISCONNECT);
         }
         else
         {
@@ -328,9 +300,9 @@ void ReceiveProc(TCPConnector *connector)
 {
     Message msg;
     //while ((msg = connector->GetMessage())->GetType() != MessageType::DISCONNECT)
-    while ((msg = connector->ReceiveMessage()).GetType() != MessageType::DISCONNECT)
+    while ((msg = connector->ReceiveMessage()).get_type() != MessageType::DISCONNECT)
     {
-        std::cout << msg.ToString() << std::endl;
+       std::cout << msg.get_content_str() << std::endl;
     }
 }
 
@@ -384,11 +356,12 @@ void TestSenderAsync(const std::string &name)
             // build an and print each string message
             std::string strMsg = name + " [ Message #: " + std::to_string(j + 1) + " ]";
             //MessagePtr msg(new Message(strMsg.c_str(), (int)strMsg.length(), MessageType::STRING));
-            Message msg = Message(strMsg, MessageType::DEFAULT);
+            
+            Message msg = Message::create_msg_str_fit(strMsg);
+            //Message msg = Message(strMsg, MessageType::DEFAULT);
 
             connector.SendMessage(msg);
-            //std::cout << "Message is: " << *msg << std::endl;
-
+          
             // post message into the send queue
             //connector.PostMessage(msg);
             //std::cout << sender.GetMessage() << std::endl;
@@ -398,7 +371,6 @@ void TestSenderAsync(const std::string &name)
         }
 
         connector.Close(&receiverProc);
-      
     }
     else
         std::cerr << " failed to connect in " << connect_attempts << " attempts " << std::endl;

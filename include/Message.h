@@ -28,16 +28,16 @@
 namespace CSE384
 {
   using MessageType = enum {
+    DEFAULT = 0,
     TEXT = 1,
     REPLY = 2,
     END = 4,
     QUIT = 8,
+    DISCONNECT = 8,
     FLUSH = 16,
-    DEFAULT = 0,
-    DISCONNECT = -1,
-    STOP_SENDING = -2,
-    STRING = -3,
-    BINARY = -4
+    STOP_SENDING = 32,
+    STRING = 64,
+    BINARY = 128
   };
 
   using usize = uint64_t;
@@ -52,14 +52,37 @@ namespace CSE384
   // https://www.modernescpp.com/index.php/c-core-guidelines-rules-for-constants-and-immutability
 
   const int TYPE_SIZE = 1;
+  const int TYPE_INDEX = 0;
   const int CONTENT_SIZE = sizeof(usize);
+  const int CONTENT_SIZE_INDEX = 1; 
   const int HEADER_SIZE = TYPE_SIZE + CONTENT_SIZE;
+  
+  inline void to_be_bytes(usize &sz, const usize& val)
+  {
+    sz = hton64_portable(val);
+  }
+
+  inline void from_be_bytes(usize &sz, const usize& val)
+  {
+    sz = ntoh64_portable(val);
+  }
 
   // helper method to approximate Rust's "to_be_bytes" method for usize type
-  inline const u8 *to_be_bytes(const usize &sz, usize &result)
+  inline void to_be_bytes(usize &sz)
   {
-    result = hton64_portable(sz);
-    return (const u8 *)&result;
+    sz = hton64_portable(sz);
+  }
+
+  // helper method to approximate Rust's "to_be_bytes" method for usize type
+  inline void from_be_bytes(usize &sz)
+  {
+    sz = ntoh64_portable(sz);
+  }
+  
+  // helper method to approximate Rust's "from_be_bytes" method for usize type
+  inline usize from_be_bytes_copy(const usize& sz)
+  {
+    return ntoh64_portable(sz);
   }
 
   // helper method to approximate Rust's "from_be_bytes" method for usize type
@@ -70,19 +93,62 @@ namespace CSE384
 
   class Message
   {
-  public:
-    Message(size_t sz) : br_len_(sz), br(new u8[br_len_ + 1])
+    public:
+  
+    Message(usize sz, u8 mtype=MessageType::DEFAULT): br_len_(sz), br(new u8[br_len_])
     {
-      if (br_len_ < HEADER_SIZE)
-        throw std::invalid_argument("message size must greater than equal to the header size");
+      if(br_len_ < HEADER_SIZE)
+         throw std::invalid_argument("message size must be greater than equal to the header size");
 
-      // init array to 0
-      std::memset(br, 0, br_len_ + 1);
+      set_type(mtype);
+      set_content_len(0);
+    }
+
+    Message(usize sz, 
+            const u8 content_buf[], 
+            usize content_len,  
+            u8 mtype): br_len_(sz), 
+                       br(new u8[br_len_])
+    {
+      if(br_len_ < HEADER_SIZE)
+         throw std::invalid_argument("message size must be greater than equal to the header size");    
+      set_type(mtype);
+      set_content_bytes(content_buf, content_len);
+    }
+
+    Message(usize sz,
+            const std::string& str,
+            u8 mtype):   Message(sz, (u8*) str.c_str(),  str.length(), mtype)
+    {}
+
+    /* void resize(usize sz)
+    {
+      
+      if(br_len_ < HEADER_SIZE)
+         throw std::invalid_argument("message size must be greater than equal to the header size");
+
+      u8* temp = new u8[sz];
+    }
+    */
+
+    // constructs a default (empty content) message with min HEADER_SIZE
+    Message(MessageType mtype=MessageType::DEFAULT): Message(HEADER_SIZE, mtype) 
+    {
+    }
+
+    Message(u8 header[]) 
+    {
+       // determine the content size
+       br_len_ =  HEADER_SIZE + from_be_bytes_copy(*((usize*) (header + TYPE_SIZE)));
+       br = new u8[br_len_];
+       
+       // copy in the header (as passed in)
+       std::memcpy(br, header, HEADER_SIZE);
+       //std::memset(br + HEADER_SIZE, 0,  max_content_len());
     }
 
     ~Message() { delete[] br; }
 
-    
     // move construction
     Message(Message &&msg)
     {
@@ -94,9 +160,9 @@ namespace CSE384
     }
 
     // copy constructor
-    Message(const Message &msg) : br_len_(msg.br_len_), br(new u8[br_len_ + 1])
+    Message(const Message &msg) : br_len_(msg.br_len_), br(new u8[br_len_])
     {
-      std::memcpy(br, msg.br, br_len_ + 1);
+      std::memcpy(br, msg.br, br_len_);
     }
 
     // move assignment
@@ -104,9 +170,9 @@ namespace CSE384
     {
       if (&msg != this)
       {
+        delete[] br;
         br = msg.br;
         br_len_ = msg.br_len_;
-
         msg.br = nullptr;
         msg.br_len_ = 0;
       }
@@ -114,13 +180,14 @@ namespace CSE384
     }
 
     // copy assignment
-    Message &operator=(Message &msg)
+    Message &operator=(const Message &msg)
     {
       if (&msg != this)
       {
+        delete[] br;
         br_len_ = msg.br_len_;
-        br = new u8[br_len_ + 1];
-        std::memcpy(br, msg.br, br_len_ + 1);
+        br = new u8[br_len_];
+        std::memcpy(br, msg.br, br_len_ );
       }
       return *this;
     }
@@ -136,12 +203,22 @@ namespace CSE384
       return br[index];
     }
 
-    void init()
+    size_t max_content_len() const
     {
-      std::memset(br, 0, br_len_ + 1);
+      return (raw_len() - HEADER_SIZE);
     }
 
-    size_t len() const
+    usize get_content_len() const
+    {
+      return from_be_bytes_copy(*((usize*) (br + TYPE_SIZE)));
+    }
+
+    void set_content_len(const usize &sz)
+    {
+       to_be_bytes(*((usize*) (br + TYPE_SIZE)), sz);
+    }
+
+    size_t raw_len() const
     {
       return br_len_;
     }
@@ -153,12 +230,12 @@ namespace CSE384
 
     void set_type(u8 mt)
     {
-      br[0] = mt;
+      br[TYPE_INDEX] = mt;
     }
 
-    u8 get_type() const
+    unsigned get_type() const
     {
-      return br[0];
+      return br[TYPE_INDEX];
     }
 
     /*-------------------------------------------
@@ -167,73 +244,46 @@ namespace CSE384
     */
     void set_content_bytes(const u8 buff[], size_t len)
     {
-      set_content_size(len);
-      set_field(HEADER_SIZE, buff, len);
+      usize clen = max_content_len();
+      if(len < clen)
+      {
+          std::memcpy(br+HEADER_SIZE, buff, len);
+          set_content_len((usize)len);
+      }
+       else
+       {
+          std::memcpy(br+HEADER_SIZE, buff, clen );
+          set_content_len((usize)clen);
+       }  
     }
 
-    // returns a VecSlice
-    auto get_content_bytes()
+    size_t get_header_len() const
     {
-      return get_field(HEADER_SIZE,
-                       get_content_size());
+        return HEADER_SIZE;
     }
 
-    /*-------------------------------------------
-      Set message content from str and set
-      content size to length of str
-    */
+    u8* get_content_bytes() const
+    {
+      return (br+HEADER_SIZE);
+    }
+
     void set_content_str(const std::string &str)
     {
-      set_content_size(str.length());
-      set_content_bytes((const u8 *)str.c_str(), str.length());
+       set_content_bytes( (u8*) str.c_str(), str.length() );
     }
 
     std::string get_content_str()
     {
-      usize sz = get_content_size();
-      auto start_it = br + HEADER_SIZE;
-      auto end_it = start_it + sz;
-
-      // 1. -- reference: C++ / Rust string differences:
       // https://hermanradtke.com/2015/05/03/string-vs-str-in-rust-functions.html
-      return std::string(start_it, end_it);
+      return std::string(br+HEADER_SIZE, br+HEADER_SIZE+max_content_len());
     }
 
-    /*-- set message content size --*/
-    void set_content_size(usize sz)
+    void init_content(u8 val=0)
     {
-      usize result;
-      set_field(TYPE_SIZE, to_be_bytes(sz, result), CONTENT_SIZE);
+      std::memset(get_content_bytes(), val,  get_content_len());
     }
-
-    usize get_content_size()
-    {
-      // use structured binding to approx. vector "slices" to avoid creating new vecs / arrays
-      auto [bytes, len] = get_field(TYPE_SIZE, CONTENT_SIZE);
-      return from_be_bytes(bytes, len);
-
-      // dst.clone_from_slice(bytes); // array from byte slice
-      // usize::from_be_bytes(dst)    // usize from byte array
-    }
-
-    VecSlice get_bytes()
-    {
-      return {br, br_len_};
-    }
-
-    void set_bytes(VecSlice &slice)
-    {
-      auto [buff, len] = slice;
-      for (int i = 0; i < len; ++i)
-        br[i] = buff[i];
-    }
-
-    u8 * const get_mut_ref()
-    {
-      return br;
-    }
-
-    const u8 * const get_ref() const
+  
+    u8* get_raw_ref() const
     {
       return br;
     }
@@ -249,7 +299,7 @@ namespace CSE384
         std::cout << "\n ";
         for (int i = 0; i < fold; ++i)
         {
-          if (i + foldpoint < br_len_)
+          if (i + foldpoint < raw_len())
           {
             std::cout << std::setw(4) << (int)this->br[i + foldpoint];
           }
@@ -281,90 +331,18 @@ namespace CSE384
       return rtn;
     }
 
-    static Message create_msg_str_fit(const std::string &content)
-    {
-      auto msg_size = content.length() + HEADER_SIZE;
-      Message msg(msg_size);
-      auto cnt_len = content.length();
-      msg.set_content_size(cnt_len);
-      if (cnt_len > 0)
-        msg.set_content_str(content);
-      return msg;
-    }
-
-    static Message create_msg_bytes_fit(const u8 content[], size_t len)
-    {
-      auto msg_size = len + HEADER_SIZE;
-      Message msg(msg_size);
-
-      msg.set_content_size(len);
-      if (len > 0)
-        msg.set_content_bytes(content, len);
-      return msg;
-    }
-
-    static Message create_msg_header_only()
-    {
-      auto msg = Message(HEADER_SIZE);
-      msg.set_content_size(0);
-      return msg;
-    }
-
-    void set_field(size_t offset, const u8 buff[], size_t len)
-    {
-      size_t item_index;
-      for (size_t i = 0; i < len; ++i)
-      {
-        if ((item_index = i + offset) < br_len_)
-          br[item_index] = buff[i];
-        else
-        {
-          return; // if vector would be overrun, just stop the loop and return
-        }
-      }
-    }
-
-    // use structured binding for vector "slices" to avoid creating new vecs / arrays
-    // (buffer pointer and len as a tuple)
-    VecSlice get_field(size_t offset, size_t size)
-    {
-      return {(br+offset), size};
-    }
-
-    void set_str(usize offset, const std::string &s)
-    {
-      auto [buff, len] = str_to_bytes(s);
-      set_field(offset, buff, len);
-    }
-
-    std::string get_str(usize offset, usize size)
-    {
-      return str_from_bytes(&br[offset], size);
-    }
-
-    //  use stuctured to produce the desire effect: reference to the buffer
-    // pointer and the length as a tuple
-    VecSlice str_to_bytes(const std::string &str)
-    {
-      return {(u8 *)str.c_str(), str.length()};
-    }
-
-    std::string str_from_bytes(const u8 buff[], size_t len)
-    {
-      return std::string(buff, (buff + len));
-    }
 
   private:
     size_t br_len_;
     u8 *br;
-
-    //std::vector<u8> br;
   };
 
   inline std::ostream &operator<<(std::ostream &outs, Message &msg)
   {
-    for (int i = 0; i < msg.len(); ++i)
-      outs << (char)msg[i];
+    usize clen = msg.get_content_len();
+    u8* cbytes = msg.get_content_bytes();
+    for (int i = 0; i < clen; ++i)
+      outs << (unsigned) cbytes[i];
     return outs;
   }
 

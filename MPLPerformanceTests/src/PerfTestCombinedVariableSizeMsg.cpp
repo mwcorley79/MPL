@@ -63,10 +63,13 @@ void client_wait_for_reply(const EndPoint &addr,    // endpoint (address, port)
    conn.Connect(addr);
 
    // construct message of sz_bytes (pertains to message body, not including header)
-   char* body = new char[sz_bytes];
-   std::memset(body, '\0', sz_bytes);
-   Message msg(body, sz_bytes, MessageType::DEFAULT);
-   delete[] body;
+   // char* body = new char[sz_bytes];
+   // std::memset(body, '\0', sz_bytes);
+   // Message msg(body, sz_bytes, MessageType::DEFAULT);
+   // delete[] body;
+   
+   Message msg(sz_bytes);
+  //msg.init();
    
    StopWatch tmr;
 
@@ -101,7 +104,7 @@ void client_no_wait_for_reply(const EndPoint &addr,    // endpoint (address, por
 {
    {
      std::lock_guard<std::mutex> l(ioLock);
-     std::cout <<"\n -- " << name << ": " << num_msgs << " msgs," << sz_bytes + MSGHEADER::SIZE()  << " bytes per msg";
+     std::cout <<"\n -- " << name << ": " << num_msgs << " msgs," << sz_bytes + HEADER_SIZE  << " bytes per msg";
    }
 
    TCPConnector conn;
@@ -110,26 +113,29 @@ void client_no_wait_for_reply(const EndPoint &addr,    // endpoint (address, por
    {
       std::thread handle = std::thread([&]() {
          Message msg;
-         while ((msg = conn.GetMessage()).GetType() != MessageType::DISCONNECT)
+         while ((msg = conn.GetMessage()).get_type() != MessageType::DISCONNECT)
          {
-            // std::cout << "\n received msg: " << msg->Length();
+          //  std::cout << "\n received msg: " << msg.len() << " " << (int) msg.get_type() << std::endl;
          }
       });
 
       // construct message of sz_bytes (pertains to message body, not including header)
-      char* body = new char[sz_bytes];
-      std::memset(body, '0', sz_bytes);
-      Message msg(body, sz_bytes, MessageType::DEFAULT);
-      delete [] body;
+      // char* body = new char[sz_bytes];
+      // std::memset(body, '0', sz_bytes);
+      // Message msg(body, sz_bytes, MessageType::DEFAULT);
+      // delete [] body;
+       Message msg(sz_bytes);
+       //msg.init();
      
+    // int count = 0;
       for (unsigned _i = 0; _i < num_msgs; ++_i)
       {
-         //std::cout << "\n posting msg " << name << " of size " << sz_bytes;
+      //   ++count;
+        //  std::cout << "\n posting msg " << name << " of size " << sz_bytes << " " <<count;
           conn.PostMessage(msg);
       }
       
       conn.Close(&handle);
-
    }
 }
 
@@ -191,17 +197,19 @@ public:
    virtual void AppProc()
    {
       // construct message of sz_bytes (pertains to message body, not including header)
-      char* body = new char[sz_bytes_];
-      std::memset(body, '\0', sz_bytes_);
-      Message msgSend(body, sz_bytes_, MessageType::DEFAULT);
-      delete [] body;
+      //char* body = new char[sz_bytes_];
+      //std::memset(body, '\0', sz_bytes_);
+      //Message msgSend(body, sz_bytes_, MessageType::DEFAULT);
+      //delete [] body;
+      Message msgSend(sz_bytes_);
+     // msgSend.init();
 
       Message msg;
       // use of Queue
       // while ((msg = GetMessage())->GetType() != MessageType::DISCONNECT)
       
       //no use of queue
-      while ((msg = ReceiveMessage()).GetType() != MessageType::DISCONNECT)
+      while ((msg = ReceiveMessage()).get_type() != MessageType::DISCONNECT)
       {
          // PostMessage(msg); // post to send queue
          SendMessage(msgSend); //direct send 

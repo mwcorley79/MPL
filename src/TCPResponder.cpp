@@ -199,12 +199,14 @@ public:
 
       Message msg;
       // when UseReceiveQueue == false, then we must ReceiveMessage instead of GetMessage()
-      while ((msg = GetMessage()).GetType() != MessageType::DISCONNECT)
+      while ((msg = GetMessage()).get_type() != MessageType::DISCONNECT)
       //while ((msg = ReceiveMessage())->GetType() != MessageType::DISCONNECT)
       {
          std::cout << "Got a message:" << msg << "from:" << RemoteEP() << std::endl;      
          //SendMessage(Message::CreateMessage(std::string("Reply from server: ") + GetServiceEndPoint().ToString(), MessageType::DEFAULT));
-         PostMessage(Message(std::string("Reply from server: ") + GetServiceEndPoint().ToString(), MessageType::DEFAULT));
+         Message msg = Message::create_msg_str_fit( std::string("Reply from server: ") + GetServiceEndPoint().ToString());
+         //std::cout << msg.get_content_str() << std::endl;
+         PostMessage(msg);
       } 
 
      /* while ((msg = GetMessage())->GetType() != MessageType::DISCONNECT)
