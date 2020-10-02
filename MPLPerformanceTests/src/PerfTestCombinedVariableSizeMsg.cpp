@@ -103,8 +103,8 @@ void client_no_wait_for_reply(const EndPoint &addr,    // endpoint (address, por
 )
 {
    {
-     std::lock_guard<std::mutex> l(ioLock);
-     std::cout <<"\n -- " << name << ": " << num_msgs << " msgs," << sz_bytes + HEADER_SIZE  << " bytes per msg";
+      std::lock_guard<std::mutex> l(ioLock);
+      std::cout << "\n -- " << name << ": " << num_msgs << " msgs," << sz_bytes + HEADER_SIZE << " bytes per msg";
    }
 
    TCPConnector conn;
@@ -115,30 +115,25 @@ void client_no_wait_for_reply(const EndPoint &addr,    // endpoint (address, por
          Message msg;
          while ((msg = conn.GetMessage()).get_type() != MessageType::DISCONNECT)
          {
-          //  std::cout << "\n received msg: " << msg.len() << " " << (int) msg.get_type() << std::endl;
+            //  std::cout << "\n received msg: " << msg.len() << " " << (int) msg.get_type() << std::endl;
          }
       });
 
       // construct message of sz_bytes (pertains to message body, not including header)
-      // char* body = new char[sz_bytes];
-      // std::memset(body, '0', sz_bytes);
-      // Message msg(body, sz_bytes, MessageType::DEFAULT);
-      // delete [] body;
-       Message msg(sz_bytes);
-       //msg.init();
-     
-    // int count = 0;
+      Message msg(sz_bytes);
+      msg.init_content(0);
+
+      // int count = 0;
       for (unsigned _i = 0; _i < num_msgs; ++_i)
       {
-      //   ++count;
-        //  std::cout << "\n posting msg " << name << " of size " << sz_bytes << " " <<count;
-          conn.PostMessage(msg);
+         // ++count;
+         //std::cout << "\n posting msg " << name << " of size " << sz_bytes << " " <<count;
+         conn.PostMessage(msg);
       }
-      
+
       conn.Close(&handle);
    }
 }
-
 
 /*-------------------------------------------------------
    Multiple clients running client_no_wait_for_reply
@@ -196,13 +191,9 @@ public:
    // this is where you define the custom server processing: you must implement it
    virtual void AppProc()
    {
-      // construct message of sz_bytes (pertains to message body, not including header)
-      //char* body = new char[sz_bytes_];
-      //std::memset(body, '\0', sz_bytes_);
-      //Message msgSend(body, sz_bytes_, MessageType::DEFAULT);
-      //delete [] body;
+      
       Message msgSend(sz_bytes_);
-     // msgSend.init();
+      msgSend.init_content(0);
 
       Message msg;
       // use of Queue

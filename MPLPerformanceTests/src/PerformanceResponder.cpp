@@ -59,7 +59,7 @@ public:
 
 
       Message msg;
-      while ((msg = ReceiveMessage()).GetType() != MessageType::DISCONNECT)
+      while ((msg = ReceiveMessage()).get_type() != MessageType::DISCONNECT)
       //while ((msg = GetMessage())->GetType() != MessageType::DISCONNECT)
       {
          // std::cout << "Got a message:" << *msg << "from: " << RemoteEP() << std::endl;

@@ -1,11 +1,9 @@
 #include "ClientHandler.h"
-
 #include "ReceiverExceptions.h"
 #include "SenderExceptions.h"
 
 namespace CSE384
 {
-
     void ClientHandler::StartReceiving()
     {
         if (!IsReceiving())
@@ -53,7 +51,8 @@ namespace CSE384
             {
                 msg = RecvSocketMessage();
                 recv_queue_.enQ(msg);
-            } while (msg.get_type() != MessageType::DISCONNECT);
+            } 
+            while (msg.get_type() != MessageType::DISCONNECT);
         }
         catch (const std::exception &ex)
         {
@@ -67,7 +66,7 @@ namespace CSE384
     {
         int recv_bytes;
         char header_buf[HEADER_SIZE];
-
+      
         // receive fixed size message header (see wire protocol in Message.h)
         if((recv_bytes = data_socket.Recv(header_buf, HEADER_SIZE, MSG_WAITALL, 1)) == HEADER_SIZE)
         {
@@ -84,9 +83,7 @@ namespace CSE384
         // if read zero bytes, then this is the zero length message signaling client shutdown
         if (recv_bytes == 0)
         {
-            Message msg;
-            msg.set_type(DISCONNECT);
-            return msg;
+            return Message(DISCONNECT);
         }
         else
         {

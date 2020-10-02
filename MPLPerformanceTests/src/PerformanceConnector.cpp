@@ -23,7 +23,7 @@ void ReceiverProc(TCPConnector *connector)
    high_resolution_clock::time_point t1 = high_resolution_clock::now();
    Message msg;
    int count = 0;
-   while ((msg = connector->ReceiveMessage()).GetType() != MessageType::DISCONNECT)
+   while ((msg = connector->ReceiveMessage()).get_type() != MessageType::DISCONNECT)
    //while ((msg = connector->GetMessage())->GetType() != MessageType::DISCONNECT)
    {
      ++count; // std::cout << msg->ToString() << std::endl;

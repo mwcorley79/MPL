@@ -204,7 +204,7 @@ public:
       {
          std::cout << "Got a message:" << msg << "from:" << RemoteEP() << std::endl;      
          //SendMessage(Message::CreateMessage(std::string("Reply from server: ") + GetServiceEndPoint().ToString(), MessageType::DEFAULT));
-         Message msg = Message::create_msg_str_fit( std::string("Reply from server: ") + GetServiceEndPoint().ToString());
+         Message msg = Message(150, std::string("Reply from server: ") + GetServiceEndPoint().ToString(), MessageType::DEFAULT);
          //std::cout << msg.get_content_str() << std::endl;
          PostMessage(msg);
       } 

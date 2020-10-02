@@ -114,16 +114,14 @@ namespace CSE384
     Message TCPConnector::RecvSocketMessage()
     {
         int recv_bytes;
-        //char header_buf[HEADER_SIZE];
-
-        Message msg;
-
+        char header_buf[HEADER_SIZE];
+      
         // receive fixed size message header (see wire protocol in Message.h)
-        if ((recv_bytes = socket.Recv( (const char*) msg.get_raw_ref(), HEADER_SIZE, MSG_WAITALL, 1)) == HEADER_SIZE)
+        if((recv_bytes = socket.Recv(header_buf, HEADER_SIZE, MSG_WAITALL, 1)) == HEADER_SIZE)
         {
-            // build message directly from the header
-            // Message msg( (u8*) header_buf);
-         
+            // build message (and space for the message content) directly from the header
+            Message msg((u8*) header_buf);
+
             // receive the message data
             if (socket.Recv( (const char *) msg.get_content_bytes(), msg.get_content_len(), MSG_WAITALL, 1) == -1)
                 throw ReceiverReceiveMessageDataException(getlasterror_portable());
@@ -149,12 +147,10 @@ namespace CSE384
             if (IsSending())
             {
                 //note: only gets deposited into queue if IsSending is true
-                Message StopMsg;
-                StopMsg.set_type(STOP_SENDING);
-                PostMessage(StopMsg);
+                PostMessage(Message(STOP_SENDING));
 
-                if (send_thread_.joinable())
-                    send_thread_.join();
+                if(send_thread_.joinable())
+                   send_thread_.join();
 
                 IsSending(false);
             }
@@ -357,7 +353,7 @@ void TestSenderAsync(const std::string &name)
             std::string strMsg = name + " [ Message #: " + std::to_string(j + 1) + " ]";
             //MessagePtr msg(new Message(strMsg.c_str(), (int)strMsg.length(), MessageType::STRING));
             
-            Message msg = Message::create_msg_str_fit(strMsg);
+            Message msg(100, strMsg, MessageType::DEFAULT);
             //Message msg = Message(strMsg, MessageType::DEFAULT);
 
             connector.SendMessage(msg);
