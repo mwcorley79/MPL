@@ -97,8 +97,8 @@ namespace CSE384
   
     Message(usize sz, u8 mtype=MessageType::DEFAULT): br_len_(sz), br(new u8[br_len_])
     {
-      if(br_len_ < HEADER_SIZE)
-         throw std::invalid_argument("message size must be greater than equal to the header size");
+      //if(br_len_ < HEADER_SIZE)
+      //   throw std::invalid_argument("message size must be greater than equal to the header size");
 
       set_type(mtype);
       set_content_len(0);
@@ -110,8 +110,8 @@ namespace CSE384
             u8 mtype): br_len_(sz), 
                        br(new u8[br_len_])
     {
-      if(br_len_ < HEADER_SIZE)
-         throw std::invalid_argument("message size must be greater than equal to the header size");    
+      //if(br_len_ < HEADER_SIZE)
+      //   throw std::invalid_argument("message size must be greater than equal to the header size");    
       set_type(mtype);
       set_content_bytes(content_buf, content_len);
     }
@@ -279,8 +279,9 @@ namespace CSE384
     }
 
     void init_content(u8 val=0)
-    {
-      std::memset(get_content_bytes(), val,  get_content_len());
+    {  
+      std::memset(get_content_bytes(), val,  max_content_len());
+      set_content_len(max_content_len());
     }
   
     u8* get_raw_ref() const
@@ -330,7 +331,6 @@ namespace CSE384
 
       return rtn;
     }
-
 
   private:
     size_t br_len_;

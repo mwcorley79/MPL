@@ -115,7 +115,7 @@ namespace CSE384
     {
         int recv_bytes;
         char header_buf[HEADER_SIZE];
-      
+
         // receive fixed size message header (see wire protocol in Message.h)
         if((recv_bytes = socket.Recv(header_buf, HEADER_SIZE, MSG_WAITALL, 1)) == HEADER_SIZE)
         {
@@ -253,31 +253,37 @@ namespace CSE384
 
     void FixedSizeMsgConnector::SendSocketMessage(const Message &msg)
     {   
-        if (socket.Send( (const char*) msg.get_raw_ref(), msg_size_ ,0,1) == -1)
-        {
+        // std::cout << "Fixed connector Send msg: " << msg.raw_len() << std::endl;
+        if (socket.Send( (const char*) msg.get_raw_ref(), msg.raw_len() ,0,1) == -1)
+        {      
             throw SenderTransmitMessageDataException(getlasterror_portable());
-        }
+        } 
     }
     
     Message FixedSizeMsgConnector::RecvSocketMessage()
     {
-        Message msg(msg_size_);
+        Message msg(GetMessageSize());
         int recv_bytes;
-
-        if((recv_bytes = socket.Recv( (const char*) msg.get_raw_ref(), msg_size_, MSG_WAITALL,1 )) == msg_size_)
+        
+        // std::cout << "Fixed connector recv msg: " << msg.raw_len() << std::endl;
+        if((recv_bytes = socket.Recv( (const char*) msg.get_raw_ref(), msg.raw_len(), MSG_WAITALL, 1)) == msg.raw_len())
         {
-           return msg;
+           return msg; 
         }
         
         // if read zero bytes, then this is the zero length message signaling client shutdown
         if (recv_bytes == 0)
         {
+            //msg.set_type(DISCONNECT);
+            //return msg;
             return Message(DISCONNECT);
         }
         else
         {
             throw ReceiverReceiveMessageHeaderException(getlasterror_portable());
         }
+
+        //return msg;
     }
 
 }; // namespace CSE384

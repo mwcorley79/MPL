@@ -176,27 +176,33 @@ namespace CSE384
     // serialize the message header and message and write them into the socket
     Message FixedSizeMsgClientHander::RecvSocketMessage()
     {
-        Message msg(msg_size_);
+        Message msg(GetMessageSize());
         int recv_bytes;
+  
+        //std::cout << "recv msg: " << msg.raw_len() << std::endl;
 
-        if((recv_bytes = GetDataSocket().Recv( (const char*) msg.get_raw_ref(), msg_size_, MSG_WAITALL,1 )) == msg_size_)
+        if((recv_bytes = GetDataSocket().Recv( (const char*) msg.get_raw_ref(), msg.raw_len(), MSG_WAITALL,1 )) == msg_size_)
         {
            return msg;
         }
         // if read zero bytes, then this is the zero length message signaling client shutdown
         if (recv_bytes == 0)
         {  
-            return Message(DISCONNECT);
+           //msg.set_type(DISCONNECT);
+           return Message(DISCONNECT);
         }
         else
         {
             throw ReceiverReceiveMessageHeaderException(getlasterror_portable());
         }
+
+        //return msg;
     }
 
     // serialize the message header and message and write them into the socket
     void FixedSizeMsgClientHander::SendSocketMessage(const Message &msg)
     {
+        // std::cout << "Send msg: " << msg.raw_len() << std::endl;
         // create the fixed message recieve that message size from the socket
         if (GetDataSocket().Send( (const char*) msg.get_raw_ref(), msg_size_,0,1) == -1)
         {

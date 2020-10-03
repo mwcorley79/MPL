@@ -28,7 +28,6 @@ using namespace std::chrono;
 
 static std::mutex ioLock;
 
-
 /*---------------------------------------------------------
   Display test data - used for individual tests
 */
@@ -44,7 +43,6 @@ void display_test_data(int64_t et, unsigned num_msgs, unsigned msg_size)
    std::cout << "\n   messages/second  " << msg_rate;
    std::cout << "\n   thruput - MB/s   " << byte_rate_mbpsec;
 }
-
 
 /*---------------------------------------------------------
   Perf test - client waits for reply before posting again
@@ -65,25 +63,19 @@ void client_wait_for_reply(const EndPoint &addr,    // endpoint (address, port)
    msg.init_content();
 
    StopWatch tmr;
-
-   //std::thread handle = std::thread( [&]() {
    tmr.start();
+
    for (unsigned _i = 0; _i < num_msgs; ++_i)
    {
-      // std::cout << "\n posting msg " << name << " of size " << sz_bytes;
       conn.PostMessage(msg);
       msg = conn.GetMessage(); // changing the message, is this what we want?
       // std::cout << "\n received msg: " << msg->GetType();
    }
 
- 
    tmr.stop();
    int64_t et = tmr.elapsed_micros();
    conn.Close(); // shutdown connection (end message etc.)
    display_test_data(et, num_msgs, sz_bytes);
-   //});
-
-   //return handle;
 }
 
 /*---------------------------------------------------------
@@ -96,8 +88,8 @@ void client_no_wait_for_reply(const EndPoint &addr,    // endpoint (address, por
 )
 {
    {
-     std::lock_guard<std::mutex> l(ioLock);
-     std::cout <<"\n -- " << name << ": " << num_msgs << " msgs," << sz_bytes + HEADER_SIZE  << " bytes per msg";
+      std::lock_guard<std::mutex> l(ioLock);
+      std::cout << "\n -- " << name << ": " << num_msgs << " msgs," << sz_bytes << " bytes per msg";
    }
 
    FixedSizeMsgConnector conn(sz_bytes);
@@ -113,30 +105,26 @@ void client_no_wait_for_reply(const EndPoint &addr,    // endpoint (address, por
       });
 
       Message msg(sz_bytes);
-      msg.init_content();
+      msg.init_content(0);
 
-      for(unsigned _i = 0; _i < num_msgs; ++_i)
+      for (unsigned _i = 0; _i < num_msgs; ++_i)
       {
-         //std::cout << "\n posting msg " << name << " of size " << sz_bytes;
-          conn.PostMessage(msg);
+         // std::cout << "\n posting msg " << name << " of size " << sz_bytes;
+         conn.PostMessage(msg);
       }
-      
-      conn.Close(&handle);
 
-      //if(handle.joinable())
-      //   handle.join();
+      conn.Close(&handle);
    }
 }
-
 
 /*-------------------------------------------------------
    Multiple clients running client_no_wait_for_reply
 */
 void multiple_clients(int nc,
-                     const EndPoint &addr,    // endpoint (address, port)
-                     const std::string &name, // test name
-                     unsigned num_msgs,       // number of mesages to send
-                     unsigned sz_bytes        // body size in bytes
+                      const EndPoint &addr,    // endpoint (address, port)
+                      const std::string &name, // test name
+                      unsigned num_msgs,       // number of mesages to send
+                      unsigned sz_bytes        // body size in bytes
 )
 {
    std::cout << "\n  number of clients:  " << nc;
@@ -185,25 +173,22 @@ public:
    virtual void AppProc()
    {
       // construct message of sz_bytes (pertains to message body, not including header)
+
       int sz_bytes = GetMessageSize();
-      //char* body = new char[sz_bytes];
-      //std::memset(body, '\0', sz_bytes);
-      //Message msgSend(sz_bytes, body, sz_bytes, MessageType::DEFAULT);
-      //delete [] body;
       Message msgSend(sz_bytes);
-      msgSend.init_content();
+      msgSend.init_content(0);
 
       Message msg;
       // use of Queue
       // while ((msg = GetMessage())->GetType() != MessageType::DISCONNECT)
-      
+
       //no use of queue
       while ((msg = ReceiveMessage()).get_type() != MessageType::DISCONNECT)
       {
          // PostMessage(msg); // post to send queue
-         SendMessage(msgSend); //direct send 
+         SendMessage(msgSend); //direct send
          // std::cout << "RECEIVED" << std::endl;
-      }   
+      }
    }
 
    ~PerfClientHandler()
@@ -212,16 +197,15 @@ public:
    }
 };
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
    // specify the server Endpoint we wish to connect
-   
    const int MSG_SIZE = 4096;
    const int NUM_CLIENTS = 16;
    const int NUM_MSGS = 1000;
    const int NUM_THREAD_POOL_THREADS = 8;
    const std::string TEST_NAME = "test4";
-   
+
    EndPoint addr("127.0.0.1", 8080);
    PerfClientHandler ph(MSG_SIZE);
 
@@ -235,7 +219,7 @@ int main(int argc, char* argv[])
    // set number of clients for the server process to service before exiting (-1 runs indefinitely)
    responder.NumClients(NUM_CLIENTS);
 
-   //responder.UseClientSendReceiveQueues(false);  // uncomment if you use SendMessage/ReceiveMessage
+   responder.UseClientSendReceiveQueues(false); // uncomment if you use SendMessage/ReceiveMessage
 
    // register the custom client handler with TCPResponder instance
    responder.RegisterClientHandler(&ph);
@@ -243,19 +227,19 @@ int main(int argc, char* argv[])
    // start the server listening thread
    responder.Start();
 
-   // give the server a 
+   // give the server a
    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
    // std::thread test3 = std::thread(client_wait_for_reply, addr, "test3", 1000, 1024);
    // test3.join();
-  
+
    std::cout << "\n  -- test4: (fixed size message) c++_comm --\n";
    int nt = 8;
    std::cout << "\n  num thrdpool thrds: " << nt;
 
    multiple_clients(NUM_CLIENTS, addr, TEST_NAME, NUM_MSGS, MSG_SIZE);
 
-  // std::cin.get();
+   // std::cin.get();
 
    // stop the listener and quit
    responder.Stop();
