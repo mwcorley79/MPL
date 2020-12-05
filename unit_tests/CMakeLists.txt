@@ -4,7 +4,7 @@ project(MPL_unit_tests)
 #######################  Build the unit test targets ################################
 
 # set to c++ 17 (standard) 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 # include all the headers from the MPL include folder, and Performance test folder
 include_directories(../include)
