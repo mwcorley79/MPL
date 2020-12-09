@@ -101,7 +101,7 @@ void client_no_wait_for_reply(const EndPoint &addr,    // endpoint (address, por
 {
    {
       std::lock_guard<std::mutex> l(ioLock);
-      std::cout << "\n -- " << name << ": " << num_msgs << " msgs," << sz_bytes + HEADER_SIZE << " bytes per msg";
+      std::cout << "\n -- " << name << ": " << num_msgs << " msgs," << sz_bytes << " bytes per msg";
    }
 
    TCPConnector conn;
