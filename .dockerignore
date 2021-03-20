@@ -1,0 +1,7 @@
+# ignore these files, and do not include them in the image build context: Mike C.  3/20/212
+.git
+Dockerfile
+.dockerignore
+.travis
+.travis.yml
+.gitignore
