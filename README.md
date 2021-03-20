@@ -87,6 +87,16 @@ The current objective is to provide an efficient C++ network communication facil
  </ol>  
  
  <hr>
+ 
+ <b> Build a Docker MPL comm test image: (assumes Docker is installed on the host: https://docs.docker.com/get-docker/ and existence of a Docker Hub account: https://www.docker.com/products/docker-hub)   </b>
+   <ul>
+          <li> Build local MPL image: "docker build -t mpl:latest ." </li>
+          <li> Run local MPL container:  "docker run -ti mpl"
+          <li> Build MPL image for registry (Docker Hub) repo:  "docker build -t username/mpl:latest ." </li>
+          <li> Log in to registry: "docker login --username=username" </li>
+          <li> Push image to repo: "docker push mcorley/mpl:latest" </li>
+          <li> Now MPL comm test can be distributed/deployed to anywhere/anyone:  "docker run -ti mcorley/mpl:latest" </li>
+    </ul>
 
 <b> Option 2: Building the CMake targets using Visual Studio Code Editor: VScode (these steps apply to both Windows and Linux) </b>
 <ol> 
