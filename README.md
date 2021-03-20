@@ -29,7 +29,7 @@ The current objective is to provide an efficient C++ network communication facil
   <li>Open a windows command prompt (cmd.exe) and type command: <b> git clone https://github.com/mwcorley79/MPL.git </b> </li>
 </ol>
 
-<hr>
+<br>
 
 <b>Option 1: Building the CMake targets from the command line -- Debug and Release Mode  (these steps apply to both Windows and Linux) </b>
 <ol> 
