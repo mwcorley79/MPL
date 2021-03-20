@@ -98,7 +98,7 @@ The current objective is to provide an efficient C++ network communication facil
           <li> Now MPL comm test can be distributed/deployed to anywhere/anyone:  "docker run -ti mcorley/mpl:latest" </li>
     </ul>
     
-    <hr/>
+    
 
 <b> Option 2: Building the CMake targets using Visual Studio Code Editor: VScode (these steps apply to both Windows and Linux) </b>
 <ol> 
