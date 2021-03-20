@@ -94,8 +94,8 @@ The current objective is to provide an efficient C++ network communication facil
            <li> Run local MPL container:  "docker run -ti mpl" </li>
           <li> Build MPL image for registry (Docker Hub) repo:  "docker build -t username/mpl:latest ." </li>
           <li> Log in to registry: "docker login --username=username" </li>
-          <li> Push image to repo: "docker push mcorley/mpl:latest" </li>
-          <li> Now MPL comm test can be distributed/deployed to anywhere/anyone:  "docker run -ti mcorley/mpl:latest" </li>
+          <li> Push image to repo: "docker push username/mpl:latest" </li>
+          <li> Now MPL comm test can be distributed/deployed to anywhere/anyone:  "docker run -ti username/mpl:latest" </li>
     </ul>
     
     
