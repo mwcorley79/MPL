@@ -86,7 +86,7 @@ The current objective is to provide an efficient C++ network communication facil
     </li>
  </ol>  
  
- <hr>
+ <hr/>
  
  <b> Build a Docker MPL comm test image: (assumes Docker is installed on the host: https://docs.docker.com/get-docker/ and existence of a Docker Hub account: https://www.docker.com/products/docker-hub)   </b>
    <ul>
@@ -98,7 +98,7 @@ The current objective is to provide an efficient C++ network communication facil
           <li> Now MPL comm test can be distributed/deployed to anywhere/anyone:  "docker run -ti mcorley/mpl:latest" </li>
     </ul>
     
-    <hr>
+    <hr/>
 
 <b> Option 2: Building the CMake targets using Visual Studio Code Editor: VScode (these steps apply to both Windows and Linux) </b>
 <ol> 
