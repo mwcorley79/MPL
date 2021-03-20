@@ -91,7 +91,7 @@ The current objective is to provide an efficient C++ network communication facil
  <b> Build a Docker MPL comm test image: (assumes Docker is installed on the host: https://docs.docker.com/get-docker/ and existence of a Docker Hub account: https://www.docker.com/products/docker-hub)   </b>
    <ul>
           <li> Build local MPL image: "docker build -t mpl:latest ." </li>
-          <li> Run local MPL container:  "docker run -ti mpl"
+           <li> Run local MPL container:  "docker run -ti mpl" </li>
           <li> Build MPL image for registry (Docker Hub) repo:  "docker build -t username/mpl:latest ." </li>
           <li> Log in to registry: "docker login --username=username" </li>
           <li> Push image to repo: "docker push mcorley/mpl:latest" </li>
